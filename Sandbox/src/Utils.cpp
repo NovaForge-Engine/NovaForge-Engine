@@ -4,8 +4,8 @@
 #include <detex.h>
 #include <stb_image.h>
 #include <cassert>
-#include <ml.h>
 
+#include <glm/vec4.hpp>
 
 
 std::string GetFullPath(const std::string& localPath, DataFolder dataFolder) {
@@ -205,10 +205,21 @@ static void PostProcessTexture(const std::string& name, Texture& texture, bool c
 		}
 
 		// Average color
-		float4 avgColor = float4::Zero();
+		glm::vec4 avgColor(0.0f);
 		const size_t pixelNum = lastMip->width * lastMip->height;
 		for (size_t i = 0; i < pixelNum; i++)
-			avgColor += Packing::unorm_to_float4<8, 8, 8, 8>(*(uint32_t*)(rgba8 + i * 4));
+		{
+			uint32_t color = (*(uint32_t*)(rgba8 + i * 4));
+			glm::vec4 col
+			{
+				color >> 24, 
+				(color >> 16) & 0xFF, 
+				(color >> 8) & 0xFF, 
+				color & 0xFF
+			};
+			avgColor += col;
+		}
+		
 		avgColor /= float(pixelNum);
 
 		if (texture.alphaMode != AlphaMode::PREMULTIPLIED && avgColor.w < 254.0f / 255.0f)

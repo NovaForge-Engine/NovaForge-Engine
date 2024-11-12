@@ -50,8 +50,7 @@ set (SHADERMAKE_GENERAL_ARGS
     --sourceDir "_Data/Shaders"
     -c Shaders.cfg
     -o "${NRIF_SHADERS_PATH}"
-    -I "vendor/NovaForge-Deps/include/NRI/"
-    -I "vendor/NovaForge-Deps/include/MathLib"
+    -I "vendor/NRI/Include"
     --sRegShift 100 --tRegShift 200 --bRegShift 300 --uRegShift 400
 )
 
