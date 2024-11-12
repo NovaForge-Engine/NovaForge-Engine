@@ -1,0 +1,15 @@
+[submodule "vendor/glfw"]
+	path = vendor/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "vendor/NRI"]
+	path = vendor/NRI
+	url = https://github.com/NVIDIAGameWorks/NRI.git
+[submodule "vendor/assimp"]
+	path = vendor/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "vendor/ShaderMake"]
+	path = vendor/ShaderMake
+	url = https://github.com/NVIDIAGameWorks/ShaderMake
+[submodule "vendor/imgui"]
+	path = vendor/imgui
+	url = https://github.com/ocornut/imgui
