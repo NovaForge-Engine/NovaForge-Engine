@@ -2,10 +2,10 @@
 add_subdirectory("NRI")
 
 # vendor/glfw
-option (GLFW_BUILD_EXAMPLES "" OFF)
-option (GLFW_BUILD_TESTS "" OFF)
-option (GLFW_BUILD_DOCS "" OFF)
-option (GLFW_INSTALL "" OFF)
+set (GLFW_BUILD_EXAMPLES OFF CACHE BOOL "")
+set (GLFW_BUILD_TESTS OFF CACHE BOOL "")
+set (GLFW_BUILD_DOCS OFF CACHE BOOL "")
+set (GLFW_INSTALL OFF CACHE BOOL "")
 add_subdirectory ("glfw")
 set_property (TARGET glfw PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET update_mappings PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
@@ -26,6 +26,7 @@ target_compile_definitions (imgui PRIVATE ${COMPILE_DEFINITIONS})
 set_property (TARGET imgui PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
 # vendor/assimp
+set (ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 add_subdirectory("assimp")
 set_property (TARGET assimp PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
