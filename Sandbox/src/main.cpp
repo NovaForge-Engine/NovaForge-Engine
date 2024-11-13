@@ -10,6 +10,7 @@
 #    define GLFW_EXPOSE_NATIVE_WIN32
 #elif defined __linux__
 #    define GLFW_EXPOSE_NATIVE_X11
+	#include <csignal> // For SIGTRAP
 #else
 #    error "Unknown platform"
 #endif
@@ -34,9 +35,9 @@
 
 #include "Utils.hpp"
 
-#include <assimp\Importer.hpp>
-#include <assimp\scene.h>
-#include <assimp\postprocess.h>
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 #include <utility>
 
 Assimp::Importer importer;

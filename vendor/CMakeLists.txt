@@ -30,6 +30,10 @@ set (ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 add_subdirectory("assimp")
 set_property (TARGET assimp PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
+# vendor/spdlog
+add_subdirectory("spdlog")
+set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
+# vendor/glm
 add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
