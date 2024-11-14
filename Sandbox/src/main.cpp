@@ -20,7 +20,6 @@
 
 #include <NRI.h>
 
-
 #include <Extensions/NRIDeviceCreation.h>
 #include <Extensions/NRIHelper.h>
 #include <Extensions/NRILowLatency.h>

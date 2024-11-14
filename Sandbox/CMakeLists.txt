@@ -2,35 +2,22 @@ cmake_minimum_required(VERSION 3.8.2)
 project(NovaSandbox)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-
 STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# elizoorg 25.09.2024
-# TODO: We can setup all project files as glob
-set(HEADER_FILES 
-
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS 
+    src/*.hpp
+    src/*.h
 )
 
-
-
-set(MODULE_FILES
-    src/main.cpp
-    src/Display.cpp
-    src/Display.hpp
-    src/InputDevice.hpp
-    src/InputDevice.cpp
-    src/Utils.hpp
-    src/Utils.cpp
+file(GLOB_RECURSE MODULE_FILES CONFIGURE_DEPENDS 
+    src/*.cpp
 )
-
 
 add_executable(NovaSandbox ${MODULE_FILES} ${HEADER_FILES})
-
-
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -42,14 +29,8 @@ target_link_libraries(
     NRI
     detex
     glfw
+    monosgen
 )
-
-
-
-
-
-
-
 
 if (WIN32)
     add_custom_command(TARGET NovaSandbox POST_BUILD

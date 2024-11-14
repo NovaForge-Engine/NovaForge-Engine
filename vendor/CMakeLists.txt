@@ -45,3 +45,23 @@ set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
+
+
+# vendor/mono
+
+# add libs based on what we have after build
+# it is impied that you built mono in mono/build
+# TODO: change this for the actual folder where mono is built on win32 with a VS solution
+if(CMAKE_HOST_LINUX)
+    add_library(monosgen SHARED IMPORTED GLOBAL)
+    set_target_properties(monosgen PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/vendor/mono/build/lib/libmonosgen-2.0.so.1.0.0"
+    )
+    target_include_directories(monosgen INTERFACE "${CMAKE_SOURCE_DIR}/vendor/mono/build/include/mono-2.0")
+elseif(CMAKE_HOST_WIN32)
+    add_library(monosgen SHARED IMPORTED GLOBAL)
+    set_target_properties(monosgen PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/vendor/mono/build/bin/mono-2.0-sgen.dll"
+    )
+    target_include_directories(monosgen INTERFACE "${CMAKE_SOURCE_DIR}/vendor/mono/build/include/mono-2.0")
+endif()

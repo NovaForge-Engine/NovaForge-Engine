@@ -19,3 +19,6 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "vendor/mono"]
+	path = vendor/mono
+	url = https://gitlab.winehq.org/mono/mono
