@@ -721,7 +721,7 @@ bool Sample::Create(int _argc, char** _argv)
 
 
 int main(int argc, char** argv) {
-	nri::GraphicsAPI api = nri::GraphicsAPI::D3D12;
+	nri::GraphicsAPI api = nri::GraphicsAPI::VK;
 
 	Sample sample;
 
