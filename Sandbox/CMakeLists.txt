@@ -42,6 +42,7 @@ target_link_libraries(
     NRI
     detex
     glfw
+    glm
 )
 
 
