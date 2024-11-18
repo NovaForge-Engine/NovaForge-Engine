@@ -684,12 +684,15 @@ bool Sample::Create(int _argc, char** _argv)
 
 	printf("Creating %swindow (%u, %u)\n", decorated ? "" : "borderless ", m_RenderWindowWidth, m_RenderWindowHeight);
 
+	int32_t x = (screenW - m_RenderWindowWidth) >> 1;
+	int32_t y = (screenH - m_RenderWindowHeight) >> 1;
 
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_VISIBLE, 0);
 	glfwWindowHint(GLFW_DECORATED, decorated ? 1 : 0);
 	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_POSITION_X, x);
+	glfwWindowHint(GLFW_POSITION_Y, y);
 
 	char windowName[256];
 	snprintf(windowName, sizeof(windowName), "%s [%s]", "MyBestRender", "D3D12");
@@ -699,11 +702,6 @@ bool Sample::Create(int _argc, char** _argv)
 		glfwTerminate();
 		return false;
 	}
-
-	int32_t x = (screenW - m_RenderWindowWidth) >> 1;
-	int32_t y = (screenH - m_RenderWindowHeight) >> 1;
-	glfwSetWindowPos(m_Window, x, y);
-
 
 #if _WIN32
 	m_NRIWindow.windows.hwnd = glfwGetWin32Window(m_Window);
@@ -715,8 +713,6 @@ bool Sample::Create(int _argc, char** _argv)
 
 	//elizoorg 01.11.2024
 	//TODO: Add glfw window callbacks
-
-	glfwShowWindow(m_Window);
 	return false;
 }
 
