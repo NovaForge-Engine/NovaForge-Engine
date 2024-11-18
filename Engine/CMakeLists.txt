@@ -35,6 +35,7 @@ target_link_libraries(
 	novaengine 
 	assimp
 	imgui
+	EnTT
 )
 
 

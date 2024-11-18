@@ -41,6 +41,10 @@ target_include_directories(assimp INTERFACE
 add_subdirectory("spdlog")
 set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
+# vendor/entt
+add_subdirectory("entt")
+set_property(TARGET EnTT PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+
 # vendor/glm
 add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
