@@ -34,6 +34,10 @@ set(MODULE_FILES
     src/MainRenderPass.cpp
     src/RenderSystem.h
     src/RenderSystem.cpp
+    src/Window.h
+    src/Window.cpp
+    src/Packing.h
+    src/Packing.cpp
 )
 
 set(INTERFACE_FILES
@@ -75,6 +79,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/de
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/MathLib)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/assimp/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/glm)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/imgui)
 
 target_link_libraries(
     NovaSandbox PUBLIC

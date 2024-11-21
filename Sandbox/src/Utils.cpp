@@ -251,3 +251,22 @@ bool LoadTexture(const std::string& path, Texture& texture, bool computeAvgColor
 
 	return true;
 }
+
+
+
+void LoadTextureFromMemory(nri::Format format, uint32_t width, uint32_t height,
+                           const uint8_t* pixels, Texture& texture)
+{
+	assert(format == nri::Format::R8_UNORM);
+
+	detexTexture** dTexture;
+	detexLoadTextureFromMemory(DETEX_PIXEL_FORMAT_R8, width, height, pixels,
+	                           &dTexture);
+
+	texture.mipNum = 1;
+	texture.layerNum = 1;
+	texture.depth = 1;
+	texture.format = format;
+	texture.alphaMode = AlphaMode::OPAQUE;
+	texture.mips = (Mip*)dTexture;
+}
