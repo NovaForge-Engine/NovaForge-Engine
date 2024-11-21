@@ -19,10 +19,6 @@ set(HEADER_FILES
 
 set(MODULE_FILES
     src/main.cpp
-    src/Display.cpp
-    src/Display.hpp
-    src/InputDevice.hpp
-    src/InputDevice.cpp
     src/Utils.hpp
     src/Utils.cpp
     src/NRIContext.h
