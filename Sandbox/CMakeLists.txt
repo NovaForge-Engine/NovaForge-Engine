@@ -25,7 +25,47 @@ set(MODULE_FILES
     src/InputDevice.cpp
     src/Utils.hpp
     src/Utils.cpp
+    src/NRIContext.h
+    src/IRenderPass.h
+    src/IRenderPass.cpp
+    src/ISystem.h
+    src/ISystem.cpp
+    src/PassCompositor.h
+    src/PassCompositor.cpp
+    src/UIRenderPass.h
+    src/UIRenderPass.cpp
+    src/MainRenderPass.h
+    src/MainRenderPass.cpp
+    src/RenderSystem.h
+    src/RenderSystem.cpp
 )
+
+set(INTERFACE_FILES
+    src/IRenderPass.h
+    src/IRenderPass.cpp
+    src/ISystem.h
+    src/ISystem.cpp
+)
+
+source_group("Interface" FILES ${INTERFACE_FILES})
+
+set(SYSTEM_FILES
+    src/RenderSystem.h
+    src/RenderSystem.cpp
+)
+
+source_group("Systems" FILES ${SYSTEM_FILES})
+
+set(RENDER_FILES
+    src/PassCompositor.h
+    src/PassCompositor.cpp
+    src/UIRenderPass.h
+    src/UIRenderPass.cpp
+    src/MainRenderPass.h
+    src/MainRenderPass.cpp
+)
+
+source_group("Render" FILES ${RENDER_FILES})
 
 
 add_executable(NovaSandbox ${MODULE_FILES} ${HEADER_FILES})
