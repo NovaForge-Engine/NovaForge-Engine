@@ -48,6 +48,22 @@ InputBinding& InputBinding::operator=(const InputBinding& other) {
     return *this;
 };
 
+InputBinding::InputBinding(const InputBinding &&other) noexcept{
+    _axes = other._axes;
+    if (other._conversionFunction) _conversionFunction = other._conversionFunction;
+    _name = other._name;
+    _type = other._type;
+    _subscribers = other._subscribers;
+};
+
+InputBinding::InputBinding(const InputBinding &other) {
+    _axes = other._axes;
+    if (other._conversionFunction) _conversionFunction = other._conversionFunction;
+    _name = other._name;
+    _type = other._type;
+    _subscribers = other._subscribers;
+};
+
 InputBinding::InputBinding(InputBinding &&other) noexcept{
     _axes = other._axes;
     if (other._conversionFunction) _conversionFunction = other._conversionFunction;

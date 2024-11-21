@@ -1,5 +1,4 @@
 
-
 #include <iostream>
 
 
@@ -34,6 +33,9 @@
 #include <array>
 
 #include "Utils.hpp"
+
+#include "include/InputManager.h"
+#include "include/GamepadManager.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
@@ -70,6 +72,10 @@ static void GLFW_ErrorCallback(int32_t error, const char* message) {
 #else
 	raise(SIGTRAP);
 #endif
+}
+
+void helloCallback(NovaEngine::InputEvent event) {
+	printf("Pressed the button!!!\n");
 }
 
 using namespace std;
@@ -646,6 +652,9 @@ bool Sample::Create(int _argc, char** _argv)
 
 	glfwSetErrorCallback(GLFW_ErrorCallback);
 
+#if __linux__
+	glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
 
 	if (!glfwInit()) {
 		return false;
@@ -713,12 +722,22 @@ bool Sample::Create(int _argc, char** _argv)
 
 	//elizoorg 01.11.2024
 	//TODO: Add glfw window callbacks
+	glfwSetKeyCallback(m_Window, &NovaEngine::InputManager::keyboardCallback);
+	glfwSetMouseButtonCallback(m_Window, &NovaEngine::InputManager::mouseButtonCallback);
+	glfwSetScrollCallback(m_Window, &NovaEngine::InputManager::mouseScrollCallback);
+	glfwSetCursorPosCallback(m_Window, &NovaEngine::InputManager::mousePositionCallback);
+
+
+	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON, NovaEngine::EventType::STARTED);
+	bind.addSubscriber(NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(bind, NovaEngine::KeyboardSource::KEY_B);
+
 	return false;
 }
 
 
 int main(int argc, char** argv) {
-	nri::GraphicsAPI api = nri::GraphicsAPI::D3D12;
+	nri::GraphicsAPI api = nri::GraphicsAPI::VK;
 
 	Sample sample;
 
@@ -726,6 +745,8 @@ int main(int argc, char** argv) {
 	bool startup = sample.Initialize(api);
 	while (startup) {
 		sample.RenderFrame();
+		NovaEngine::GamepadManager::instance().pollGamepadEvents();
+		glfwPollEvents();
 	}
 
 

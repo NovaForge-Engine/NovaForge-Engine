@@ -1,4 +1,3 @@
-#include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 
 #include "include/InputManager.h"
@@ -17,11 +16,11 @@ GamepadManager::GamepadManager() {
 void GamepadManager::callbackJoystickConnectionChanged(int jid, int event) {
     if (event == GLFW_CONNECTED) {
         if (glfwJoystickIsGamepad(jid)) {
-            spdlog::debug("Gamepad {} with id {} has been connected", GamepadManager::instance().getGamepadName(jid), jid);
+            //spdlog::debug("Gamepad {} with id {} has been connected", GamepadManager::instance().getGamepadName(jid), jid);
             GamepadManager::instance()._activeGamepads[jid] = GamepadState();
         }
     } else if (event == GLFW_DISCONNECTED) {
-        spdlog::debug("Gamepad with id {} has been disconnected", jid);
+        //spdlog::debug("Gamepad with id {} has been disconnected", jid);
         GamepadManager::instance()._activeGamepads.erase(jid);
     }
 }
@@ -29,7 +28,7 @@ void GamepadManager::callbackJoystickConnectionChanged(int jid, int event) {
 void GamepadManager::searchForActiveGamepads() {
     for (int gid = 0; gid < GLFW_JOYSTICK_LAST; gid++) {
         if (glfwJoystickIsGamepad(gid)) {
-            spdlog::debug("Found connected gamepad {} with id {} to use", getGamepadName(gid), gid);
+            //spdlog::debug("Found connected gamepad {} with id {} to use", getGamepadName(gid), gid);
             _activeGamepads[gid] = GamepadState();
         }
     }
@@ -48,16 +47,16 @@ void GamepadManager::pollGamepadEvents() {
                 if (gamepadState.buttonsHeld.contains(i)) {
                     gamepadState.buttonsHeld.insert(i);
 
-                    InputSource source(std::make_pair(activeState.first, static_cast<GamepadSource>(i)));
-                    InputEvent newEvent(source, true, true);
+                    InputSource source(static_cast<GamepadSource>(i));
+                    InputEvent newEvent(source, true, true, activeState.first);
                     InputManager::instance().addEvent(newEvent);
                 }
             } else if (newState.buttons[i] == GLFW_RELEASE) {
                 if (gamepadState.buttonsHeld.count(i)) {
                     gamepadState.buttonsHeld.erase(i);
 
-                    InputSource source(std::make_pair(activeState.first, static_cast<GamepadSource>(i)));
-                    InputEvent newEvent(source, false, true);
+                    InputSource source(static_cast<GamepadSource>(i));
+                    InputEvent newEvent(source, false, true, activeState.first);
                     InputManager::instance().addEvent(newEvent);
                 }
             }
@@ -70,8 +69,8 @@ void GamepadManager::pollGamepadEvents() {
 
         glm::vec2 delta = axisNew - axisLast;
         if (delta != glm::vec2(0.f)) {
-            InputSource source(std::make_pair(activeState.first, static_cast<GamepadSource>(GamepadSource::STICK_LEFT)));
-            InputEvent newEvent(source, axisNew, delta);
+            InputSource source(static_cast<GamepadSource>(GamepadSource::STICK_LEFT));
+            InputEvent newEvent(source, axisNew, delta, activeState.first);
             InputManager::instance().addEvent(newEvent);
         }
         gamepadState.stickLastValues[GLFW_GAMEPAD_AXIS_LEFT] = axisNew;
@@ -82,8 +81,8 @@ void GamepadManager::pollGamepadEvents() {
         
         delta = axisNew - axisLast;
         if (delta != glm::vec2(0.f)) {
-            InputSource source(std::make_pair(activeState.first, static_cast<GamepadSource>(GamepadSource::STICK_RIGHT)));
-            InputEvent newEvent(source, axisNew, delta);
+            InputSource source(static_cast<GamepadSource>(GamepadSource::STICK_RIGHT));
+            InputEvent newEvent(source, axisNew, delta, activeState.first);
             InputManager::instance().addEvent(newEvent);
         }
         gamepadState.stickLastValues[GLFW_GAMEPAD_AXIS_RIGHT] = axisNew;
@@ -94,8 +93,8 @@ void GamepadManager::pollGamepadEvents() {
 
         double tdelta = triggerNew - triggerLast;
         if (tdelta != 0.f) {
-            InputSource source(std::make_pair(activeState.first, static_cast<GamepadSource>(GamepadSource::AXIS_LEFT_TRIGGER)));
-            InputEvent newEvent(source, triggerNew, tdelta);
+            InputSource source(static_cast<GamepadSource>(GamepadSource::AXIS_LEFT_TRIGGER));
+            InputEvent newEvent(source, triggerNew, tdelta, activeState.first);
             InputManager::instance().addEvent(newEvent);
         }
         gamepadState.triggerLastValues[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] = triggerNew;
@@ -105,8 +104,8 @@ void GamepadManager::pollGamepadEvents() {
 
         tdelta = triggerNew - triggerLast;
         if (tdelta != 0.f) {
-            InputSource source(std::make_pair(activeState.first, static_cast<GamepadSource>(GamepadSource::AXIS_RIGHT_TRIGGER)));
-            InputEvent newEvent(source, triggerNew, tdelta);
+            InputSource source(static_cast<GamepadSource>(GamepadSource::AXIS_RIGHT_TRIGGER));
+            InputEvent newEvent(source, triggerNew, tdelta, activeState.first);
             InputManager::instance().addEvent(newEvent);
         }
         gamepadState.triggerLastValues[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] = triggerNew;

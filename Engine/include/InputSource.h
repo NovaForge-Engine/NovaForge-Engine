@@ -7,12 +7,12 @@
 
 namespace NovaEngine {
 
-using InputSourceVariant = std::variant<std::pair<KeyboardModifiers, KeyboardSource>, std::pair<KeyboardModifiers, MouseSource>, std::pair<uint8_t, GamepadSource>>;
+using InputSourceVariant = std::variant<KeyboardSource, MouseSource, GamepadSource>;
 
 enum class InputDeviceType {
-    KEYBOARD,
-    MOUSE,
-    GAMEPAD
+    KEYBOARD = 0,
+    MOUSE = 1,
+    GAMEPAD = 2
 };
 
 class InputSource {
@@ -24,6 +24,7 @@ class InputSource {
     InputSource(InputSource&& other) noexcept;
     InputSource& operator=(const InputSource& other);
     bool operator==(const InputSource& other) const;
+    bool operator<(const InputSource& other) const;
     [[nodiscard]] EventAxes getType() const { return _type; };
     [[nodiscard]] InputDeviceType getDevice() const { return _device; };
     [[nodiscard]] InputSourceVariant getSource() const { return _source; };

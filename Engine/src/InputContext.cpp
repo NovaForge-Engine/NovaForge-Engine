@@ -50,8 +50,9 @@ ContainerQueryResult InputContext::removeBinding(const std::string &actionName) 
 
 ContainerQueryResult InputContext::processEvent(InputEvent event) {
     const InputSource source = event.getSource();
+    auto ptr = _bindings.begin();
     while (true) {
-        auto searchResult = std::find_if(_bindings.begin(), _bindings.end(),
+        auto searchResult = std::find_if(ptr, _bindings.end(),
             [source] (const std::pair<InputBinding, InputSource> &item) {
                 return source == item.second;
             });
@@ -62,7 +63,10 @@ ContainerQueryResult InputContext::processEvent(InputEvent event) {
         bool inform = (type == EventType::STARTED && isStartEvent(event)) ||
          (type == EventType::ENDED && isEndEvent(event)) ||
          (type == EventType::CHANGED && !isEndEvent(event) && !isStartEvent(event));
-        if (inform) searchResult->first.informSubscribers(event);
+        if (inform) {
+            searchResult->first.informSubscribers(event);
+        }
+        ptr = ++searchResult;
     }
     return ContainerQueryResult::SUCCESS;
 }

@@ -24,6 +24,8 @@ class InputBinding {
     public:
     InputBinding(std::string name, EventAxes axes, EventType type):
         _name(std::move(name)), _axes(axes), _type(type) {};
+    InputBinding(const InputBinding &other);
+    InputBinding(const InputBinding &&other) noexcept;
     InputBinding(InputBinding &other);
     InputBinding(InputBinding &&other) noexcept;
     InputBinding& operator=(const InputBinding& other);
