@@ -26,7 +26,10 @@ public:
 	          const nri::HelperInterface& helperInterface, nri::Device& device,
 	          nri::Format renderTargetFormat);
 
-	void Draw(const nri::CoreInterface& NRI, const nri::StreamerInterface &streamerInterface, nri::Streamer &streamer,nri::CommandBuffer& buffer, float sdrScale, bool isSrgb);
+	void Draw(const nri::CoreInterface& NRI,
+	          const nri::StreamerInterface& streamerInterface,
+	          nri::Streamer& streamer, nri::CommandBuffer& commandBuffer,
+	          float sdrScale, bool isSrgb);
 
 	void BeginUI();
 	void EndUI(const nri::StreamerInterface& streamerInterface,
