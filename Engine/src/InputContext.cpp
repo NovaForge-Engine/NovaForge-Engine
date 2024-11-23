@@ -77,6 +77,14 @@ bool InputContext::isStartEvent(const InputEvent &event) {
     return absValue == relValue;
 }
 
+std::map<InputBinding, InputSource> InputContext::getBindings() const {
+    std::map<InputBinding, InputSource> result;
+    for (auto &item: _bindings) {
+        result.emplace(item.first, item.second);
+    }
+    return result;
+}
+
 bool InputContext::isEndEvent(const InputEvent &event) {
     InputValueVariant absValue = event.getAbsolute();
     if (absValue.index() == InputValueVariant(false).index()) return std::get<bool>(absValue) == false;
