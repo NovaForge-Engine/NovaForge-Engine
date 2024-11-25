@@ -37,6 +37,8 @@ class InputBinding {
     [[nodiscard]] std::string getName() const { return _name; };
     [[nodiscard]] EventType getType() const { return _type; };
 
+    bool operator < (const InputBinding &other) const { return _name < other._name; };
+
     private:
     EventAxes _axes;
     EventType _type;

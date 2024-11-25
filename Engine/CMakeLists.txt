@@ -34,6 +34,7 @@ target_link_libraries(
 	imgui
 	glfw
 	EnTT
+	glm
 )
 
 
