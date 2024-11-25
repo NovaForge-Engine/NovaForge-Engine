@@ -13,17 +13,14 @@ include_directories(include)
 
 SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# elizoorg 25.09.2024
-# TODO: We can setup all project files as glob
-set(HEADER_FILES 
-	include/Engine.h
-	include/Export.h
+file(GLOB_RECURSE HEADER_FILES COMPILE_DEPENDS
+	include/*.h include/*.hpp
 )
 
 
 
-set(MODULE_FILES
-	src/Engine.cpp
+file(GLOB MODULE_FILES COMPILE_DEPENDS
+	src/*.cpp
 )
 
 
@@ -35,6 +32,8 @@ target_link_libraries(
 	novaengine 
 	assimp
 	imgui
+	glfw
+	EnTT
 )
 
 

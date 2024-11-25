@@ -1,5 +1,4 @@
 
-
 #include <iostream>
 
 
@@ -10,6 +9,7 @@
 #    define GLFW_EXPOSE_NATIVE_WIN32
 #elif defined __linux__
 #    define GLFW_EXPOSE_NATIVE_X11
+	#include <csignal> // For SIGTRAP
 #else
 #    error "Unknown platform"
 #endif
@@ -34,9 +34,12 @@
 
 #include "Utils.hpp"
 
-#include <assimp\Importer.hpp>
-#include <assimp\scene.h>
-#include <assimp\postprocess.h>
+#include "include/InputManager.h"
+#include "include/GamepadManager.h"
+
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 #include <utility>
 
 Assimp::Importer importer;
@@ -69,6 +72,10 @@ static void GLFW_ErrorCallback(int32_t error, const char* message) {
 #else
 	raise(SIGTRAP);
 #endif
+}
+
+void helloCallback(NovaEngine::InputEvent event) {
+	printf("Pressed the button!!!\n");
 }
 
 using namespace std;
@@ -645,6 +652,9 @@ bool Sample::Create(int _argc, char** _argv)
 
 	glfwSetErrorCallback(GLFW_ErrorCallback);
 
+#if __linux__
+	glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
 
 	if (!glfwInit()) {
 		return false;
@@ -683,12 +693,15 @@ bool Sample::Create(int _argc, char** _argv)
 
 	printf("Creating %swindow (%u, %u)\n", decorated ? "" : "borderless ", m_RenderWindowWidth, m_RenderWindowHeight);
 
+	int32_t x = (screenW - m_RenderWindowWidth) >> 1;
+	int32_t y = (screenH - m_RenderWindowHeight) >> 1;
 
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_VISIBLE, 0);
 	glfwWindowHint(GLFW_DECORATED, decorated ? 1 : 0);
 	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_POSITION_X, x);
+	glfwWindowHint(GLFW_POSITION_Y, y);
 
 	char windowName[256];
 	snprintf(windowName, sizeof(windowName), "%s [%s]", "MyBestRender", "D3D12");
@@ -698,11 +711,6 @@ bool Sample::Create(int _argc, char** _argv)
 		glfwTerminate();
 		return false;
 	}
-
-	int32_t x = (screenW - m_RenderWindowWidth) >> 1;
-	int32_t y = (screenH - m_RenderWindowHeight) >> 1;
-	glfwSetWindowPos(m_Window, x, y);
-
 
 #if _WIN32
 	m_NRIWindow.windows.hwnd = glfwGetWin32Window(m_Window);
@@ -714,14 +722,22 @@ bool Sample::Create(int _argc, char** _argv)
 
 	//elizoorg 01.11.2024
 	//TODO: Add glfw window callbacks
+	glfwSetKeyCallback(m_Window, &NovaEngine::InputManager::keyboardCallback);
+	glfwSetMouseButtonCallback(m_Window, &NovaEngine::InputManager::mouseButtonCallback);
+	glfwSetScrollCallback(m_Window, &NovaEngine::InputManager::mouseScrollCallback);
+	glfwSetCursorPosCallback(m_Window, &NovaEngine::InputManager::mousePositionCallback);
 
-	glfwShowWindow(m_Window);
+
+	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON, NovaEngine::EventType::STARTED);
+	bind.addSubscriber(NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(bind, NovaEngine::KeyboardSource::KEY_B);
+
 	return false;
 }
 
 
 int main(int argc, char** argv) {
-	nri::GraphicsAPI api = nri::GraphicsAPI::D3D12;
+	nri::GraphicsAPI api = nri::GraphicsAPI::VK;
 
 	Sample sample;
 
@@ -729,6 +745,8 @@ int main(int argc, char** argv) {
 	bool startup = sample.Initialize(api);
 	while (startup) {
 		sample.RenderFrame();
+		NovaEngine::GamepadManager::instance().pollGamepadEvents();
+		glfwPollEvents();
 	}
 
 
