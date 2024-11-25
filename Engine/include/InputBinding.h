@@ -29,6 +29,7 @@ class InputBinding {
     InputBinding(InputBinding &other);
     InputBinding(InputBinding &&other) noexcept;
     InputBinding& operator=(const InputBinding& other);
+    bool operator<(const InputBinding& other) const { return _name < other._name; };
     
     void informSubscribers(InputEvent event);
     ContainerAdditionResult addSubscriber(InputDelegate newSubscriber);
