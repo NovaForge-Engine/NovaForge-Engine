@@ -3,8 +3,6 @@
 #include <set>
 #include <map>
 #include <string>
-#include <optional>
-#include <functional>
 
 #include <glm/vec2.hpp>
 #include <GLFW/glfw3.h>
@@ -25,7 +23,7 @@ struct GamepadState {
  * This class is a singleton for providing additional callbacks to inputs. It allows to overcome 
  * lack of gamepad input callbacks in GLFW, which is required for easier implementation of in-game controls. 
  */
-class GamepadManager: public Singleton<GamepadManager> {
+class ENGINE_DLL GamepadManager: public Singleton<GamepadManager> {
 public:
 	GamepadManager();
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "include/Export.h"
+
 /*!
  * \brief Util class for making non copyable
  */

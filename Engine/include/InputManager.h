@@ -12,12 +12,14 @@ namespace NovaEngine {
 
 const std::string DEFAULT_CONTEXT_NAME = "Default";
 
-class InputManager: public Singleton<InputManager> {
+class ENGINE_DLL InputManager: public Singleton<InputManager> {
     public:
     InputManager();
     [[nodiscard]] bool hasContext(const std::string &contextName) const { return _contextMaps.contains(contextName); };
+    [[nodiscard]] std::string getActiveContextName() const { return _activeName; };
     ContainerAdditionResult addContext(const std::string &contextName);
     InputContext& getContext(const std::string &contextName);
+    InputContext& getActiveContext() { return _contextMaps.at(_activeName); };
     ContainerQueryResult switchContext(const std::string &contextName);
     ContainerRemovalResult removeContext(const std::string &contextName);
     void addEvent(InputEvent event);

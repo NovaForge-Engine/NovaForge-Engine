@@ -44,7 +44,7 @@ void GamepadManager::pollGamepadEvents() {
         auto gamepadState = activeState.second;
         for (int i = 0; i < GLFW_GAMEPAD_BUTTON_LAST; i++) {
             if (newState.buttons[i] == GLFW_PRESS) {
-                if (gamepadState.buttonsHeld.contains(i)) {
+                if (!gamepadState.buttonsHeld.contains(i)) {
                     gamepadState.buttonsHeld.insert(i);
 
                     InputSource source(static_cast<GamepadSource>(i));
@@ -52,7 +52,7 @@ void GamepadManager::pollGamepadEvents() {
                     InputManager::instance().addEvent(newEvent);
                 }
             } else if (newState.buttons[i] == GLFW_RELEASE) {
-                if (gamepadState.buttonsHeld.count(i)) {
+                if (gamepadState.buttonsHeld.contains(i)) {
                     gamepadState.buttonsHeld.erase(i);
 
                     InputSource source(static_cast<GamepadSource>(i));
@@ -89,7 +89,8 @@ void GamepadManager::pollGamepadEvents() {
 
         // Create and pass trigger events
         double triggerNew = newState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER];
-        double triggerLast = gamepadState.triggerLastValues.find(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER)->second;
+        auto iTriggerLast = gamepadState.triggerLastValues.find(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER);
+        double triggerLast = iTriggerLast != gamepadState.triggerLastValues.end() ? iTriggerLast->second : 0.f;
 
         double tdelta = triggerNew - triggerLast;
         if (tdelta != 0.f) {
@@ -100,7 +101,8 @@ void GamepadManager::pollGamepadEvents() {
         gamepadState.triggerLastValues[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] = triggerNew;
 
         triggerNew = newState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
-        triggerLast = gamepadState.triggerLastValues.find(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)->second;
+        iTriggerLast = gamepadState.triggerLastValues.find(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER);
+        triggerLast = iTriggerLast != gamepadState.triggerLastValues.end() ? iTriggerLast->second : 0.f;
 
         tdelta = triggerNew - triggerLast;
         if (tdelta != 0.f) {

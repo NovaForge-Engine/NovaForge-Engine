@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.2) 
+cmake_minimum_required(VERSION 3.10) 
 project(novaengine)
 
 
@@ -17,16 +17,14 @@ file(GLOB_RECURSE HEADER_FILES COMPILE_DEPENDS
 	include/*.h include/*.hpp
 )
 
-
-
 file(GLOB MODULE_FILES COMPILE_DEPENDS
 	src/*.cpp
 )
 
+set (CMAKE_POSITION_INDEPENDENT_CODE OFF)
+set (CMAKE_POSITION_INDEPENDENT_BINARIES OFF)
 
 add_library(novaengine SHARED ${MODULE_FILES} ${HEADER_FILES})
-
-
 
 target_link_libraries(
 	novaengine 
@@ -37,12 +35,9 @@ target_link_libraries(
 	glm
 )
 
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
 
 add_compile_definitions(FORGE_EXPORT)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_NAME}-bin)
 install(FILES ${HEADER_FILES} DESTINATION ${PROJECT_NAME}-include)
-
