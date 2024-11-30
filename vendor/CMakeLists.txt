@@ -53,11 +53,5 @@ target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
 
 # vendor/JoltPhysics
 add_subdirectory("joltphysics/Build")
-# Tenzy21 30.11.2024
-# TODO: Move generated Jolt project module into libs
-
-#file (GLOB_RECURSE JOLT_SOURCE "joltphysics/*.cpp" "joltphysics/*.h")
-#source_group ("" FILES ${JOLT_SOURCE})
-#add_library (JoltPhysics STATIC ${JOLT_SOURCE})
-#target_include_directories(JoltPhysics INTERFACE ${CMAKE_SOURCE_DIR}/vendor/joltphysics/)
-#set_property (TARGET JoltPhysics PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+target_include_directories(Jolt INTERFACE ${CMAKE_SOURCE_DIR}/vendor/joltphysics)
+set_property (TARGET Jolt PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
