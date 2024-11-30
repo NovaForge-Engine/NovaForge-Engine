@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8.2) 
 project(NovaSandbox)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
+ 
 
 STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -39,14 +39,8 @@ target_link_libraries(
     detex
     glfw
     glm
+	Jolt
 )
-
-
-
-
-
-
-
 
 if (WIN32)
     add_custom_command(TARGET NovaSandbox POST_BUILD

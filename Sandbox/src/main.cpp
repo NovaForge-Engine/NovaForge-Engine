@@ -40,6 +40,8 @@
 #include "assimp/postprocess.h"
 #include <utility>
 
+#include <Jolt/Jolt.h>
+
 Assimp::Importer importer;
 
 

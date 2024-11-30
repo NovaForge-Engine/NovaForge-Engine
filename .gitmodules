@@ -19,3 +19,6 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "vendor/joltphysics"]
+	path = vendor/joltphysics
+	url = https://github.com/jrouwe/JoltPhysics

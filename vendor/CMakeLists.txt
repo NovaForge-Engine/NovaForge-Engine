@@ -12,7 +12,6 @@ set_property (TARGET glfw PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET update_mappings PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(glfw INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glfw/include)
 
-
 # vendor/detex
 file (GLOB DETEX_SOURCE "detex/*.c" "detex/*.h")
 source_group ("" FILES ${DETEX_SOURCE})
@@ -32,7 +31,7 @@ set_property (TARGET imgui PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set (ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 add_subdirectory("assimp")
 set_property (TARGET assimp PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(assimp INTERFACE 
+target_include_directories(assimp INTERFACE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/vendor/assimp/include>
     $<INSTALL_INTERFACE:assimp/include>
 )
@@ -44,9 +43,21 @@ set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 # vendor/glm
 add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-
 set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+if(BUILD_STATIC_LIBS)
+	set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+endif()
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
+
+# vendor/JoltPhysics
+add_subdirectory("joltphysics/Build")
+# Tenzy21 30.11.2024
+# TODO: Move generated Jolt project module into libs
+
+#file (GLOB_RECURSE JOLT_SOURCE "joltphysics/*.cpp" "joltphysics/*.h")
+#source_group ("" FILES ${JOLT_SOURCE})
+#add_library (JoltPhysics STATIC ${JOLT_SOURCE})
+#target_include_directories(JoltPhysics INTERFACE ${CMAKE_SOURCE_DIR}/vendor/joltphysics/)
+#set_property (TARGET JoltPhysics PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
