@@ -2,18 +2,25 @@
 #include <cstddef>
 
 #include "include/InputManager.h"
+#include <iostream>
 
-namespace NovaEngine {
+namespace NovaEngine {;
+
 
 InputManager::InputManager() {
     _contextMaps.insert(std::make_pair(DEFAULT_CONTEXT_NAME, InputContext(DEFAULT_CONTEXT_NAME)));
+
+
 }
+
+
 
 ContainerAdditionResult InputManager::addContext(const std::string &contextName) {
     if (hasContext(contextName)) {
         return ContainerAdditionResult::ALREADY_EXISTS;
     }
-    _contextMaps.insert(std::make_pair(contextName, InputContext(contextName)));
+    std::pair<std::string, InputContext> contextPair(contextName, InputContext(contextName));
+    _contextMaps.insert(std::move(contextPair));
     return ContainerAdditionResult::SUCCESS;
 }
 
@@ -47,7 +54,8 @@ InputContext& InputManager::getContext(const std::string &contextName) {
     if (!_contextMaps.contains(contextName)) {
         throw std::runtime_error("Access to unknown context. You can use hasContext() to check if one exists.");
     } else {
-        return _contextMaps.at(contextName);
+        InputContext& context = _contextMaps.at(contextName);
+		return context;
     }
 };
 

@@ -15,7 +15,8 @@ enum class InputDeviceType {
     GAMEPAD = 2
 };
 
-class InputSource {
+class  InputSource
+{
     public:
     explicit InputSource(InputSourceVariant source);
     InputSource(const InputSource& other);

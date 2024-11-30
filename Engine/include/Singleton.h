@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include "include/Export.h"
 
 /*!
  * \brief Util class for making non copyable
@@ -13,9 +15,11 @@ private:
 	Noncopyable &operator=(const Noncopyable &) = delete;
 };
 
-template<typename T> class Singleton : Noncopyable {
+template<typename T> class Singleton : Noncopyable
+{
 public:
-	static T &instance();
+	static  T& instance();
+
 
 	Singleton() = default;
 	Singleton(const Singleton &s) = delete;
@@ -23,12 +27,14 @@ public:
 
 };
 
-template<typename T> T &Singleton<T>::instance() {
+
+
+template<typename T> T& Singleton<T>::instance()
+{
 	static T t;
 	return t;
 }
 
-template<typename T>
-Singleton<T>::~Singleton() {
-
+template<typename T> Singleton<T>::~Singleton()
+{
 }

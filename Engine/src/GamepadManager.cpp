@@ -3,47 +3,95 @@
 #include "include/InputManager.h"
 
 #include "include/GamepadManager.h"
+#include <iostream>
 
 namespace NovaEngine {
 
 GamepadManager::GamepadManager() {
-    glfwSetJoystickCallback(&GamepadManager::callbackJoystickConnectionChanged);
-
+	glfwInit();
+	std::cout << "GamepadManager::GamepadManager() "
+			  << NovaEngine::GamepadManager::instance <<  std::endl;
+    //glfwSetJoystickCallback(&GamepadManager::callbackJoystickConnectionChanged);
     // see if there are any connected gamepads already
-    searchForActiveGamepads();
+	//GamepadManager::instance().searchForActiveGamepads();
 }
 
 void GamepadManager::callbackJoystickConnectionChanged(int jid, int event) {
+	std::cout << "GamepadManager::callbackJoystickConnectionChanged() "
+			  << NovaEngine::GamepadManager::instance << std::endl;
     if (event == GLFW_CONNECTED) {
         if (glfwJoystickIsGamepad(jid)) {
-            //spdlog::debug("Gamepad {} with id {} has been connected", GamepadManager::instance().getGamepadName(jid), jid);
+            spdlog::debug("Gamepad {} with id {} has been connected", GamepadManager::instance().getGamepadName(jid), jid);
             GamepadManager::instance()._activeGamepads[jid] = GamepadState();
         }
     } else if (event == GLFW_DISCONNECTED) {
-        //spdlog::debug("Gamepad with id {} has been disconnected", jid);
+        spdlog::debug("Gamepad with id {} has been disconnected", jid);
         GamepadManager::instance()._activeGamepads.erase(jid);
     }
 }
 
 void GamepadManager::searchForActiveGamepads() {
+	std::cout << "GamepadManager::searchForActiveGamepads() "
+			  << NovaEngine::GamepadManager::instance << std::endl;
+
     for (int gid = 0; gid < GLFW_JOYSTICK_LAST; gid++) {
-        if (glfwJoystickIsGamepad(gid)) {
-            //spdlog::debug("Found connected gamepad {} with id {} to use", getGamepadName(gid), gid);
-            _activeGamepads[gid] = GamepadState();
+        if (glfwJoystickPresent(gid)) {
+			std::cout << "Found connected gamepad to use" << getGamepadName(gid) << "  " << gid << std::endl;
+			GamepadState state = GamepadState();
+			state.triggerLastValues.insert(
+				std::make_pair(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, -1.0f));
+			state.triggerLastValues.insert(
+				std::make_pair(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, -1.0f));
+
+            _activeGamepads[gid] = state;
         }
     }
+}
+
+void GamepadManager::JoystickConnectionCallback(int jid, int event)
+{
+	std::cout << &NovaEngine::GamepadManager::instance << std::endl;
+	if (event == GLFW_CONNECTED)
+	{
+		GamepadState state = GamepadState();
+		state.triggerLastValues.insert(std::make_pair(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,0.0f ));
+		state.triggerLastValues.insert(std::make_pair(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, 0.0f));
+
+
+		_activeGamepads[jid] = state;
+    }
+	else
+	{
+		_activeGamepads.erase(jid);
+	}
+}
+
+void GamepadManager::ConnectJoystick(int id)
+{
+	GamepadState state = GamepadState();
+	state.triggerLastValues.insert(
+		std::make_pair(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, 0.0f));
+	state.triggerLastValues.insert(
+		std::make_pair(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, 0.0f));
+	_activeGamepads[id] = state;
+}
+
+void GamepadManager::DisconnectJoystick(int id)
+{
+	_activeGamepads.erase(id);
+
 }
 
 void GamepadManager::pollGamepadEvents() {
     if (!hasActiveGamepads())
         return;
-    
     GLFWgamepadstate newState;
     for (auto &activeState: _activeGamepads) {
         glfwGetGamepadState(activeState.first, &newState);
         auto gamepadState = activeState.second;
         for (int i = 0; i < GLFW_GAMEPAD_BUTTON_LAST; i++) {
             if (newState.buttons[i] == GLFW_PRESS) {
+				spdlog::info("key is pressed {}", i);
                 if (gamepadState.buttonsHeld.contains(i)) {
                     gamepadState.buttonsHeld.insert(i);
 
@@ -127,4 +175,19 @@ std::string GamepadManager::getGamepadName(int id) {
         return {};
 }
 
-} // End of namespace Platform
+void ENGINE_DLL GLFWJoystickConnectionCallback(int jid, int event)
+{
+	std::cout << "GamepadManager::glfwJoystick() "
+			  << NovaEngine::GamepadManager::instance << std::endl;
+	spdlog::info("Joystick {} has been {}", jid, event == GLFW_CONNECTED ? "connected" : "disconnected");
+	if (event == GLFW_CONNECTED)
+	{
+		GamepadManager::instance().ConnectJoystick(jid);
+	}
+	else
+	{
+		GamepadManager::instance().DisconnectJoystick(jid);
+	}
+}
+
+} // namespace NovaEngine

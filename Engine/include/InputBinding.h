@@ -20,7 +20,7 @@ enum class EventType {
 using InputDelegate = entt::delegate<void (InputEvent)>;
 using InputValueConversionDelegate = entt::delegate<InputValueVariant (InputValueVariant, EventAxes)>;
 
-class InputBinding {
+class  InputBinding {
     public:
     InputBinding(std::string name, EventAxes axes, EventType type):
         _name(std::move(name)), _axes(axes), _type(type) {};
@@ -37,7 +37,7 @@ class InputBinding {
     [[nodiscard]] std::string getName() const { return _name; };
     [[nodiscard]] EventType getType() const { return _type; };
 
-    bool operator < (const InputBinding &other) const { return _name < other._name; };
+    bool operator < (const InputBinding &other) const { return _name > other._name; };
 
     private:
     EventAxes _axes;

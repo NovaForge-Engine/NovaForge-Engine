@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include "include/InputBinding.h"
+#include <iostream>
 
 namespace NovaEngine {
 

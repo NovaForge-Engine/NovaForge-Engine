@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 
 #include "include/InputContext.h"
+#include <iostream>
 
 namespace NovaEngine {
 
@@ -50,13 +51,14 @@ ContainerQueryResult InputContext::removeBinding(const std::string &actionName) 
 
 ContainerQueryResult InputContext::processEvent(InputEvent event) {
     const InputSource source = event.getSource();
-    auto ptr = _bindings.begin();
+    auto ptr = this->_bindings.begin();
     while (true) {
         auto searchResult = std::find_if(ptr, _bindings.end(),
             [source] (const std::pair<InputBinding, InputSource> &item) {
                 return source == item.second;
             });
         if (searchResult == _bindings.end()) {
+		
             break;
         }
         EventType type = searchResult->first.getType();

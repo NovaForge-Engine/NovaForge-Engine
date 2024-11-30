@@ -8,11 +8,14 @@
 #include "include/InputContext.h"
 #include "include/Singleton.h"
 
+#include "spdlog/spdlog.h"
+
 namespace NovaEngine {
 
 const std::string DEFAULT_CONTEXT_NAME = "Default";
 
-class InputManager: public Singleton<InputManager> {
+class ENGINE_DLL InputManager : public Singleton<InputManager>
+{
     public:
     InputManager();
     [[nodiscard]] bool hasContext(const std::string &contextName) const { return _contextMaps.contains(contextName); };

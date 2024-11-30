@@ -42,26 +42,11 @@
 #include "assimp/postprocess.h"
 #include <utility>
 
+#include <spdlog/spdlog.h>
+
 Assimp::Importer importer;
 
 
-struct Vertex {
-	float position[2];
-
-	float uv[2];
-};
-
-struct ConstantBufferLayout {
-	float color[3];
-	float scale;
-};
-
-static const Vertex g_VertexData[] = {
-	{-0.71f, -0.50f, 0.0f, 0.0f},
-	{0.00f, 0.71f, 1.0f, 1.0f},
-	{0.71f, -0.50f, 0.0f, 1.0f} };
-
-static const uint16_t g_IndexData[] = { 0, 1, 2 };
 
 
 
@@ -76,6 +61,7 @@ static void GLFW_ErrorCallback(int32_t error, const char* message) {
 
 void helloCallback(NovaEngine::InputEvent event) {
 	printf("Pressed the button!!!\n");
+	std::cout << "SOsat' america" << std::endl;
 }
 
 using namespace std;
@@ -86,7 +72,7 @@ bool m_DebugAPI = false;
 bool m_DebugNRI = false;
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
-constexpr uint32_t BUFFERED_FRAME_MAX_NUM = 2;
+
 constexpr uint32_t SWAP_CHAIN_TEXTURE_NUM = 2;
 constexpr nri::SPIRVBindingOffsets SPIRV_BINDING_OFFSETS = { 100, 200, 300, 400 }; // just ShaderMake defaults for simplicity
 nri::AllocationCallbacks m_AllocationCallbacks = {};
@@ -104,8 +90,7 @@ struct Frame
 {
 	nri::CommandAllocator* commandAllocator;
 	nri::CommandBuffer* commandBuffer;
-	nri::Descriptor* constantBufferView;
-	nri::DescriptorSet* constantBufferDescriptorSet;
+
 	uint64_t constantBufferViewOffset;
 };
 
@@ -115,6 +100,17 @@ struct NRIInterface : public nri::CoreInterface,
 	public nri::SwapChainInterface
 {
 };
+
+
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action,
+                 int mods)
+{
+	std::cout << "132312" << std::endl;
+	NovaEngine::InputManager::instance().keyboardCallback(window, key, scancode,
+	                                                      action, mods);
+	std::cout << "2321321" << std::endl;
+}
 
 
 #define NRI_ABORT_ON_FAILURE(result) \
@@ -129,19 +125,12 @@ private:
 	nri::SwapChain* m_SwapChain = nullptr;
 	nri::CommandQueue* m_CommandQueue = nullptr;
 	nri::Fence* m_FrameFence = nullptr;
-	nri::DescriptorPool* m_DescriptorPool = nullptr;
-	nri::PipelineLayout* m_PipelineLayout = nullptr;
-	nri::Pipeline* m_Pipeline = nullptr;
-	nri::DescriptorSet* m_TextureDescriptorSet = nullptr;
-	nri::Descriptor* m_TextureShaderResource = nullptr;
-	nri::Descriptor* m_Sampler = nullptr;
-	nri::Buffer* m_ConstantBuffer = nullptr;
-	nri::Buffer* m_GeometryBuffer = nullptr;
-	nri::Texture* m_Texture = nullptr;
+
+	
 
 	std::array<Frame, BUFFERED_FRAME_MAX_NUM> m_Frames = {};
 	std::vector<BackBuffer> m_SwapChainBuffers;
-	std::vector<nri::Memory*> m_MemoryAllocations;
+	
 
 
 	uint32_t m_RenderOutputWidth = 1920;
@@ -149,7 +138,7 @@ private:
 	uint32_t m_RenderWindowWidth;
 	uint32_t m_RenderWindowHeight;
 
-	uint64_t m_GeometryOffset = 0;
+	
 	uint32_t frameIndex = 0;
 
 	float m_Transparency = 1.0f;
@@ -177,21 +166,25 @@ void Sample::RenderFrame()
 	nri::Dim_t halfWidth = windowWidth / 2;
 	nri::Dim_t halfHeight = windowHeight / 2;
 
-
 	const uint32_t bufferedFrameIndex = frameIndex % BUFFERED_FRAME_MAX_NUM;
 	const Frame& frame = m_Frames[bufferedFrameIndex];
 
-	if (frameIndex >= BUFFERED_FRAME_MAX_NUM) {
+	if (frameIndex >= BUFFERED_FRAME_MAX_NUM)
+	{
 		NRI.Wait(*m_FrameFence, 1 + frameIndex - BUFFERED_FRAME_MAX_NUM);
 		NRI.ResetCommandAllocator(*frame.commandAllocator);
 	}
 
-	const uint32_t currentTextureIndex = NRI.AcquireNextSwapChainTexture(*m_SwapChain);
+	const uint32_t currentTextureIndex =
+		NRI.AcquireNextSwapChainTexture(*m_SwapChain);
 	BackBuffer& currentBackBuffer = m_SwapChainBuffers[currentTextureIndex];
 
-
-	ConstantBufferLayout* commonConstants = (ConstantBufferLayout*)NRI.MapBuffer(*m_ConstantBuffer, frame.constantBufferViewOffset, sizeof(ConstantBufferLayout));
-	if (commonConstants) {
+	ConstantBufferLayout* commonConstants =
+		(ConstantBufferLayout*)NRI.MapBuffer(*m_ConstantBuffer,
+	                                         frame.constantBufferViewOffset,
+	                                         sizeof(ConstantBufferLayout));
+	if (commonConstants)
+	{
 		commonConstants->color[0] = 0.8f;
 		commonConstants->color[1] = 0.5f;
 		commonConstants->color[2] = 0.1f;
@@ -202,7 +195,8 @@ void Sample::RenderFrame()
 
 	nri::TextureBarrierDesc textureBarrierDescs = {};
 	textureBarrierDescs.texture = currentBackBuffer.texture;
-	textureBarrierDescs.after = { nri::AccessBits::COLOR_ATTACHMENT, nri::Layout::COLOR_ATTACHMENT };
+	textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
+	                             nri::Layout::COLOR_ATTACHMENT};
 	textureBarrierDescs.layerNum = 1;
 	textureBarrierDescs.mipNum = 1;
 
@@ -219,7 +213,7 @@ void Sample::RenderFrame()
 		attachmentsDesc.colorNum = 1;
 		attachmentsDesc.colors = &currentBackBuffer.colorAttachment;
 
-		constexpr nri::Color32f COLOR_0 = { 1.0f, 1.0f, 0.0f, 1.0f };
+		constexpr nri::Color32f COLOR_0 = {1.0f, 1.0f, 0.0f, 1.0f};
 
 		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
 		{
@@ -230,40 +224,49 @@ void Sample::RenderFrame()
 				clearDesc.planes = nri::PlaneBits::COLOR;
 				clearDesc.value.color.f = COLOR_0;
 
-				NRI.CmdClearAttachments(*commandBuffer, &clearDesc, 1, nullptr, 0);
+				NRI.CmdClearAttachments(*commandBuffer, &clearDesc, 1, nullptr,
+				                        0);
 			}
 
 			{
 				Annotation annotation(NRI, *commandBuffer, "Triangle");
 
-				const nri::Viewport viewport = { 0.0f, 0.0f, (float)windowWidth, (float)windowHeight, 0.0f, 1.0f };
+				const nri::Viewport viewport = {
+					0.0f, 0.0f, (float)windowWidth, (float)windowHeight,
+					0.0f, 1.0f};
 				NRI.CmdSetViewports(*commandBuffer, &viewport, 1);
 
 				NRI.CmdSetPipelineLayout(*commandBuffer, *m_PipelineLayout);
 				NRI.CmdSetPipeline(*commandBuffer, *m_Pipeline);
 				NRI.CmdSetRootConstants(*commandBuffer, 0, &m_Transparency, 4);
-				NRI.CmdSetIndexBuffer(*commandBuffer, *m_GeometryBuffer, 0, nri::IndexType::UINT16);
-				NRI.CmdSetVertexBuffers(*commandBuffer, 0, 1, &m_GeometryBuffer, &m_GeometryOffset);
-				NRI.CmdSetDescriptorSet(*commandBuffer, 0, *frame.constantBufferDescriptorSet, nullptr);
-				NRI.CmdSetDescriptorSet(*commandBuffer, 1, *m_TextureDescriptorSet, nullptr);
+				NRI.CmdSetIndexBuffer(*commandBuffer, *m_GeometryBuffer, 0,
+				                      nri::IndexType::UINT16);
+				NRI.CmdSetVertexBuffers(*commandBuffer, 0, 1, &m_GeometryBuffer,
+				                        &m_GeometryOffset);
+				NRI.CmdSetDescriptorSet(*commandBuffer, 0,
+				                        *frame.constantBufferDescriptorSet,
+				                        nullptr);
+				NRI.CmdSetDescriptorSet(*commandBuffer, 1,
+				                        *m_TextureDescriptorSet, nullptr);
 
-				nri::Rect scissor = { 0, 0, windowWidth, windowHeight };
+				nri::Rect scissor = {0, 0, windowWidth, windowHeight};
 				NRI.CmdSetScissors(*commandBuffer, &scissor, 1);
-				NRI.CmdDrawIndexed(*commandBuffer, { 3, 1, 0, 0, 0 });
+				NRI.CmdDrawIndexed(*commandBuffer, {3, 1, 0, 0, 0});
 
-				scissor = { (int16_t)halfWidth, (int16_t)halfHeight, halfWidth, halfHeight };
+				scissor = {(int16_t)halfWidth, (int16_t)halfHeight, halfWidth,
+				           halfHeight};
 				NRI.CmdSetScissors(*commandBuffer, &scissor, 1);
-				NRI.CmdDraw(*commandBuffer, { 3, 1, 0, 0 });
+				NRI.CmdDraw(*commandBuffer, {3, 1, 0, 0});
 			}
 
 			{
-	
 			}
 		}
 		NRI.CmdEndRendering(*commandBuffer);
 
 		textureBarrierDescs.before = textureBarrierDescs.after;
-		textureBarrierDescs.after = { nri::AccessBits::UNKNOWN, nri::Layout::PRESENT };
+		textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,
+		                             nri::Layout::PRESENT};
 
 		NRI.CmdBarrier(*commandBuffer, barrierGroupDesc);
 	}
@@ -392,258 +395,6 @@ bool Sample::Initialize(nri::GraphicsAPI graphicsApi) {
 	}
 
 
-	const nri::DeviceDesc& deviceDesc = NRI.GetDeviceDesc(*m_Device);
-	ShaderCodeStorage shaderCodeStorage;
-	{
-		nri::DescriptorRangeDesc descriptorRangeConstant[1];
-		descriptorRangeConstant[0] = {
-			0, 1, nri::DescriptorType::CONSTANT_BUFFER, nri::StageBits::ALL };
-
-		nri::DescriptorRangeDesc descriptorRangeTexture[2];
-		descriptorRangeTexture[0] = { 0, 1, nri::DescriptorType::TEXTURE,
-									 nri::StageBits::FRAGMENT_SHADER };
-		descriptorRangeTexture[1] = { 0, 1, nri::DescriptorType::SAMPLER,
-									 nri::StageBits::FRAGMENT_SHADER };
-
-		nri::DescriptorSetDesc descriptorSetDescs[] = {
-			{0, descriptorRangeConstant,
-			 GetCountOf(descriptorRangeConstant)},
-			{1, descriptorRangeTexture,
-			 GetCountOf(descriptorRangeTexture)},
-		};
-
-		nri::RootConstantDesc rootConstant = { 1, sizeof(float),
-											  nri::StageBits::FRAGMENT_SHADER };
-
-		nri::PipelineLayoutDesc pipelineLayoutDesc = {};
-		pipelineLayoutDesc.descriptorSetNum =
-			GetCountOf(descriptorSetDescs);
-		pipelineLayoutDesc.descriptorSets = descriptorSetDescs;
-		pipelineLayoutDesc.rootConstantNum = 1;
-		pipelineLayoutDesc.rootConstants = &rootConstant;
-		pipelineLayoutDesc.shaderStages =
-			nri::StageBits::VERTEX_SHADER | nri::StageBits::FRAGMENT_SHADER;
-
-		NRI_ABORT_ON_FAILURE(NRI.CreatePipelineLayout(
-			*m_Device, pipelineLayoutDesc, m_PipelineLayout));
-
-		nri::VertexStreamDesc vertexStreamDesc = {};
-		vertexStreamDesc.bindingSlot = 0;
-		vertexStreamDesc.stride = sizeof(Vertex);
-
-
-		nri::VertexAttributeDesc vertexAttributeDesc[2] = {};
-		{
-			vertexAttributeDesc[0].format = nri::Format::RG32_SFLOAT;
-			vertexAttributeDesc[0].streamIndex = 0;
-			vertexAttributeDesc[0].offset =
-				GetOffsetOf(&Vertex::position);
-			vertexAttributeDesc[0].d3d = { "POSITION", 0 };
-			vertexAttributeDesc[0].vk.location = { 0 };
-
-			vertexAttributeDesc[1].format = nri::Format::RG32_SFLOAT;
-			vertexAttributeDesc[1].streamIndex = 0;
-			vertexAttributeDesc[1].offset = GetOffsetOf(&Vertex::uv);
-			vertexAttributeDesc[1].d3d = { "TEXCOORD", 0 };
-			vertexAttributeDesc[1].vk.location = { 1 };
-		}
-
-		nri::VertexInputDesc vertexInputDesc = {};
-		vertexInputDesc.attributes = vertexAttributeDesc;
-		vertexInputDesc.attributeNum =
-			(uint8_t)GetCountOf(vertexAttributeDesc);
-		vertexInputDesc.streams = &vertexStreamDesc;
-		vertexInputDesc.streamNum = 1;
-
-		nri::InputAssemblyDesc inputAssemblyDesc = {};
-		inputAssemblyDesc.topology = nri::Topology::TRIANGLE_LIST;
-
-		nri::RasterizationDesc rasterizationDesc = {};
-		rasterizationDesc.viewportNum = 1;
-		rasterizationDesc.fillMode = nri::FillMode::SOLID;
-		rasterizationDesc.cullMode = nri::CullMode::NONE;
-
-		nri::ColorAttachmentDesc colorAttachmentDesc = {};
-		colorAttachmentDesc.format = swapChainFormat;
-		colorAttachmentDesc.colorWriteMask = nri::ColorWriteBits::RGBA;
-		colorAttachmentDesc.blendEnabled = true;
-		colorAttachmentDesc.colorBlend = { nri::BlendFactor::SRC_ALPHA,
-										  nri::BlendFactor::ONE_MINUS_SRC_ALPHA,
-										  nri::BlendFunc::ADD };
-
-		nri::OutputMergerDesc outputMergerDesc = {};
-		outputMergerDesc.colors = &colorAttachmentDesc;
-		outputMergerDesc.colorNum = 1;
-
-
-		nri::ShaderDesc shaderStages[] = {
-				LoadShader(deviceDesc.graphicsAPI, "Triangle.vs",
-								  shaderCodeStorage),
-				LoadShader(deviceDesc.graphicsAPI, "Triangle.fs",
-								  shaderCodeStorage),
-		};
-
-
-
-		nri::GraphicsPipelineDesc graphicsPipelineDesc = {};
-		graphicsPipelineDesc.pipelineLayout = m_PipelineLayout;
-		graphicsPipelineDesc.vertexInput = &vertexInputDesc;
-		graphicsPipelineDesc.inputAssembly = inputAssemblyDesc;
-		graphicsPipelineDesc.rasterization = rasterizationDesc;
-		graphicsPipelineDesc.outputMerger = outputMergerDesc;
-		graphicsPipelineDesc.shaders = shaderStages;
-		graphicsPipelineDesc.shaderNum = GetCountOf(shaderStages);
-
-		NRI_ABORT_ON_FAILURE(NRI.CreateGraphicsPipeline(*m_Device, graphicsPipelineDesc, m_Pipeline));
-
-
-	}
-
-	{ // Descriptor pool
-		nri::DescriptorPoolDesc descriptorPoolDesc = {};
-		descriptorPoolDesc.descriptorSetMaxNum = BUFFERED_FRAME_MAX_NUM + 1;
-		descriptorPoolDesc.constantBufferMaxNum = BUFFERED_FRAME_MAX_NUM;
-		descriptorPoolDesc.textureMaxNum = 1;
-		descriptorPoolDesc.samplerMaxNum = 1;
-
-		NRI_ABORT_ON_FAILURE(NRI.CreateDescriptorPool(
-			*m_Device, descriptorPoolDesc, m_DescriptorPool));
-	}
-
-	Texture texture;
-
-	std::string path =
-		GetFullPath("wood.dds", DataFolder::TEXTURES);
-	if (!LoadTexture(path, texture))
-		return false;
-
-
-	// Resources
-	const uint32_t constantBufferSize = Align((uint32_t)sizeof(ConstantBufferLayout), deviceDesc.constantBufferOffsetAlignment);
-	const uint64_t indexDataSize = sizeof(g_IndexData);
-	const uint64_t indexDataAlignedSize = Align(indexDataSize, 16);
-	const uint64_t vertexDataSize = sizeof(g_VertexData);
-
-
-	{
-		// Texture
-		nri::TextureDesc textureDesc = {};
-		textureDesc.type = nri::TextureType::TEXTURE_2D;
-		textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
-		textureDesc.format = texture.GetFormat();
-		textureDesc.width = texture.GetWidth();
-		textureDesc.height = texture.GetHeight();
-		textureDesc.mipNum = texture.GetMipNum();
-
-		NRI_ABORT_ON_FAILURE(NRI.CreateTexture(*m_Device, textureDesc, m_Texture));
-
-		{ // Constant buffer
-			nri::BufferDesc bufferDesc = {};
-			bufferDesc.size = constantBufferSize * BUFFERED_FRAME_MAX_NUM;
-			bufferDesc.usage = nri::BufferUsageBits::CONSTANT_BUFFER;
-			NRI_ABORT_ON_FAILURE(NRI.CreateBuffer(*m_Device, bufferDesc, m_ConstantBuffer));
-		}
-
-		{ // Geometry buffer
-			nri::BufferDesc bufferDesc = {};
-			bufferDesc.size = indexDataAlignedSize + vertexDataSize;
-			bufferDesc.usage = nri::BufferUsageBits::VERTEX_BUFFER | nri::BufferUsageBits::INDEX_BUFFER;
-			NRI_ABORT_ON_FAILURE(NRI.CreateBuffer(*m_Device, bufferDesc, m_GeometryBuffer));
-		}
-		m_GeometryOffset = indexDataAlignedSize;
-	}
-
-
-	nri::ResourceGroupDesc resourceGroupDesc = {};
-	resourceGroupDesc.memoryLocation = nri::MemoryLocation::HOST_UPLOAD;
-	resourceGroupDesc.bufferNum = 1;
-	resourceGroupDesc.buffers = &m_ConstantBuffer;
-
-	m_MemoryAllocations.resize(1, nullptr);
-	NRI_ABORT_ON_FAILURE(NRI.AllocateAndBindMemory(*m_Device, resourceGroupDesc, m_MemoryAllocations.data()));
-
-
-	resourceGroupDesc.memoryLocation = nri::MemoryLocation::DEVICE;
-	resourceGroupDesc.bufferNum = 1;
-	resourceGroupDesc.buffers = &m_GeometryBuffer;
-	resourceGroupDesc.textureNum = 1;
-	resourceGroupDesc.textures = &m_Texture;
-
-
-	m_MemoryAllocations.resize(1 + NRI.CalculateAllocationNumber(*m_Device, resourceGroupDesc), nullptr);
-	NRI_ABORT_ON_FAILURE(NRI.AllocateAndBindMemory(*m_Device, resourceGroupDesc, m_MemoryAllocations.data() + 1));
-
-	{ // Descriptors
-	   // Texture
-		nri::Texture2DViewDesc texture2DViewDesc = { m_Texture, nri::Texture2DViewType::SHADER_RESOURCE_2D, texture.GetFormat() };
-		NRI_ABORT_ON_FAILURE(NRI.CreateTexture2DView(texture2DViewDesc, m_TextureShaderResource));
-
-		// Sampler
-		nri::SamplerDesc samplerDesc = {};
-		samplerDesc.addressModes = { nri::AddressMode::MIRRORED_REPEAT, nri::AddressMode::MIRRORED_REPEAT };
-		samplerDesc.filters = { nri::Filter::LINEAR, nri::Filter::LINEAR, nri::Filter::LINEAR };
-		samplerDesc.anisotropy = 4;
-		samplerDesc.mipMax = 16.0f;
-		NRI_ABORT_ON_FAILURE(NRI.CreateSampler(*m_Device, samplerDesc, m_Sampler));
-
-		// Constant buffer
-		for (uint32_t i = 0; i < BUFFERED_FRAME_MAX_NUM; i++) {
-			nri::BufferViewDesc bufferViewDesc = {};
-			bufferViewDesc.buffer = m_ConstantBuffer;
-			bufferViewDesc.viewType = nri::BufferViewType::CONSTANT;
-			bufferViewDesc.offset = i * constantBufferSize;
-			bufferViewDesc.size = constantBufferSize;
-			NRI_ABORT_ON_FAILURE(NRI.CreateBufferView(bufferViewDesc, m_Frames[i].constantBufferView));
-
-			m_Frames[i].constantBufferViewOffset = bufferViewDesc.offset;
-		}
-	}
-
-	{ // Descriptor sets
-		// Texture
-		NRI_ABORT_ON_FAILURE(NRI.AllocateDescriptorSets(*m_DescriptorPool, *m_PipelineLayout, 1,
-			&m_TextureDescriptorSet, 1, 0));
-
-		nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDescs[2] = {};
-		descriptorRangeUpdateDescs[0].descriptorNum = 1;
-		descriptorRangeUpdateDescs[0].descriptors = &m_TextureShaderResource;
-
-		descriptorRangeUpdateDescs[1].descriptorNum = 1;
-		descriptorRangeUpdateDescs[1].descriptors = &m_Sampler;
-		NRI.UpdateDescriptorRanges(*m_TextureDescriptorSet, 0, GetCountOf(descriptorRangeUpdateDescs), descriptorRangeUpdateDescs);
-
-		// Constant buffer
-		for (Frame& frame : m_Frames) {
-			NRI_ABORT_ON_FAILURE(NRI.AllocateDescriptorSets(*m_DescriptorPool, *m_PipelineLayout, 0, &frame.constantBufferDescriptorSet, 1, 0));
-
-			nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc = { &frame.constantBufferView, 1 };
-			NRI.UpdateDescriptorRanges(*frame.constantBufferDescriptorSet, 0, 1, &descriptorRangeUpdateDesc);
-		}
-	}
-
-
-	{ // Upload data
-		std::vector<uint8_t> geometryBufferData(indexDataAlignedSize + vertexDataSize);
-		memcpy(&geometryBufferData[0], g_IndexData, indexDataSize);
-		memcpy(&geometryBufferData[indexDataAlignedSize], g_VertexData, vertexDataSize);
-
-		std::array<nri::TextureSubresourceUploadDesc, 16> subresources;
-		for (uint32_t mip = 0; mip < texture.GetMipNum(); mip++)
-			texture.GetSubresource(subresources[mip], mip);
-
-		nri::TextureUploadDesc textureData = {};
-		textureData.subresources = subresources.data();
-		textureData.texture = m_Texture;
-		textureData.after = { nri::AccessBits::SHADER_RESOURCE, nri::Layout::SHADER_RESOURCE };
-
-		nri::BufferUploadDesc bufferData = {};
-		bufferData.buffer = m_GeometryBuffer;
-		bufferData.data = &geometryBufferData[0];
-		bufferData.dataSize = geometryBufferData.size();
-		bufferData.after = { nri::AccessBits::INDEX_BUFFER | nri::AccessBits::VERTEX_BUFFER };
-
-		NRI_ABORT_ON_FAILURE(NRI.UploadData(*m_CommandQueue, &textureData, 1, &bufferData, 1));
-	}
 	return true;
 }
 
@@ -656,9 +407,8 @@ bool Sample::Create(int _argc, char** _argv)
 	glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 #endif
 
-	if (!glfwInit()) {
-		return false;
-	}
+	glfwInit();
+		
 
 
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -722,30 +472,88 @@ bool Sample::Create(int _argc, char** _argv)
 
 	//elizoorg 01.11.2024
 	//TODO: Add glfw window callbacks
-	glfwSetKeyCallback(m_Window, &NovaEngine::InputManager::keyboardCallback);
+
+	glfwSetKeyCallback(m_Window, keyCallback);
 	glfwSetMouseButtonCallback(m_Window, &NovaEngine::InputManager::mouseButtonCallback);
 	glfwSetScrollCallback(m_Window, &NovaEngine::InputManager::mouseScrollCallback);
 	glfwSetCursorPosCallback(m_Window, &NovaEngine::InputManager::mousePositionCallback);
 
 
+	glfwSetJoystickCallback(
+		&NovaEngine::GLFWJoystickConnectionCallback);
+
+	NovaEngine::GamepadManager::instance().searchForActiveGamepads();
+
+
 	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON, NovaEngine::EventType::STARTED);
+	NovaEngine::InputManager::instance().addContext("Test");
+	NovaEngine::InputManager::instance().switchContext("Test");
+
+	NovaEngine::InputContext context = NovaEngine::InputManager::instance().getContext("Test");
+	
 	bind.addSubscriber(NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
-	NovaEngine::InputManager::instance().getContext("Default").addBinding(bind, NovaEngine::KeyboardSource::KEY_B);
+
+	context.addBinding(bind, NovaEngine::KeyboardSource::KEY_B);
+
+	NovaEngine::InputContext& context2 =
+		NovaEngine::InputManager::instance().getContext("Test");
+
+
+
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(bind, NovaEngine::KeyboardSource::KEY_A);
+
+	context2.addBinding(bind, NovaEngine::KeyboardSource::KEY_C);
 
 	return false;
 }
 
 
+
+
 int main(int argc, char** argv) {
-	nri::GraphicsAPI api = nri::GraphicsAPI::VK;
+	nri::GraphicsAPI api = nri::GraphicsAPI::D3D12;
 
 	Sample sample;
 
 	sample.Create(argc, argv);
 	bool startup = sample.Initialize(api);
+	
+	NovaEngine::InputManager::instance().addContext("Test");
+	NovaEngine::InputManager::instance().switchContext("Test");
+
+	NovaEngine::InputContext& context2 =
+		NovaEngine::InputManager::instance().getContext("Test");
+	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON,
+	                              NovaEngine::EventType::STARTED);
+	bind.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
+	context2.addBinding(bind, NovaEngine::KeyboardSource::KEY_C);
+
+
+
+
+
+
+		NovaEngine::InputBinding bind2("testbind", NovaEngine::EventAxes::SINGLE,
+	                               NovaEngine::EventType::CHANGED);
+
+			bind2.addSubscriber(
+			NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
+
+	context2.addBinding(bind2, NovaEngine::GamepadSource::AXIS_LEFT_TRIGGER);
+
+
+	std::cout << &NovaEngine::GamepadManager::instance << std::endl;
+
+
+
 	while (startup) {
 		sample.RenderFrame();
+
+
+		//NovaEngine::GamepadManager::instance().searchForActiveGamepads();
 		NovaEngine::GamepadManager::instance().pollGamepadEvents();
+		
 		glfwPollEvents();
 	}
 

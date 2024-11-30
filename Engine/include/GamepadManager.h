@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 
 #include "include/Singleton.h"
+#include "Export.h"
 
 namespace NovaEngine {
 
@@ -25,7 +26,12 @@ struct GamepadState {
  * This class is a singleton for providing additional callbacks to inputs. It allows to overcome 
  * lack of gamepad input callbacks in GLFW, which is required for easier implementation of in-game controls. 
  */
-class GamepadManager: public Singleton<GamepadManager> {
+
+void ENGINE_DLL GLFWJoystickConnectionCallback(int jid, int event);
+
+
+class ENGINE_DLL GamepadManager : public Singleton<GamepadManager>
+{
 public:
 	GamepadManager();
 
@@ -33,9 +39,15 @@ public:
 	bool hasActiveGamepad(int id);
 	bool hasActiveGamepads();
 	std::string getGamepadName(int id);
+	void searchForActiveGamepads();
+
+	void JoystickConnectionCallback(int jid, int event);
+
+	void ConnectJoystick(int id);
+	void DisconnectJoystick(int id);
+
 
 private:
-	void searchForActiveGamepads();
 
 	static void callbackJoystickConnectionChanged(int jid, int event);
 
