@@ -52,6 +52,10 @@ endif()
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
 
 # vendor/JoltPhysics
+
+set(BUILD_SHARED_LIBS ON)
+
 add_subdirectory("joltphysics/Build")
-target_include_directories(Jolt INTERFACE ${CMAKE_SOURCE_DIR}/vendor/joltphysics)
 set_property (TARGET Jolt PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+
+set(BUILD_SHARED_LIBS OFF)
