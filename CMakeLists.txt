@@ -52,6 +52,7 @@ set (SHADERMAKE_GENERAL_ARGS
     -c Shaders.cfg
     -o "${NRIF_SHADERS_PATH}"
     -I "vendor/NRI/Include"
+    -I "vendor/ml"
     --sRegShift 100 --tRegShift 200 --bRegShift 300 --uRegShift 400
 )
 

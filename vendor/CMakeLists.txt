@@ -57,6 +57,6 @@ target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
 set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+#set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
 
