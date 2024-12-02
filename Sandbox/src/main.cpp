@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "PhysicsUtility.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -729,8 +730,6 @@ int main(int argc, char** argv) {
 	while (startup) {
 		sample.RenderFrame();
 	}
-
-
 
 	return 0;
 }
