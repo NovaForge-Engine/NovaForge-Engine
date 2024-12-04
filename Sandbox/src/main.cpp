@@ -730,7 +730,6 @@ int main(int argc, char** argv) {
 	while (startup) {
 		sample.RenderFrame();
 	}
-
 	return 0;
 }
 

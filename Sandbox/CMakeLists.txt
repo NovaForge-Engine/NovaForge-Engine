@@ -21,6 +21,10 @@ set(MODULE_FILES
     src/main.cpp
     src/Utils.hpp
     src/Utils.cpp
+    src/PhysEngine.cpp
+    src/PhysEngine.h
+    src/PhysicsUtility.cpp
+    src/PhysicsUtility.h
 )
 
 
@@ -37,6 +41,7 @@ target_link_libraries(
     imgui
     NRI
     detex
+    spdlog
     glfw
     glm
 	Jolt

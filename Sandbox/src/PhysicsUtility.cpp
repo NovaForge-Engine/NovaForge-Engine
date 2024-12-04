@@ -1,7 +1,7 @@
 #include "PhysicsUtility.h"
 
 
-static void TraceImpl(const char* message, ...)
+void TraceImpl(const char* message, ...)
 {
 	va_list list;
 	va_start(list, message);
@@ -16,16 +16,21 @@ static void TraceImpl(const char* message, ...)
 
 #ifdef JPH_ENABLE_ASSERTS
 
-	static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine)
+	bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine)
 	{
 		// TODO: We also need some macros for Asserts
 		printf_s("Jolt | AssertFailedImpl: %s:%d: (%s) %s\n", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
-		JPH_ASSERT(true);
+		JPH_ASSERT(false);
 
 		return true;
 	}
 
 #endif // JPH_ENABLE_ASSERTS
+
+bool ObjectLayerPairFilterImpl::ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const
+{
+	return false;
+}
 
 
 BroadPhaseLayerInterfaceImpl::BroadPhaseLayerInterfaceImpl()
