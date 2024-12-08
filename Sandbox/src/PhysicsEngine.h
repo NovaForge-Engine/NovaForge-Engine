@@ -13,13 +13,21 @@ class PhysicsEngine
 public:
 	PhysicsEngine();
 	~PhysicsEngine();
+
+	static PhysicsEngine* Get();
+
 	void Initialize(float gravityScale = 1.0f);
 	void UpdatePhysics();
 	JPH::PhysicsSystem* GetPhysicsSystem();
 	JPH::DebugRenderer* GetDebugRenderer() const;
 	void Cleanup();
 
+	bool CanCollide(CollisionLayer layer1, CollisionLayer layer2) const;
+	void SetCollisionRule(CollisionLayer layer1, CollisionLayer layer2, bool collisionRule);
+
 private:
+	static PhysicsEngine* instance;
+
 	static constexpr float fpsPhys = 120.0f;
 
 	static constexpr JPH::uint cMaxBodies = 1024;
@@ -28,6 +36,8 @@ private:
 	static constexpr JPH::uint cMaxContactConstraints = 1024;
 	const int cCollisionSteps = 1;
 	const float cDeltaTime = 1.0f / fpsPhys;
+
+	std::vector<std::vector<bool>> collisionMatrix;
 
 	JPH::TempAllocatorImpl* tempAllocator;
 	JPH::JobSystemThreadPool* jobSystem;

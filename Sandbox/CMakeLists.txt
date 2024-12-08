@@ -21,8 +21,8 @@ set(MODULE_FILES
     src/main.cpp
     src/Utils.hpp
     src/Utils.cpp
-    src/PhysEngine.cpp
-    src/PhysEngine.h
+    src/PhysicsEngine.cpp
+    src/PhysicsEngine.h
     src/PhysicsUtility.cpp
     src/PhysicsUtility.h
 )
@@ -45,6 +45,7 @@ target_link_libraries(
     glfw
     glm
 	Jolt
+    magic_enum
 )
 
 if (WIN32)

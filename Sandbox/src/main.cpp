@@ -1,7 +1,6 @@
 
 
 #include <iostream>
-
 #include "PhysicsUtility.h"
 
 #define GLFW_INCLUDE_NONE
@@ -18,9 +17,7 @@
 
 #include <GLFW/glfw3native.h>
 
-
 #include <NRI.h>
-
 
 #include <Extensions/NRIDeviceCreation.h>
 #include <Extensions/NRIHelper.h>
@@ -33,7 +30,6 @@
 
 #include <vector>
 #include <array>
-
 #include "Utils.hpp"
 
 #include "assimp/Importer.hpp"
@@ -42,6 +38,8 @@
 #include <utility>
 
 #include <Jolt/Jolt.h>
+
+#include "PhysicsEngine.h"
 
 Assimp::Importer importer;
 
@@ -719,11 +717,27 @@ bool Sample::Create(int _argc, char** _argv)
 	return false;
 }
 
+class Test
+{
+public:
+	Test();
+
+private:
+	PhysicsEngine* physEngine;
+};
+
+Test::Test()
+	: physEngine(PhysicsEngine::Get())
+{}
+
 
 int main(int argc, char** argv) {
 	nri::GraphicsAPI api = nri::GraphicsAPI::VK;
 
 	Sample sample;
+	Test test;
+	auto collisions = collisionLayersCount;
+	auto bpLayers = broadPhaseLayersCount;
 
 	sample.Create(argc, argv);
 	bool startup = sample.Initialize(api);

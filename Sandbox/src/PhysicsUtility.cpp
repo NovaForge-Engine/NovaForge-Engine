@@ -1,4 +1,5 @@
 #include "PhysicsUtility.h"
+#include "PhysicsEngine.h"
 
 
 void TraceImpl(const char* message, ...)
@@ -27,68 +28,53 @@ void TraceImpl(const char* message, ...)
 
 #endif // JPH_ENABLE_ASSERTS
 
+
 bool ObjectLayerPairFilterImpl::ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const
 {
-	return false;
+	return ShouldCollide(FromJoltLayer(inObject1), FromJoltLayer(inObject2));
 }
 
 
-BroadPhaseLayerInterfaceImpl::BroadPhaseLayerInterfaceImpl()
+bool ObjectLayerPairFilterImpl::ShouldCollide(CollisionLayer inObject1, CollisionLayer inObject2) const
 {
-	// Create a mapping table from object to broad phase layer
-	mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-	mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
-	mObjectToBroadPhase[Layers::PLAYER] = BroadPhaseLayers::PLAYER;
+	return PhysicsEngine::Get()->CanCollide(inObject1, inObject2);
 }
 
 
 JPH::uint BroadPhaseLayerInterfaceImpl::GetNumBroadPhaseLayers() const
 {
-	return BroadPhaseLayers::NUM_LAYERS;
+	return static_cast<JPH::uint>(broadPhaseLayersCount);
 }
 
 
 JPH::BroadPhaseLayer BroadPhaseLayerInterfaceImpl::GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const
 {
-	JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
-	return mObjectToBroadPhase[inLayer];
+	JPH_ASSERT(inLayer < collisionLayersCount);
+	return JPH::BroadPhaseLayer(inLayer);
 }
 
 #if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
 
 	const char* BroadPhaseLayerInterfaceImpl::GetBroadPhaseLayerName(JPH::BroadPhaseLayer inLayer) const
 	{
-		switch ((JPH::BroadPhaseLayer::Type)inLayer)
-		{
-			case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:
-				return "NON_MOVING";
-			case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:
-				return "MOVING";
-			case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::PLAYER:
-				return "PLAYER";
-			default:
-				JPH_ASSERT(false);
-				return "INVALID";
-		}
+		return GetBroadPhaseLayerName(FromJoltLayer(inLayer));
+	}
+
+	const char* BroadPhaseLayerInterfaceImpl::GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const
+	{
+		return magic_enum::enum_name(inLayer).data();
 	}
 
 #endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
 
-bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide(
-	JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const
+bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide(CollisionLayer inLayer1, BroadPhaseLayer inLayer2) const
 {
-	switch (inLayer1)
-	{
-		case Layers::PLAYER:
-			return true;
-		case Layers::NON_MOVING:
-			return inLayer2 == BroadPhaseLayers::MOVING;
-		case Layers::MOVING:
-			return true;
-		default:
-			JPH_ASSERT(false);
-			return false;
-	}
+	return PhysicsEngine::Get()->CanCollide(inLayer1, CollisionLayer(inLayer2));
+}
+
+bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const
+{
+	return PhysicsEngine::Get()->CanCollide(FromJoltLayer(inLayer1), CollisionLayer(FromJoltLayer(inLayer2)));
 }
 
 JPH::ValidateResult ContactListener::OnContactValidate(

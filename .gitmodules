@@ -22,3 +22,6 @@
 [submodule "vendor/joltphysics"]
 	path = vendor/joltphysics
 	url = https://github.com/jrouwe/JoltPhysics
+[submodule "vendor/magic_enum"]
+	path = vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum

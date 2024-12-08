@@ -59,3 +59,8 @@ add_subdirectory("joltphysics/Build")
 set_property (TARGET Jolt PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
 set(BUILD_SHARED_LIBS OFF)
+
+#vendor/magic_enum
+add_subdirectory("magic_enum")
+set_property (TARGET magic_enum PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+#target_include_directories(magic_enum INTERFACE ${CMAKE_SOURCE_DIR}/vendor/magic_enum)

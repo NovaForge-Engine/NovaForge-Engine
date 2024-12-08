@@ -18,6 +18,8 @@
 #include "Jolt/RegisterTypes.h"
 #include <Jolt/Renderer/DebugRenderer.h>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <iostream>
 #include <cstdarg>
 
@@ -30,48 +32,68 @@ void TraceImpl(const char* inFMT, ...);
     bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine);
 
 #endif //JPH_ENABLE_ASSERTS
-    
-namespace Layers
+
+enum class CollisionLayer : JPH::ObjectLayer 
 {
-	static constexpr JPH::ObjectLayer NON_MOVING = 0;
-	static constexpr JPH::ObjectLayer MOVING = 1;
-	static constexpr JPH::ObjectLayer PLAYER = 2;
-	static constexpr JPH::ObjectLayer NUM_LAYERS = 3;
+	NON_MOVING = 0,
+	MOVING = 1,
+	PLAYER = 2,
 };
 
-namespace BroadPhaseLayers
+constexpr JPH::ObjectLayer collisionLayersCount = magic_enum::enum_count<CollisionLayer>();
+
+enum class BroadPhaseLayer : JPH::BroadPhaseLayer::Type
 {
-	static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
-	static constexpr JPH::BroadPhaseLayer MOVING(1);
-	static constexpr JPH::BroadPhaseLayer PLAYER(2);
-	static constexpr JPH::uint NUM_LAYERS(3);
+	NON_MOVING = 0,
+	MOVING = 1,
+	PLAYER = 2,
 };
+
+constexpr JPH::BroadPhaseLayer::Type broadPhaseLayersCount = magic_enum::enum_count<BroadPhaseLayer>();
+
+inline JPH::ObjectLayer ToJoltLayer(CollisionLayer layer)
+{
+	return static_cast<JPH::ObjectLayer>(layer);
+}
+
+inline CollisionLayer FromJoltLayer(JPH::ObjectLayer layer)
+{
+	return static_cast<CollisionLayer>(layer);
+}
+
+inline JPH::BroadPhaseLayer ToJoltLayer(BroadPhaseLayer layer)
+{
+	return JPH::BroadPhaseLayer(static_cast<JPH::BroadPhaseLayer::Type>(layer));
+}
+
+inline BroadPhaseLayer FromJoltLayer(JPH::BroadPhaseLayer layer)
+{
+	return static_cast<BroadPhaseLayer>(layer.GetValue());
+}
 
 class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter {
 public:
+	bool ShouldCollide(CollisionLayer inObject1, CollisionLayer inObject2) const;
 	virtual bool ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const override;
 };
 
 class BroadPhaseLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface {
 public:
-	BroadPhaseLayerInterfaceImpl();
 	virtual JPH::uint GetNumBroadPhaseLayers() const override;
-	virtual JPH::BroadPhaseLayer
-	GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override;
+	virtual JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override;
 
 #if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
 
 	virtual const char* GetBroadPhaseLayerName(JPH::BroadPhaseLayer inLayer) const override;
+	const char* GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const;
 
 #endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
-private:
-	JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
 };
 
 class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter
 {
 public:
+	bool ShouldCollide(CollisionLayer inLayer1, BroadPhaseLayer inLayer2) const;
 	virtual bool ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override;
 };
 
