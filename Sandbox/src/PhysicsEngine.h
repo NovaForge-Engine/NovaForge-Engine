@@ -4,9 +4,13 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Renderer/DebugRenderer.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Core/Core.h>
+
+#include <glm/glm.hpp>
 
 #include "PhysicsUtility.h"
 
+using ID = JPH::uint32;
 
 class PhysicsEngine
 {
@@ -25,6 +29,13 @@ public:
 	bool CanCollide(CollisionLayer layer1, CollisionLayer layer2) const;
 	void SetCollisionRule(CollisionLayer layer1, CollisionLayer layer2, bool collisionRule);
 
+	JPH::BodyID GetBodyID(ID id);
+	ID AddBody(const JPH::Vec3& position, const JPH::Quat& rotation, const JPH::Shape* shape, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass);
+	void RemoveBody(ID id);
+
+	std::pair<JPH::Vec3, JPH::Quat> GetBodyTransform(ID id);
+	void SetBodyTransform(ID id, const JPH::Vec3& position, const JPH::Quat& rotation);
+
 private:
 	static PhysicsEngine* instance;
 
@@ -38,6 +49,7 @@ private:
 	const float cDeltaTime = 1.0f / fpsPhys;
 
 	std::vector<std::vector<bool>> collisionMatrix;
+	std::unordered_map<ID, JPH::BodyID> bodyIdTable;
 
 	JPH::TempAllocatorImpl* tempAllocator;
 	JPH::JobSystemThreadPool* jobSystem;

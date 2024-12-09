@@ -35,9 +35,10 @@ void TraceImpl(const char* inFMT, ...);
 
 enum class CollisionLayer : JPH::ObjectLayer 
 {
-	NON_MOVING = 0,
-	MOVING = 1,
-	PLAYER = 2,
+	NO_COLLISION = 0,
+	NON_MOVING = 1,
+	MOVING = 2,
+	PLAYER = 3
 };
 
 constexpr JPH::ObjectLayer collisionLayersCount = magic_enum::enum_count<CollisionLayer>();

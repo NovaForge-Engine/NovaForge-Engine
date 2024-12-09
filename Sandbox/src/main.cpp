@@ -728,7 +728,11 @@ private:
 
 Test::Test()
 	: physEngine(PhysicsEngine::Get())
-{}
+{
+	physEngine->Initialize();
+	physEngine->SetCollisionRule(CollisionLayer::PLAYER, CollisionLayer::MOVING, true);
+	physEngine->SetCollisionRule(CollisionLayer::PLAYER, CollisionLayer::NON_MOVING, true);
+}
 
 
 int main(int argc, char** argv) {

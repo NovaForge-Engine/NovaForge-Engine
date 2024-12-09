@@ -31,14 +31,9 @@ void PhysicsEngine::Initialize(float gravityScale)
 	JPH::RegisterTypes();
 
 	tempAllocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
-	jobSystem = new JPH::JobSystemThreadPool(
-		JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers,
-		JPH::thread::hardware_concurrency() - 1);
+	jobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
 
-	physicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs,
-	                    cMaxContactConstraints, broadPhaseLayerInterface,
-	                    objectVsBroadphaseLayerFilter,
-	                    objectVsObjectLayerFilter);
+	physicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broadPhaseLayerInterface, objectVsBroadphaseLayerFilter, objectVsObjectLayerFilter);
 
 	physicsSystem.SetBodyActivationListener(&bodyActivationListener);
 	physicsSystem.SetContactListener(&contactListener);
@@ -87,4 +82,59 @@ void PhysicsEngine::SetCollisionRule(CollisionLayer layer1, CollisionLayer layer
 
 	collisionMatrix[l1][l2] = collisionRule;
 	collisionMatrix[l2][l1] = collisionRule;
+}
+
+
+JPH::BodyID PhysicsEngine::GetBodyID(ID id)
+{
+	JPH_ASSERT(id < bodyIdTable.size(), "Trying get BodyID with invalid id");
+	return bodyIdTable.at(id);
+}
+
+
+ID PhysicsEngine::AddBody(const JPH::Vec3& position, const JPH::Quat& rotation, const JPH::Shape* shape, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass)
+{
+	static ID nextBodyID = 1;
+	ID bodyID = nextBodyID++;
+
+	JPH::BodyCreationSettings bodySettings(shape, position, rotation, motionType, collisionLayer);
+	JPH::MassProperties msp;
+	msp.ScaleToMass(mass);
+	bodySettings.mMassPropertiesOverride = msp;
+	bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+
+	JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+	bodyIdTable[bodyID] = body->GetID();
+	bodyInterface.AddBody(body->GetID(), JPH::EActivation::Activate);
+
+	return bodyID;
+}
+
+
+void PhysicsEngine::RemoveBody(ID id)
+{
+	if (bodyIdTable.find(id) != bodyIdTable.end())
+	{
+		JPH::BodyID bodyID = bodyIdTable[id];
+		bodyInterface.RemoveBody(bodyID);
+		bodyIdTable.erase(id);
+	}
+}
+
+
+std::pair<JPH::Vec3, JPH::Quat> PhysicsEngine::GetBodyTransform(ID id)
+{
+	JPH::BodyID bodyID = GetBodyID(id);
+	JPH::Vec3 position;
+	JPH::Quat rotation;
+	bodyInterface.GetPositionAndRotation(bodyID, position, rotation);
+
+	return {position, rotation};
+}
+
+
+void PhysicsEngine::SetBodyTransform(ID id, const JPH::Vec3& position, const JPH::Quat& rotation)
+{
+	JPH::BodyID bodyID = GetBodyID(id);
+	bodyInterface.SetPositionAndRotation(bodyID, position, rotation, JPH::EActivation::Activate);
 }
