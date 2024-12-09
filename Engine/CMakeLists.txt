@@ -22,7 +22,8 @@ file(GLOB_RECURSE HEADER_FILES COMPILE_DEPENDS
 file(GLOB MODULE_FILES COMPILE_DEPENDS
 	src/*.cpp
 )
-
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_library(novaengine SHARED ${MODULE_FILES} ${HEADER_FILES})
 

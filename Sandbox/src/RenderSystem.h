@@ -1,10 +1,9 @@
 #pragma once
 #include "ISystem.h"
-#include "PassCompositor.h"
+
 class RenderSystem : public ISystem{
 
     private:
-	PassCompositor compositor;
     public:
     RenderSystem();
     ~RenderSystem();

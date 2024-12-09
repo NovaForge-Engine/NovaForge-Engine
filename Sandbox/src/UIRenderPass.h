@@ -22,9 +22,17 @@ public:
 	void Shutdown() override;
 	void PrepareFrame() override;
 
-	bool Init(const nri::CoreInterface& NRI,
-	          const nri::HelperInterface& helperInterface, nri::Device& device,
-	          nri::Format renderTargetFormat);
+	struct InitParams
+	{
+		nri::CoreInterface& NRI;
+		nri::HelperInterface& helperInterface;
+		nri::Device& device;
+		nri::Format renderTargetFormat;
+	};
+	
+	bool Init(InitParams params);
+
+	
 
 	void Draw(const nri::CoreInterface& NRI,
 	          const nri::StreamerInterface& streamerInterface,

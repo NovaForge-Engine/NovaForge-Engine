@@ -19,9 +19,7 @@ void UIRenderPass::PrepareFrame()
 {
 }
 
-bool UIRenderPass::Init(const nri::CoreInterface& NRI,
-                        const nri::HelperInterface& helperInterface,
-                        nri::Device& device, nri::Format renderTargetFormat)
+bool UIRenderPass::Init(InitParams params)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -69,7 +67,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 	m_MouseCursors[ImGuiMouseCursor_Hand] =
 		glfwCreateStandardCursor(GLFW_HAND_CURSOR);
 
-	const nri::DeviceDesc& deviceDesc = NRI.GetDeviceDesc(device);
+	const nri::DeviceDesc& deviceDesc = params.NRI.GetDeviceDesc(params.device);
 
 	{
 		nri::DescriptorRangeDesc descriptorRanges[] = {
@@ -95,7 +93,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 		pipelineLayoutDesc.shaderStages =
 			nri::StageBits::VERTEX_SHADER | nri::StageBits::FRAGMENT_SHADER;
 
-		if (NRI.CreatePipelineLayout(device, pipelineLayoutDesc,
+		if (params.NRI.CreatePipelineLayout(params.device, pipelineLayoutDesc,
 		                             m_PipelineLayout) != nri::Result::SUCCESS)
 			return false;
 
@@ -145,7 +143,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 		rasterizationDesc.cullMode = nri::CullMode::NONE;
 
 		nri::ColorAttachmentDesc colorAttachmentDesc = {};
-		colorAttachmentDesc.format = renderTargetFormat;
+		colorAttachmentDesc.format = params.renderTargetFormat;
 		colorAttachmentDesc.colorWriteMask = nri::ColorWriteBits::RGBA;
 		colorAttachmentDesc.blendEnabled = true;
 		colorAttachmentDesc.colorBlend = {nri::BlendFactor::SRC_ALPHA,
@@ -168,7 +166,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 		graphicsPipelineDesc.shaders = shaders;
 		graphicsPipelineDesc.shaderNum = GetCountOf(shaders);
 
-		if (NRI.CreateGraphicsPipeline(device, graphicsPipelineDesc,
+		if (params.NRI.CreateGraphicsPipeline(params.device, graphicsPipelineDesc,
 		                               m_Pipeline) != nri::Result::SUCCESS)
 			return false;
 	}
@@ -191,7 +189,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 	textureDesc.mipNum = 1;
 	textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
 
-	if (NRI.CreateTexture(device, textureDesc, m_FontTexture) !=
+	if (params.NRI.CreateTexture(params.device, textureDesc, m_FontTexture) !=
 	    nri::Result::SUCCESS)
 		return false;
 
@@ -200,15 +198,15 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 	resourceGroupDesc.textureNum = 1;
 	resourceGroupDesc.textures = &m_FontTexture;
 
-	nri::Result result = helperInterface.AllocateAndBindMemory(
-		device, resourceGroupDesc, &m_FontTextureMemory);
+	nri::Result result = params.helperInterface.AllocateAndBindMemory(
+		params.device, resourceGroupDesc, &m_FontTextureMemory);
 	if (result != nri::Result::SUCCESS)
 		return false;
 
 	// Descriptor - texture
 	nri::Texture2DViewDesc texture2DViewDesc = {
 		m_FontTexture, nri::Texture2DViewType::SHADER_RESOURCE_2D, format};
-	if (NRI.CreateTexture2DView(texture2DViewDesc, m_FontShaderResource) !=
+	if (params.NRI.CreateTexture2DView(texture2DViewDesc, m_FontShaderResource) !=
 	    nri::Result::SUCCESS)
 		return false;
 
@@ -227,12 +225,12 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 	samplerDesc.filters.mip =
 		contentScale > 1.25f ? nri::Filter::NEAREST : nri::Filter::LINEAR;
 
-	if (NRI.CreateSampler(device, samplerDesc, m_Sampler) !=
+	if (params.NRI.CreateSampler(params.device, samplerDesc, m_Sampler) !=
 	    nri::Result::SUCCESS)
 		return false;
 
 	nri::CommandQueue* commandQueue = nullptr;
-	NRI.GetCommandQueue(device, nri::CommandQueueType::GRAPHICS, commandQueue);
+	params.NRI.GetCommandQueue(params.device, nri::CommandQueueType::GRAPHICS, commandQueue);
 	{
 		nri::TextureSubresourceUploadDesc subresource = {};
 		texture.GetSubresource(subresource, 0);
@@ -243,7 +241,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 		textureData.after = {nri::AccessBits::SHADER_RESOURCE,
 		                     nri::Layout::SHADER_RESOURCE};
 
-		if (helperInterface.UploadData(*commandQueue, &textureData, 1, nullptr,
+		if (params.helperInterface.UploadData(*commandQueue, &textureData, 1, nullptr,
 		                               0) != nri::Result::SUCCESS)
 			return false;
 	}
@@ -255,14 +253,14 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 		descriptorPoolDesc.textureMaxNum = 1;
 		descriptorPoolDesc.samplerMaxNum = 1;
 
-		if (NRI.CreateDescriptorPool(device, descriptorPoolDesc,
+		if (params.NRI.CreateDescriptorPool(params.device, descriptorPoolDesc,
 		                             m_DescriptorPool) != nri::Result::SUCCESS)
 			return false;
 	}
 
 	// Descriptor set
 	{
-		if (NRI.AllocateDescriptorSets(*m_DescriptorPool, *m_PipelineLayout, 0,
+		if (params.NRI.AllocateDescriptorSets(*m_DescriptorPool, *m_PipelineLayout, 0,
 		                               &m_DescriptorSet, 1,
 		                               0) != nri::Result::SUCCESS)
 			return false;
@@ -270,7 +268,7 @@ bool UIRenderPass::Init(const nri::CoreInterface& NRI,
 		nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc[] = {
 			{&m_FontShaderResource, 1}, {&m_Sampler, 1}};
 
-		NRI.UpdateDescriptorRanges(*m_DescriptorSet, 0,
+		params.NRI.UpdateDescriptorRanges(*m_DescriptorSet, 0,
 		                           GetCountOf(descriptorRangeUpdateDesc),
 		                           descriptorRangeUpdateDesc);
 	}
@@ -356,6 +354,13 @@ void UIRenderPass::BeginUI()
 	//io.DeltaTime = (float)(timeCur - m_TimePrev);
 	//io.DisplaySize =
 	//	ImVec2((float)m_WindowResolution.x, (float)m_WindowResolution.y);
+	// 
+	// 
+	// 
+	// 
+	io.DisplaySize = ImVec2(1280.0f, 720.0f);
+
+
 	//m_TimePrev = timeCur;
 
 	//// Read keyboard modifiers inputs
@@ -420,6 +425,9 @@ void UIRenderPass::BeginUI()
 void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
                          nri::Streamer& streamer)
 {
+
+
+	ImGui::Text("Hello, world %d", 123);
 	ImGui::EndFrame();
 	ImGui::Render();
 	const ImDrawData& drawData = *ImGui::GetDrawData();

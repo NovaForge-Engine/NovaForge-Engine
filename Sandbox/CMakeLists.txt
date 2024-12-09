@@ -26,8 +26,6 @@ set(MODULE_FILES
     src/IRenderPass.cpp
     src/ISystem.h
     src/ISystem.cpp
-    src/PassCompositor.h
-    src/PassCompositor.cpp
     src/UIRenderPass.h
     src/UIRenderPass.cpp
     src/MainRenderPass.h
@@ -38,6 +36,9 @@ set(MODULE_FILES
     src/Window.cpp
     src/Packing.h
     src/Packing.cpp
+    src/Application.cpp
+	src/Application.h
+    src/Settings.h
 )
 
 set(INTERFACE_FILES
@@ -57,8 +58,6 @@ set(SYSTEM_FILES
 source_group("Systems" FILES ${SYSTEM_FILES})
 
 set(RENDER_FILES
-    src/PassCompositor.h
-    src/PassCompositor.cpp
     src/UIRenderPass.h
     src/UIRenderPass.cpp
     src/MainRenderPass.h
@@ -67,6 +66,8 @@ set(RENDER_FILES
 
 source_group("Render" FILES ${RENDER_FILES})
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_executable(NovaSandbox ${MODULE_FILES} ${HEADER_FILES})
 

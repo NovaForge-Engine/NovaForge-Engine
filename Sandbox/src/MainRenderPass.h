@@ -4,7 +4,16 @@
 #include "Utils.hpp"
 
 
-constexpr uint32_t BUFFERED_FRAME_MAX_NUM = 2;
+#include "Settings.h"
+
+#include <NRI.h>
+#include <Extensions/NRIHelper.h>
+#include <Extensions/NRIStreamer.h>
+#include <Extensions/NRISwapChain.h>
+#include <NRIDescs.h>
+
+
+#include "Window.h"
 
 struct Vertex
 {
@@ -32,19 +41,33 @@ public:
 	void Draw() override;
 	void Shutdown() override;
 	void PrepareFrame() override;
-	bool Init(const nri::CoreInterface& NRI,
-	          const nri::HelperInterface& helperInterface,
-	          nri::Device& m_Device,
-	          nri::Format renderTargetFormat);
 
+	struct InitParams
+	{
+		nri::CoreInterface& NRI;
+		nri::HelperInterface& helperInterface;
+		nri::Device& m_Device;
+		nri::Format renderTargetFormat;
+		nri::CommandQueue* commandQueue;
+	};
+	bool Init(InitParams params);
 
+	void Draw(const nri::CoreInterface& NRI,
+	          const nri::StreamerInterface& streamerInterface,
+	          const nri::SwapChainInterface& swapChainInterface,
+	          const nri::StreamerInterface& streamer,
+	          nri::CommandBuffer& commandBuffer, const Frame& frame,
+	          const BackBuffer& currentBackBuffer,
+	          const uint32_t currentTextureIndex,
+	          const uint32_t m_RenderWindowWidth,
+	          const uint32_t m_RenderWindowHeight);
+	
 	
     MainRenderPass();
     ~MainRenderPass();
-
-
     private:
-
+	float m_Transparency = 1.0f;
+	float m_Scale = 1.0f;
 
 	nri::PipelineLayout* m_PipelineLayout = nullptr;
 	nri::Pipeline* m_Pipeline = nullptr;
