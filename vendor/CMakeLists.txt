@@ -38,6 +38,24 @@ target_include_directories(assimp INTERFACE
     $<INSTALL_INTERFACE:assimp/include>
 )
 
+# vendor/filewatch
+add_library (filewatch INTERFACE "filewatch/FileWatch.hpp")
+target_compile_definitions (filewatch PRIVATE ${COMPILE_DEFINITIONS})
+set_property (TARGET filewatch PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+target_include_directories(filewatch INTERFACE ${CMAKE_SOURCE_DIR}/vendor/filewatch)
+
+# vendor/PicoSHA2
+add_subdirectory("PicoSHA2")
+set_property(TARGET picosha2 PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+
+# vendor/magic_enum
+add_subdirectory("magic_enum")
+set_property(TARGET magic_enum PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+
+# vendor/expected
+add_subdirectory("expected")
+set_property(TARGET expected PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+
 # vendor/spdlog
 add_subdirectory("spdlog")
 set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
@@ -47,6 +65,18 @@ target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/spdlog/inc
 add_subdirectory("entt")
 set_property(TARGET EnTT PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/entt/src)
+
+# vendor/sqlite3
+add_subdirectory("sqlite")
+set_property(TARGET sqlite3-shared PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+target_include_directories(sqlite3-shared INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/vendor/sqlite>
+    $<INSTALL_INTERFACE:sqlite>
+)
+
+# vendor/toml11
+add_subdirectory("toml11")
+set_property(TARGET toml11 PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
 # vendor/glm
 add_subdirectory("glm")
@@ -66,10 +96,10 @@ set_property (TARGET magic_enum PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
 #vendor/other
 if(WIN32)
-set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-#set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+	set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+	set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+	set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+	#set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 endif()
 
 

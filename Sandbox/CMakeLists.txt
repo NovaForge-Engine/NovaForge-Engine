@@ -51,7 +51,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(
     NovaSandbox PUBLIC
     novaengine
-    assimp
     imgui
     NRI
     detex
@@ -60,6 +59,7 @@ target_link_libraries(
     glm
     Jolt
     magic_enum
+    assimp
 )
 
 if (WIN32)

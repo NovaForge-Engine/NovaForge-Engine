@@ -29,3 +29,21 @@
 [submodule "vendor/entt"]
 	path = vendor/entt
 	url = https://github.com/skypjack/entt
+[submodule "vendor/filewatch"]
+	path = vendor/filewatch
+	url = https://github.com/ThomasMonkman/filewatch
+[submodule "vendor/PicoSHA2"]
+	path = vendor/PicoSHA2
+	url = https://github.com/okdshin/PicoSHA2
+[submodule "vendor/toml11"]
+	path = vendor/toml11
+	url = https://github.com/ToruNiina/toml11
+[submodule "vendor/magic_enum"]
+	path = vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum
+[submodule "vendor/--force"]
+	path = vendor/--force
+	url = https://github.com/TartanLlama/expected
+[submodule "vendor/expected"]
+	path = vendor/expected
+	url = https://github.com/TartanLlama/expected

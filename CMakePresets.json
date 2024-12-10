@@ -43,9 +43,13 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+	"CMAKE_LINKER_TYPE": "MOLD",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+	"CMAKE_CXX_FLAGS": "-g",
+	"ASSIMP_BUILD_ZLIB": "ON",
+	"BUILD_SHARED_LIBS": "ON",
+	"GLFW_BUILD_WAYLAND": "OFF"
       },
       "condition": {
         "type": "equals",
