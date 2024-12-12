@@ -4,7 +4,7 @@
 
 
 int main(int argc, char** argv) {
-	constexpr auto api = nri::GraphicsAPI::D3D12;
+	constexpr auto api = nri::GraphicsAPI::VK;
 
 	Application app;
 

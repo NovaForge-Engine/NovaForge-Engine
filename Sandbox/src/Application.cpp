@@ -13,7 +13,7 @@ Application::~Application()
 bool Application::Init(nri::GraphicsAPI graphicsAPI)
 {
 
-	window = new Window();
+	window = new SystemWindow();
 
 	window->Initialize(1280, 720);
 
@@ -190,14 +190,14 @@ void Application::Draw()
 		NRI.Wait(*m_FrameFence, 1 + frameIndex - BUFFERED_FRAME_MAX_NUM);
 		NRI.ResetCommandAllocator(*frame.commandAllocator);
 	}
-	uiRenderPass.BeginUI();
+	//uiRenderPass.BeginUI();
 
-	uiRenderPass.EndUI(NRI,*m_Streamer);
+	//uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);
 
 
 	mainRenderPass.PrepareFrame();
-	uiRenderPass.PrepareFrame();
+	//uiRenderPass.PrepareFrame();
 
 
 	mainRenderPass.Draw(NRI,NRI,NRI,NRI,*buffer,frame,window->m_SwapChainBuffers[bufferedFrameIndex],bufferedFrameIndex,window->m_RenderWindowWidth,window->m_RenderWindowHeight);
@@ -207,7 +207,7 @@ void Application::Draw()
 	attachmentsDesc.colorNum = 1;
 	attachmentsDesc.colors = &window->m_SwapChainBuffers[bufferedFrameIndex].colorAttachment;
 	 NRI.CmdBeginRendering(*buffer, attachmentsDesc);
-	uiRenderPass.Draw(NRI,NRI,*m_Streamer,*buffer,1.0f,true);
+	//uiRenderPass.Draw(NRI,NRI,*m_Streamer,*buffer,1.0f,true);
 	 NRI.CmdEndRendering(*buffer);
 
 	 NRI.EndCommandBuffer(*buffer);

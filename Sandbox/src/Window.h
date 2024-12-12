@@ -22,12 +22,12 @@
 
 #include "Settings.h"
 
-void GLFW_ErrorCallback(int32_t error, const char* message);
-
 #include <stdint.h>
 
 #include <NRI.h>
 #include <Extensions/NRISwapChain.h>
+
+void GLFW_ErrorCallback(int32_t error, const char* message);
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action,
 				 int mods);
@@ -47,11 +47,11 @@ struct Frame
 	uint64_t constantBufferViewOffset;
 };
 
-class Window
+class SystemWindow
 {
 	public:
-	Window();
-	~Window();
+	SystemWindow();
+	~SystemWindow();
 
 	bool Initialize(int width, int height);
 	void Update();
@@ -60,9 +60,9 @@ class Window
 
 
 	uint32_t m_RenderWindowWidth;
-	uint32_t m_RenderOutputWidth = 1920;
+	uint32_t m_RenderOutputWidth = 1280;
 	uint32_t m_RenderWindowHeight;
-	uint32_t m_RenderOutputHeight  = 1080;
+	uint32_t m_RenderOutputHeight = 720;
 	
 	std::array<Frame, BUFFERED_FRAME_MAX_NUM>& GetFrames() { return m_Frames; }
 	std::array<BackBuffer,SWAP_CHAIN_TEXTURE_NUM>& GetSwapChainBuffers() { return m_SwapChainBuffers; }

@@ -18,17 +18,17 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action,
 }
 
 
-Window::Window()
+SystemWindow::SystemWindow()
 {
 	
 }
 
-Window::~Window()
+SystemWindow::~SystemWindow()
 {
 	
 }
 
-bool Window::Initialize(int width, int height)
+bool SystemWindow::Initialize(int width, int height)
 {
 	glfwSetErrorCallback(GLFW_ErrorCallback);
 
@@ -106,20 +106,20 @@ bool Window::Initialize(int width, int height)
 	glfwSetMouseButtonCallback(m_Window, &NovaEngine::InputManager::mouseButtonCallback);
 	glfwSetScrollCallback(m_Window, &NovaEngine::InputManager::mouseScrollCallback);
 	glfwSetCursorPosCallback(m_Window, &NovaEngine::InputManager::mousePositionCallback);
+	return true;
 
 	
 }
 
-void Window::Update()
+void SystemWindow::Update()
 {
 }
 
-void Window::Render()
+void SystemWindow::Render()
 {
 }
 
-void Window::Shutdown()
+void SystemWindow::Shutdown()
 {
 	
 }
-

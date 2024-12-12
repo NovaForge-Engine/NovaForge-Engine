@@ -272,6 +272,7 @@ bool UIRenderPass::Init(InitParams params)
 		                           GetCountOf(descriptorRangeUpdateDesc),
 		                           descriptorRangeUpdateDesc);
 	}
+	return true;
 }
 
 void UIRenderPass::Draw(const nri::CoreInterface& NRI,

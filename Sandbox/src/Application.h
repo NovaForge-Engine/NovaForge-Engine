@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include <NRI.h>
 
 
@@ -23,8 +22,8 @@
 #include "Settings.h"
 
 
-inline bool m_DebugAPI = false;
-inline bool m_DebugNRI = false;
+inline bool m_DebugAPI = true;
+inline bool m_DebugNRI = true;
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
 
@@ -41,7 +40,7 @@ public:
 
 
 	private:
-	Window* window;
+	SystemWindow* window;
 
 
 	MainRenderPass mainRenderPass;
