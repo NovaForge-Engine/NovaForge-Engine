@@ -70,6 +70,12 @@ static void GLFW_ErrorCallback(int32_t error, const char* message) {
 	raise(SIGTRAP);
 #endif
 }
+#include <mono/jit/jit.h>
+#include <mono/metadata/image.h>
+
+
+MonoAssembly* assembly;
+
 
 using namespace std;
 

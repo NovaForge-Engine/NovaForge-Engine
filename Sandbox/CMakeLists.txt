@@ -30,6 +30,7 @@ target_link_libraries(
     detex
     glfw
     monosgen
+glm
 )
 
 if (WIN32)
