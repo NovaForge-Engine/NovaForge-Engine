@@ -1,7 +1,7 @@
 # NovaForge-Engine
 Руководство по установке:
 1) Склонировать репозиторий `git clone`
-2) Перейти на нужную ветку `git checkout` <имя ветки> или воспользоваться клиентом git например github desktop\
+2) Перейти на нужную ветку `git checkout <имя ветки>` или воспользоваться клиентом git например github desktop\
 3) Установить CMake
 4) После клонирования и установки на нужную вветку пишем: `git submodule update --init --recursive --depth 1`
 
