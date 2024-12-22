@@ -61,7 +61,7 @@ if(CMAKE_HOST_LINUX)
 elseif(CMAKE_HOST_WIN32)
     add_library(monosgen SHARED IMPORTED GLOBAL)
     set_target_properties(monosgen PROPERTIES
-	IMPORTED_IMPLIB "${CMAKE_SOURCE_DIR}/vendor/mono/build/bin/mono-2.0-sgen.lib"
+	    IMPORTED_IMPLIB "${CMAKE_SOURCE_DIR}/vendor/mono/build/bin/mono-2.0-sgen.lib"
     )
     target_include_directories(monosgen INTERFACE "${CMAKE_SOURCE_DIR}/vendor/mono/build/include/")
 endif()

@@ -11,10 +11,13 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS 
     src/*.hpp
     src/*.h
+    ScriptingSystem/*.hpp
+    ScriptingSystem/*.h
 )
 
 file(GLOB_RECURSE MODULE_FILES CONFIGURE_DEPENDS 
     src/*.cpp
+    ScriptingSystem/*.cpp
 )
 
 add_executable(NovaSandbox ${MODULE_FILES} ${HEADER_FILES})
@@ -30,7 +33,7 @@ target_link_libraries(
     detex
     glfw
     monosgen
-glm
+    glm
 )
 
 if (WIN32)
