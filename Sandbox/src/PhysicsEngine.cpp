@@ -92,9 +92,37 @@ JPH::BodyID PhysicsEngine::GetBodyID(ID id)
 }
 
 
-ID PhysicsEngine::AddBody(const JPH::Vec3& position, const JPH::Quat& rotation, const JPH::Shape* shape, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass)
+ID PhysicsEngine::CreateBody(JPH::BodyCreationSettings& inSettings, float mass)
 {
-	static ID nextBodyID = 1;
+	JPH::MassProperties msp;
+	msp.ScaleToMass(mass);
+	inSettings.mMassPropertiesOverride = msp;
+	inSettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+
+	ID bodyID = nextBodyID++;
+	JPH::Body* body = bodyInterface.CreateBody(inSettings);
+
+	bodyIdTable[bodyID] = body->GetID();
+	return bodyID;
+}
+
+//(@Tenzy21 | 04.01.2025) TODO: Implement/Fix later
+// 
+//ID PhysicsEngine::CreateBody(JPH::ShapeSettings* inShapeSettings, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass)
+//{
+//	return CreateBody(JPH::BodyCreationSettings(inShapeSettings, inPosition, inRotation, inMotionType, collisionLayer), mass);
+//}
+//
+//
+//ID PhysicsEngine::CreateBody(JPH::Shape* inShape, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass)
+//{
+//	return CreateBody(JPH::BodyCreationSettings(inShape, inPosition, inRotation, inMotionType, collisionLayer), mass);
+//}
+
+
+//(@Tenzy21 | 04.01.2025) TODO: Separate adding and creating logic + Implement other signatures later
+ID PhysicsEngine::CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass)
+{
 	ID bodyID = nextBodyID++;
 
 	JPH::BodyCreationSettings bodySettings(shape, position, rotation, motionType, collisionLayer);
@@ -110,7 +138,7 @@ ID PhysicsEngine::AddBody(const JPH::Vec3& position, const JPH::Quat& rotation, 
 	return bodyID;
 }
 
-
+//(@Tenzy21 | 04.01.2025) TODO: Separate removing and destroying logic
 void PhysicsEngine::RemoveBody(ID id)
 {
 	if (bodyIdTable.find(id) != bodyIdTable.end())

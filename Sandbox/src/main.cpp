@@ -722,6 +722,11 @@ class Test
 public:
 	Test();
 
+	void Update();
+	ID TryCreateBody();
+
+	PhysicsEngine* GetPhys();
+
 private:
 	PhysicsEngine* physEngine;
 };
@@ -735,6 +740,30 @@ Test::Test()
 }
 
 
+void Test::Update()
+{
+	physEngine->UpdatePhysics();
+}
+
+
+ID Test::TryCreateBody()
+{
+	JPH::BoxShapeSettings test(JPH::Vec3(1, 1, 1));
+	JPH::BodyCreationSettings bodySettings(
+		test.Create().Get(), JPH::Vec3(0, 0, 0), JPH::Quat(0, 0, 0, 1),
+		JPH::EMotionType::Dynamic,
+		ToJoltLayer(CollisionLayer::MOVING));
+	
+	return physEngine->CreateBody(bodySettings, 50000.0f);
+}
+
+
+PhysicsEngine* Test::GetPhys()
+{
+	return physEngine;
+}
+
+
 int main(int argc, char** argv) {
 	nri::GraphicsAPI api = nri::GraphicsAPI::VK;
 
@@ -742,11 +771,16 @@ int main(int argc, char** argv) {
 	Test test;
 	auto collisions = collisionLayersCount;
 	auto bpLayers = broadPhaseLayersCount;
+	ID testBodyId = test.TryCreateBody();
 
 	sample.Create(argc, argv);
 	bool startup = sample.Initialize(api);
 	while (startup) {
 		sample.RenderFrame();
+		test.Update();
+
+		JPH::Vec3 location = test.GetPhys()->GetBodyTransform(testBodyId).first;
+		std::cout << location.GetX() << " " << location.GetY() << " " << location.GetZ() << std::endl;
 	}
 	return 0;
 }

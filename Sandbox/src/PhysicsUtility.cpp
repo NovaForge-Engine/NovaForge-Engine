@@ -20,8 +20,9 @@ void TraceImpl(const char* message, ...)
 	bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine)
 	{
 		// TODO: We also need some macros for Asserts
-		printf_s("Jolt | AssertFailedImpl: %s:%d: (%s) %s\n", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
-		JPH_ASSERT(false);
+		// (@Tenzy21 | 04.01.2025) TODO: Research reursive asserting bug
+		//printf_s("Jolt | AssertFailedImpl: %s:%d: (%s) %s\n", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
+		//JPH_ASSERT(false);
 
 		return true;
 	}

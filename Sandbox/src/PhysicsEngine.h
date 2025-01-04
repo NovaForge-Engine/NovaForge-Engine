@@ -30,7 +30,12 @@ public:
 	void SetCollisionRule(CollisionLayer layer1, CollisionLayer layer2, bool collisionRule);
 
 	JPH::BodyID GetBodyID(ID id);
-	ID AddBody(const JPH::Vec3& position, const JPH::Quat& rotation, const JPH::Shape* shape, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass);
+
+	ID CreateBody(JPH::BodyCreationSettings& inSettings, float mass);
+	ID CreateBody(JPH::ShapeSettings * inShapeSettings, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
+	ID CreateBody(JPH::Shape * inShape, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
+
+	ID CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass);
 	void RemoveBody(ID id);
 
 	std::pair<JPH::Vec3, JPH::Quat> GetBodyTransform(ID id);
@@ -49,7 +54,9 @@ private:
 	const float cDeltaTime = 1.0f / fpsPhys;
 
 	std::vector<std::vector<bool>> collisionMatrix;
+
 	std::unordered_map<ID, JPH::BodyID> bodyIdTable;
+	ID nextBodyID = 0;
 
 	JPH::TempAllocatorImpl* tempAllocator;
 	JPH::JobSystemThreadPool* jobSystem;
