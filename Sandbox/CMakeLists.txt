@@ -9,67 +9,26 @@ STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURC
 include_directories(include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# elizoorg 25.09.2024
-# TODO: We can setup all project files as glob
-set(HEADER_FILES 
-
-)
-
-
-
-set(MODULE_FILES
-    src/main.cpp
-    src/Utils.hpp
-    src/Utils.cpp
-    src/NRIContext.h
-    src/IRenderPass.h
-    src/IRenderPass.cpp
-    src/ISystem.h
-    src/ISystem.cpp
-    src/UIRenderPass.h
-    src/UIRenderPass.cpp
-    src/MainRenderPass.h
-    src/MainRenderPass.cpp
-    src/RenderSystem.h
-    src/RenderSystem.cpp
-    src/Window.h
-    src/Window.cpp
-    src/Packing.h
-    src/Packing.cpp
-    src/Application.cpp
-	src/Application.h
-    src/Settings.h
-)
-
-set(INTERFACE_FILES
-    src/IRenderPass.h
-    src/IRenderPass.cpp
-    src/ISystem.h
-    src/ISystem.cpp
-)
-
-source_group("Interface" FILES ${INTERFACE_FILES})
-
-set(SYSTEM_FILES
-    src/RenderSystem.h
-    src/RenderSystem.cpp
-)
-
-source_group("Systems" FILES ${SYSTEM_FILES})
-
-set(RENDER_FILES
-    src/UIRenderPass.h
-    src/UIRenderPass.cpp
-    src/MainRenderPass.h
-    src/MainRenderPass.cpp
-)
-
-source_group("Render" FILES ${RENDER_FILES})
 
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_executable(NovaSandbox ${MODULE_FILES} ${HEADER_FILES})
+file(GLOB_RECURSE SRCFILES 	
+	RELATIVE ${PROJECT_SOURCE_DIR}
+	./*.cpp;
+	./*.c;
+	./*.cxx;
+	./*.h;
+	./*.hpp;
+)
+
+source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SRCFILES})
+
+
+
+
+
+add_executable(NovaSandbox ${SRCFILES})
 
 
 
@@ -85,13 +44,6 @@ target_link_libraries(
     glfw
     glm
 )
-
-
-
-
-
-
-
 
 if (WIN32)
     add_custom_command(TARGET NovaSandbox POST_BUILD

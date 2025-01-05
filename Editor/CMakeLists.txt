@@ -6,17 +6,19 @@ STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURC
 
 include_directories(include)
 
-# elizoorg 25.09.2024
-# TODO: We can setup all project files as glob
-set(HEADER_FILES 
-
+file(GLOB_RECURSE SRCFILES 	
+	RELATIVE ${PROJECT_SOURCE_DIR}
+	./*.cpp;
+	./*.c;
+	./*.cxx;
+	./*.h;
+	./*.hpp;
 )
 
-set(MODULE_FILES
-    src/main.cpp
-)
+source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SRCFILES})
 
-add_executable(${PROJECT_NAME} ${MODULE_FILES} ${HEADER_FILES})
+
+add_executable(${PROJECT_NAME} ${SRCFILES})
 
 target_link_libraries(
 	novaeditor PUBLIC
