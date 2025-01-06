@@ -24,11 +24,25 @@ file(GLOB_RECURSE SRCFILES
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SRCFILES})
 
-
+set(DEBUG_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 
 
 add_executable(NovaSandbox ${SRCFILES})
+if (MSVC)
+set_target_properties(
+	NovaSandbox PROPERTIES
+	VS_DEBUGGER_WORKING_DIRECTORY ${DEBUG_WORKING_DIRECTORY}
+)
+endif()
+
+set_target_properties(
+	NovaSandbox PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/build/exec/release_with_debug_info"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/exec/release"
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_SOURCE_DIR}/build/exec/min_size_release"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/build/exec/debug"
+)
 
 
 
