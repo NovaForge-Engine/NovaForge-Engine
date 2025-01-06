@@ -8,6 +8,16 @@ include(CMakePrintHelpers)
 set(CMAKE_PREFIX_PATH "$ENV{VCPKG_ROOT}")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+if (MSVC)
+  add_compile_options(/bigobj)
+else ()
+  add_compile_options(-Wa,-mbig-obj)
+endif ()
+
+if(MSVC)
+  add_definitions(/MP)
+endif()
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -52,6 +62,7 @@ set (SHADERMAKE_GENERAL_ARGS
     -c Shaders.cfg
     -o "${NRIF_SHADERS_PATH}"
     -I "vendor/NRI/Include"
+    -I "vendor/ml"
     --sRegShift 100 --tRegShift 200 --bRegShift 300 --uRegShift 400
 )
 
