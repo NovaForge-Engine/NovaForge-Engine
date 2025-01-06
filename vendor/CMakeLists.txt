@@ -52,13 +52,10 @@ target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/entt/src)
 # vendor/glm
 add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-
-set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
 
+
+#vendor/other
 set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
