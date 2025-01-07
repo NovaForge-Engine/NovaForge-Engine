@@ -184,7 +184,8 @@ void Application::Draw()
 {
 	const uint32_t bufferedFrameIndex = frameIndex % BUFFERED_FRAME_MAX_NUM;
 	const Frame& frame = window->GetFrames()[bufferedFrameIndex];
-	nri::CommandBuffer *buffer = frame.commandBuffer;
+	nri::CommandBuffer* buffer = frame.commandBuffer;
+
 
 	if (frameIndex >= BUFFERED_FRAME_MAX_NUM) {
 		NRI.Wait(*m_FrameFence, 1 + frameIndex - BUFFERED_FRAME_MAX_NUM);
@@ -196,19 +197,55 @@ void Application::Draw()
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);
 
 
+
+
+
 	mainRenderPass.PrepareFrame();
 	uiRenderPass.PrepareFrame();
 
 
-	mainRenderPass.Draw(NRI,NRI,NRI,NRI,*buffer,frame,window->m_SwapChainBuffers[bufferedFrameIndex],bufferedFrameIndex,window->m_RenderWindowWidth,window->m_RenderWindowHeight);
+    const uint32_t currentTextureIndex =
+		NRI.AcquireNextSwapChainTexture(*m_SwapChain);
+
+	BackBuffer& backBuffer = window->m_SwapChainBuffers[currentTextureIndex];
+
+
+
+	mainRenderPass.Draw(NRI, NRI, NRI, NRI, *buffer, frame, backBuffer,
+	                    bufferedFrameIndex, window->m_RenderWindowWidth,
+	                    window->m_RenderWindowHeight);
 
 
 	nri::AttachmentsDesc attachmentsDesc = {};
 	attachmentsDesc.colorNum = 1;
-	attachmentsDesc.colors = &window->m_SwapChainBuffers[bufferedFrameIndex].colorAttachment;
+	attachmentsDesc.colors = &backBuffer.colorAttachment;
+
+
 	 NRI.CmdBeginRendering(*buffer, attachmentsDesc);
-	uiRenderPass.Draw(NRI,NRI,*m_Streamer,*buffer,1.0f,true);
+	{
+		uiRenderPass.Draw(NRI, NRI, *m_Streamer, *buffer, 1.0f, true);
+	}
 	 NRI.CmdEndRendering(*buffer);
+
+	 nri::TextureBarrierDesc textureBarrierDescs = {};
+	 textureBarrierDescs.texture =
+		 window->m_SwapChainBuffers[bufferedFrameIndex].texture;
+	 textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
+	                              nri::Layout::COLOR_ATTACHMENT};
+	 textureBarrierDescs.layerNum = 1;
+	 textureBarrierDescs.mipNum = 1;
+
+	 nri::BarrierGroupDesc barrierGroupDesc = {};
+	 barrierGroupDesc.textureNum = 1;
+	 barrierGroupDesc.textures = &textureBarrierDescs;
+
+
+	 textureBarrierDescs.before = textureBarrierDescs.after;
+	 textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,
+	                              nri::Layout::PRESENT};
+
+	 NRI.CmdBarrier(*buffer, barrierGroupDesc);
+
 
 	 NRI.EndCommandBuffer(*buffer);
 
