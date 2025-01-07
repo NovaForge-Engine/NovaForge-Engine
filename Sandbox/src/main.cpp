@@ -6,13 +6,15 @@
 int main(int argc, char** argv) {
 	Application app;
 
-	bool startup = app.Init(argc,argv);
-	spdlog::info("Application started with startup {}", startup);
-	while (startup) {
+	app.shouldClose = app.Init(argc,argv);
+
+
+	spdlog::info("Application started with startup {}", app.shouldClose);
+	while (app.shouldClose) {
 		app.Update();
 
 		app.Draw();	
-		glfwPollEvents();
+
 	}
 
 

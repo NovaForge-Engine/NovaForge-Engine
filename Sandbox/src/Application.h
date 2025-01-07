@@ -48,13 +48,16 @@ public:
 	void InitCmdLineDefault(cmdline::parser& cmdLine);
 	void ReadCmdLineDefault(cmdline::parser& cmdLine);
 
-
+	bool shouldClose = false;
 	private:
 	Window* window;
 
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
+	
+
+	
 
 
 	Frame& getCurrentFrame(){return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];}

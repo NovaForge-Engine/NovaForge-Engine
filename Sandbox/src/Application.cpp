@@ -208,6 +208,13 @@ void Application::Shutdown()
 
 void Application::Update()
 {
+	glfwPollEvents();
+
+
+	if (glfwWindowShouldClose(window->GetGLFWWindow())) {
+		shouldClose = false;
+	}
+
 }
 
 void Application::Draw()
