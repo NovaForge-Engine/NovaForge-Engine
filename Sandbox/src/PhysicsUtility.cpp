@@ -1,7 +1,6 @@
 #include "PhysicsUtility.h"
 #include "PhysicsEngine.h"
 
-
 void TraceImpl(const char* message, ...)
 {
 	va_list list;
@@ -10,8 +9,7 @@ void TraceImpl(const char* message, ...)
 	vsnprintf(buffer, sizeof(buffer), message, list);
 	va_end(list);
 
-	//TODO: Probably we need some macros for Logging
-	printf_s("Jolt | TraceImpl: %s\n", buffer);
+	spdlog::info("Jolt | TraceImpl: {}", buffer);
 }
 
 
@@ -19,12 +17,8 @@ void TraceImpl(const char* message, ...)
 
 	bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine)
 	{
-		// TODO: We also need some macros for Asserts
-		// (@Tenzy21 | 04.01.2025) TODO: Research reursive asserting bug
-		//printf_s("Jolt | AssertFailedImpl: %s:%d: (%s) %s\n", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
-		//JPH_ASSERT(false);
-
-		return true;
+		spdlog::critical("Jolt | Assert: {}:{}: ({}) {}", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
+		return false;
 	}
 
 #endif // JPH_ENABLE_ASSERTS
@@ -78,13 +72,10 @@ bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide(JPH::ObjectLayer inLayer1,
 	return PhysicsEngine::Get()->CanCollide(FromJoltLayer(inLayer1), CollisionLayer(FromJoltLayer(inLayer2)));
 }
 
-JPH::ValidateResult ContactListener::OnContactValidate(
-	const JPH::Body& inBody1, const JPH::Body& inBody2,
-	JPH::RVec3Arg inBaseOffset,
-	const JPH::CollideShapeResult& inCollisionResult)
+JPH::ValidateResult ContactListener::OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult)
 {
-	// LOG:
-	// std::cout << "Contact validate callback" << std::endl;
+	// (@Tenzy21 | 05.01.2025) Research crash on logging
+	//spdlog::debug("Contact validate callback | BodyID-1: {}, BodyID-2: {}",MapBodyID(inBody1.GetID()));
 	return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 }
 

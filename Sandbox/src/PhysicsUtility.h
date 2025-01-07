@@ -17,8 +17,8 @@
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include "Jolt/RegisterTypes.h"
 #include <Jolt/Renderer/DebugRenderer.h>
-
 #include <magic_enum/magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <cstdarg>
@@ -32,6 +32,20 @@ void TraceImpl(const char* inFMT, ...);
     bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine);
 
 #endif //JPH_ENABLE_ASSERTS
+
+using NovaBodyID = JPH::uint32;
+using JoltBodyID = JPH::BodyID;
+
+// (@Tenzy21 | 05.01.2025) Research crash on trying get info for logging
+//inline JoltBodyID MapBodyID(NovaBodyID id)
+//{
+//	return PhysicsEngine::Get()->GetBodyID(id);
+//}
+//
+//inline NovaBodyID MapBodyID(JoltBodyID id)
+//{
+//	return PhysicsEngine::Get()->GetBodyID(id);
+//}
 
 enum class CollisionLayer : JPH::ObjectLayer 
 {
@@ -110,8 +124,8 @@ public:
 class BodyActivationListener : public JPH::BodyActivationListener
 {
 public:
-	virtual void OnBodyActivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData) override;
-	virtual void OnBodyDeactivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData) override;
+	virtual void OnBodyActivated(const JoltBodyID& inBodyID, JPH::uint64 inBodyUserData) override;
+	virtual void OnBodyDeactivated(const JoltBodyID& inBodyID, JPH::uint64 inBodyUserData) override;
 };
 
 class DebugRenderer : public JPH::DebugRenderer

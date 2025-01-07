@@ -39,14 +39,15 @@ void PhysicsEngine::Init(float gravityScale)
 	physicsSystem.SetContactListener(&contactListener);
 	
 	physicsSystem.SetGravity(JPH::Vec3(0.0f, -9.81f / 100 * gravityScale, 0.0f));
-
 	debugRenderer = new DebugRenderer();
+
+	spdlog::info("PhysicsEngine initialized");
 }
 
 void PhysicsEngine::Terminate()
 {
 	JPH::UnregisterTypes();
-	delete JPH::Factory::sInstance;
+	delete JPH::Factory::sInstance;`
 	JPH::Factory::sInstance = nullptr;
 	delete instance;
 }
@@ -86,24 +87,32 @@ void PhysicsEngine::SetCollisionRule(CollisionLayer layer1, CollisionLayer layer
 }
 
 
-JPH::BodyID PhysicsEngine::GetBodyID(ID id)
+JoltBodyID PhysicsEngine::GetBodyID(NovaBodyID novaBodyId)
 {
-	JPH_ASSERT(id < bodyIdTable.size(), "Trying get BodyID with invalid id");
-	return bodyIdTable.at(id);
+	JPH_ASSERT(novaToJoltBodyIdTable.contains(novaBodyId), "Trying get JoltBodyID with invalid NovaBodyID");
+	return novaToJoltBodyIdTable.at(novaBodyId);
 }
 
 
-ID PhysicsEngine::CreateBody(JPH::BodyCreationSettings& inSettings, float mass)
+NovaBodyID PhysicsEngine::GetBodyID(JoltBodyID joltBodyId)
+{
+	JPH_ASSERT(joltToNovaBodyIdTable.contains(joltBodyId), "Trying get NovaBodyID with invalid JoltBodyID");
+	return joltToNovaBodyIdTable.at(joltBodyId);
+}
+
+
+NovaBodyID PhysicsEngine::CreateBody(JPH::BodyCreationSettings& inSettings, float mass)
 {
 	JPH::MassProperties msp;
 	msp.ScaleToMass(mass);
 	inSettings.mMassPropertiesOverride = msp;
 	inSettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
 
-	ID bodyID = nextBodyID++;
+	NovaBodyID bodyID = nextBodyID++;
 	JPH::Body* body = bodyInterface.CreateBody(inSettings);
 
-	bodyIdTable[bodyID] = body->GetID();
+	novaToJoltBodyIdTable[bodyID] = body->GetID();
+	joltToNovaBodyIdTable[body->GetID()] = bodyID;
 	return bodyID;
 }
 
@@ -122,9 +131,9 @@ ID PhysicsEngine::CreateBody(JPH::BodyCreationSettings& inSettings, float mass)
 
 
 //(@Tenzy21 | 04.01.2025) TODO: Separate adding and creating logic + Implement other signatures later
-ID PhysicsEngine::CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass)
+NovaBodyID PhysicsEngine::CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass)
 {
-	ID bodyID = nextBodyID++;
+	NovaBodyID bodyID = nextBodyID++;
 
 	JPH::BodyCreationSettings bodySettings(shape, position, rotation, motionType, collisionLayer);
 	JPH::MassProperties msp;
@@ -133,27 +142,28 @@ ID PhysicsEngine::CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& pos
 	bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
 
 	JPH::Body* body = bodyInterface.CreateBody(bodySettings);
-	bodyIdTable[bodyID] = body->GetID();
+	novaToJoltBodyIdTable[bodyID] = body->GetID();
+	joltToNovaBodyIdTable[body->GetID()] = bodyID;
 	bodyInterface.AddBody(body->GetID(), JPH::EActivation::Activate);
 
 	return bodyID;
 }
 
 //(@Tenzy21 | 04.01.2025) TODO: Separate removing and destroying logic
-void PhysicsEngine::RemoveBody(ID id)
+void PhysicsEngine::RemoveBody(NovaBodyID id)
 {
-	if (bodyIdTable.find(id) != bodyIdTable.end())
+	if (novaToJoltBodyIdTable.find(id) != novaToJoltBodyIdTable.end())
 	{
-		JPH::BodyID bodyID = bodyIdTable[id];
+		JoltBodyID bodyID = novaToJoltBodyIdTable[id];
 		bodyInterface.RemoveBody(bodyID);
-		bodyIdTable.erase(id);
+		novaToJoltBodyIdTable.erase(id);
 	}
 }
 
 
-std::pair<JPH::Vec3, JPH::Quat> PhysicsEngine::GetBodyTransform(ID id)
+std::pair<JPH::Vec3, JPH::Quat> PhysicsEngine::GetBodyTransform(NovaBodyID id)
 {
-	JPH::BodyID bodyID = GetBodyID(id);
+	JoltBodyID bodyID = GetBodyID(id);
 	JPH::Vec3 position;
 	JPH::Quat rotation;
 	bodyInterface.GetPositionAndRotation(bodyID, position, rotation);
@@ -162,8 +172,8 @@ std::pair<JPH::Vec3, JPH::Quat> PhysicsEngine::GetBodyTransform(ID id)
 }
 
 
-void PhysicsEngine::SetBodyTransform(ID id, const JPH::Vec3& position, const JPH::Quat& rotation)
+void PhysicsEngine::SetBodyTransform(NovaBodyID id, const JPH::Vec3& position, const JPH::Quat& rotation)
 {
-	JPH::BodyID bodyID = GetBodyID(id);
+	JoltBodyID bodyID = GetBodyID(id);
 	bodyInterface.SetPositionAndRotation(bodyID, position, rotation, JPH::EActivation::Activate);
 }

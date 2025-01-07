@@ -5,12 +5,10 @@
 #include <Jolt/Renderer/DebugRenderer.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/Core.h>
-
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 
 #include "PhysicsUtility.h"
-
-using ID = JPH::uint32;
 
 class PhysicsEngine
 {
@@ -30,17 +28,18 @@ public:
 	bool CanCollide(CollisionLayer layer1, CollisionLayer layer2) const;
 	void SetCollisionRule(CollisionLayer layer1, CollisionLayer layer2, bool collisionRule);
 
-	JPH::BodyID GetBodyID(ID id);
+	JoltBodyID GetBodyID(NovaBodyID novaBodyId);
+	NovaBodyID GetBodyID(JoltBodyID joltBodyId);
 
-	ID CreateBody(JPH::BodyCreationSettings& inSettings, float mass);
-	ID CreateBody(JPH::ShapeSettings * inShapeSettings, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
-	ID CreateBody(JPH::Shape * inShape, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
+	NovaBodyID CreateBody(JPH::BodyCreationSettings& inSettings, float mass);
+	NovaBodyID CreateBody(JPH::ShapeSettings * inShapeSettings, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
+	NovaBodyID CreateBody(JPH::Shape * inShape, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
 
-	ID CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass);
-	void RemoveBody(ID id);
+	NovaBodyID CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass);
+	void RemoveBody(NovaBodyID id);
 
-	std::pair<JPH::Vec3, JPH::Quat> GetBodyTransform(ID id);
-	void SetBodyTransform(ID id, const JPH::Vec3& position, const JPH::Quat& rotation);
+	std::pair<JPH::Vec3, JPH::Quat> GetBodyTransform(NovaBodyID id);
+	void SetBodyTransform(NovaBodyID id, const JPH::Vec3& position, const JPH::Quat& rotation);
 
 private:
 	static PhysicsEngine* instance;
@@ -56,8 +55,9 @@ private:
 
 	std::vector<std::vector<bool>> collisionMatrix;
 
-	std::unordered_map<ID, JPH::BodyID> bodyIdTable;
-	ID nextBodyID = 0;
+	std::unordered_map<NovaBodyID, JoltBodyID> novaToJoltBodyIdTable;
+	std::unordered_map<JoltBodyID, NovaBodyID> joltToNovaBodyIdTable;
+	NovaBodyID nextBodyID = 0;
 
 	JPH::TempAllocatorImpl* tempAllocator;
 	JPH::JobSystemThreadPool* jobSystem;
