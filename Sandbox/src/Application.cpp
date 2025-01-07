@@ -185,7 +185,8 @@ bool Application::Init(int argc,char** argv)
 		.NRI = NRI,
 		.helperInterface = NRI,
 		.device = *m_Device,
-		.renderTargetFormat = swapChainFormat
+		.renderTargetFormat = swapChainFormat,
+		.window = window
 	};
 
 	result = uiRenderPass.Init(uiPassParams);
@@ -229,6 +230,8 @@ void Application::Draw()
 		NRI.ResetCommandAllocator(*frame.commandAllocator);
 	}
 	uiRenderPass.BeginUI();
+
+
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);

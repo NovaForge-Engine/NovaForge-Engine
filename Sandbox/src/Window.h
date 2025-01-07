@@ -22,12 +22,17 @@
 
 #include "Settings.h"
 
+#include <WinUser.h>
+
+
 void GLFW_ErrorCallback(int32_t error, const char* message);
 
 #include <stdint.h>
 
 #include <NRI.h>
 #include <Extensions/NRISwapChain.h>
+
+#include "imgui_impl_glfw.h"
 
 #include <string>
 
@@ -48,6 +53,9 @@ struct Frame
 
 	uint64_t constantBufferViewOffset;
 };
+
+
+
 
 class Window
 {

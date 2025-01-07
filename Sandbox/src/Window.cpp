@@ -10,6 +10,7 @@ void GLFW_ErrorCallback(int32_t error, const char* message)
 #endif
 }
 
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action,
 	int mods)
 {
@@ -78,7 +79,7 @@ bool Window::Initialize(int width, int height,std::string api)
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_DECORATED, decorated ? 1 : 0);
-	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_RESIZABLE, 1);
 	glfwWindowHint(GLFW_POSITION_X, x);
 	glfwWindowHint(GLFW_POSITION_Y, y);
 
@@ -99,8 +100,12 @@ bool Window::Initialize(int width, int height,std::string api)
 #endif
 
 
+
 	//elizoorg 01.11.2024
 	//TODO: Add glfw window callbacks
+
+
+
 
 	glfwSetKeyCallback(m_Window, keyCallback);
 	glfwSetMouseButtonCallback(m_Window, &NovaEngine::InputManager::mouseButtonCallback);

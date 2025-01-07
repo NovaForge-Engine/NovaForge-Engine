@@ -2,7 +2,6 @@
 
 #include "Utils.hpp"
 #include "Packing.h"
-
 void UIRenderPass::Init()
 {
 }
@@ -26,6 +25,9 @@ bool UIRenderPass::Init(InitParams params)
 	ImGui::StyleColorsDark();
 
 	float contentScale = 1.0f;
+
+	ImGui_ImplGlfw_InitForOther(params.window->GetGLFWWindow(), true);
+
 	//elizoorg 21.11.2024
 	//TODO: m_DpiMode should also be provided to this function which should be stored into window class
 	/*if (m_DpiMode != 0)
@@ -342,6 +344,8 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 
 }
 
+
+
 void UIRenderPass::BeginUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -361,6 +365,8 @@ void UIRenderPass::BeginUI()
 	// 
 	// 
 	io.DisplaySize = ImVec2(1280.0f, 720.0f);
+
+
 
 
 	//m_TimePrev = timeCur;
@@ -421,6 +427,7 @@ void UIRenderPass::BeginUI()
 	// Start the frame. This call will update the io.WantCaptureMouse,
 	// io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not)
 	// to your application.
+	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
 

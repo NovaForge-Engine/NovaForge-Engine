@@ -134,7 +134,7 @@ bool MainRenderPass::Init(InitParams params)
 		Align((uint32_t)sizeof(ConstantBufferLayout),
 	          deviceDesc.constantBufferOffsetAlignment);
 	const uint64_t indexDataSize = sizeof(g_IndexData);
-	const uint64_t indexDataAlignedSize = Align(indexDataSize, 16);
+	constexpr uint64_t indexDataAlignedSize = Align(indexDataSize, 16);
 	const uint64_t vertexDataSize = sizeof(g_VertexData);
 
 	{
