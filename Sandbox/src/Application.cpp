@@ -10,12 +10,35 @@ Application::~Application()
 {
 }
 
-bool Application::Init(nri::GraphicsAPI graphicsAPI)
+bool Application::Init(int argc,char** argv)
 {
+
+
+	cmdline::parser cmdLine;
+
+	InitCmdLineDefault(cmdLine);
+	InitCmdLine(cmdLine);
+
+	bool parseStatus = cmdLine.parse(argc, argv);
+
+	if (cmdLine.exist("help"))
+	{
+		std::cout <<cmdLine.usage() << std::endl;
+		return false;
+	}
+
+	if (!parseStatus) {
+		spdlog::error("Failed to parse command line arguments. Error: {} , Usage {}", cmdLine.error(), cmdLine.usage());
+		return false;
+	}
+
+	ReadCmdLineDefault(cmdLine);
+	ReadCmdLine(cmdLine);
+
 
 	window = new Window();
 
-	window->Initialize(1280, 720);
+	window->Initialize(1280, 720, cmdLine.get<std::string>("api"));
 
 
 	nri::AdapterDesc bestAdapterDesc = {};
@@ -25,6 +48,13 @@ bool Application::Init(nri::GraphicsAPI graphicsAPI)
 		{
 		return false;
 		};
+
+
+	nri::GraphicsAPI graphicsAPI = nri::GraphicsAPI::D3D12;
+		if (cmdLine.get<std::string>("api") == "VULKAN" || cmdLine.get<std::string>("api") == "VK")
+	graphicsAPI = nri::GraphicsAPI::VK;
+
+
 
 	nri::DeviceCreationDesc deviceCreationDesc = {};
 	deviceCreationDesc.graphicsAPI = graphicsAPI;
@@ -228,8 +258,7 @@ void Application::Draw()
 	 NRI.CmdEndRendering(*buffer);
 
 	 nri::TextureBarrierDesc textureBarrierDescs = {};
-	 textureBarrierDescs.texture =
-		 window->m_SwapChainBuffers[bufferedFrameIndex].texture;
+	 textureBarrierDescs.texture = backBuffer.texture;
 	 textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
 	                              nri::Layout::COLOR_ATTACHMENT};
 	 textureBarrierDescs.layerNum = 1;
@@ -276,5 +305,29 @@ void Application::Draw()
 
 	frameIndex++;
 
+
+}
+
+
+void Application::InitCmdLineDefault(cmdline::parser& cmdLine)
+{
+#if _WIN32
+	std::string graphicsAPI = "D3D12";
+#else
+	std::string graphicsAPI = "VULKAN";
+#endif
+	cmdLine.add("help", '?', "print this message");
+	cmdLine.add<std::string>(
+		"api", 'a', "graphics API: D3D12 or VULKAN", false, graphicsAPI,
+		cmdline::oneof<std::string>("D3D12", "VULKAN"));
+	cmdLine.add("debugAPI", 0, "enable graphics API validation layer");
+	cmdLine.add("debugNRI", 0, "enable NRI validation layer");
+
+}
+
+void Application::ReadCmdLineDefault(cmdline::parser& cmdLine)
+{
+	m_DebugAPI = cmdLine.exist("debugAPI");
+	m_DebugNRI = cmdLine.exist("debugNRI");
 
 }

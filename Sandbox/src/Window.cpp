@@ -28,7 +28,7 @@ Window::~Window()
 	
 }
 
-bool Window::Initialize(int width, int height)
+bool Window::Initialize(int width, int height,std::string api)
 {
 	glfwSetErrorCallback(GLFW_ErrorCallback);
 
@@ -83,7 +83,7 @@ bool Window::Initialize(int width, int height)
 	glfwWindowHint(GLFW_POSITION_Y, y);
 
 	char windowName[256];
-	snprintf(windowName, sizeof(windowName), "%s [%s]", "MyBestRender", "D3D12");
+	snprintf(windowName, sizeof(windowName), "%s [%s]", "MyBestRender", api.c_str());
 
 	m_Window = glfwCreateWindow(m_RenderWindowWidth, m_RenderWindowHeight, windowName, NULL, NULL);
 	if (!m_Window) {

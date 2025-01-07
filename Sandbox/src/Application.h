@@ -22,9 +22,10 @@
 
 #include "Settings.h"
 
+#include "CmdLine.h"
 
-inline bool m_DebugAPI = false;
-inline bool m_DebugNRI = false;
+
+
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
 
@@ -34,10 +35,18 @@ public:
 	Application();
 	~Application();
 
-	bool Init(nri::GraphicsAPI graphicsAPI);
+	bool Init(int argc,char **argv);
 	void Shutdown();
 	void Update();
 	void Draw();
+
+
+	void InitCmdLine([[maybe_unused]] cmdline::parser& cmdLine) {}
+
+	void ReadCmdLine([[maybe_unused]] cmdline::parser& cmdLine) {}
+
+	void InitCmdLineDefault(cmdline::parser& cmdLine);
+	void ReadCmdLineDefault(cmdline::parser& cmdLine);
 
 
 	private:
@@ -56,6 +65,9 @@ public:
 	nri::SwapChain* m_SwapChain = nullptr;
 	nri::CommandQueue* m_CommandQueue = nullptr;
 	nri::Fence* m_FrameFence = nullptr;
+
+	bool m_DebugAPI = false;
+	bool m_DebugNRI = false;
 
 	uint32_t frameIndex = 0;
 

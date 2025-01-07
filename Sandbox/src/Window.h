@@ -29,6 +29,8 @@ void GLFW_ErrorCallback(int32_t error, const char* message);
 #include <NRI.h>
 #include <Extensions/NRISwapChain.h>
 
+#include <string>
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action,
 				 int mods);
 
@@ -53,7 +55,7 @@ class Window
 	Window();
 	~Window();
 
-	bool Initialize(int width, int height);
+	bool Initialize(int width, int height, std::string api);
 	void Update();
 	void Render();
 	void Shutdown();
