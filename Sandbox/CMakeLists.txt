@@ -9,26 +9,40 @@ STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURC
 include_directories(include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# elizoorg 25.09.2024
-# TODO: We can setup all project files as glob
-set(HEADER_FILES 
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+file(GLOB_RECURSE SRCFILES 	
+	RELATIVE ${PROJECT_SOURCE_DIR}
+	./*.cpp;
+	./*.c;
+	./*.cxx;
+	./*.h;
+	./*.hpp;
 )
 
+source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SRCFILES})
+
+set(DEBUG_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 
-set(MODULE_FILES
-    src/main.cpp
-    src/Utils.hpp
-    src/Utils.cpp
-    src/PhysicsEngine.cpp
-    src/PhysicsEngine.h
-    src/PhysicsUtility.cpp
-    src/PhysicsUtility.h
+
+add_executable(NovaSandbox ${SRCFILES})
+if (MSVC)
+set_target_properties(
+	NovaSandbox PROPERTIES
+	VS_DEBUGGER_WORKING_DIRECTORY ${DEBUG_WORKING_DIRECTORY}
 )
+endif()
 
-
-add_executable(NovaSandbox ${MODULE_FILES} ${HEADER_FILES})
+set_target_properties(
+	NovaSandbox PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/build/exec/release_with_debug_info"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/exec/release"
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_SOURCE_DIR}/build/exec/min_size_release"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/build/exec/debug"
+)
 
 
 
