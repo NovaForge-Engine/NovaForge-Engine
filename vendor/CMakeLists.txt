@@ -53,6 +53,17 @@ add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
 
+# vendor/JoltPhysics
+set(BUILD_SHARED_LIBS ON)
+add_subdirectory("joltphysics/Build")
+set_property (TARGET Jolt PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+set(BUILD_SHARED_LIBS OFF)
+
+#vendor/magic_enum
+add_subdirectory("magic_enum")
+set_property (TARGET magic_enum PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+#target_include_directories(magic_enum INTERFACE ${CMAKE_SOURCE_DIR}/vendor/magic_enum)
+
 #vendor/other
 set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")

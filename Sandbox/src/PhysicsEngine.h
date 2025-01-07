@@ -20,11 +20,12 @@ public:
 
 	static PhysicsEngine* Get();
 
-	void Initialize(float gravityScale = 1.0f);
-	void UpdatePhysics();
+	void Init(float gravityScale = 1.0f);
+	void Terminate();
+	void Update();
+
 	JPH::PhysicsSystem* GetPhysicsSystem();
 	JPH::DebugRenderer* GetDebugRenderer() const;
-	void Cleanup();
 
 	bool CanCollide(CollisionLayer layer1, CollisionLayer layer2) const;
 	void SetCollisionRule(CollisionLayer layer1, CollisionLayer layer2, bool collisionRule);

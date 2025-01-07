@@ -21,7 +21,7 @@ PhysicsEngine* PhysicsEngine::Get()
 	return instance;
 }
 
-void PhysicsEngine::Initialize(float gravityScale)
+void PhysicsEngine::Init(float gravityScale)
 {
 	JPH::RegisterDefaultAllocator();
 	JPH::Trace = TraceImpl;
@@ -43,7 +43,15 @@ void PhysicsEngine::Initialize(float gravityScale)
 	debugRenderer = new DebugRenderer();
 }
 
-void PhysicsEngine::UpdatePhysics()
+void PhysicsEngine::Terminate()
+{
+	JPH::UnregisterTypes();
+	delete JPH::Factory::sInstance;
+	JPH::Factory::sInstance = nullptr;
+	delete instance;
+}
+
+void PhysicsEngine::Update()
 {
 	physicsSystem.Update(cDeltaTime, cCollisionSteps, tempAllocator, jobSystem);
 }
@@ -56,13 +64,6 @@ JPH::PhysicsSystem* PhysicsEngine::GetPhysicsSystem()
 JPH::DebugRenderer* PhysicsEngine::GetDebugRenderer() const
 {
 	return debugRenderer;
-}
-
-void PhysicsEngine::Cleanup()
-{
-	JPH::UnregisterTypes();
-	delete JPH::Factory::sInstance;
-	JPH::Factory::sInstance = nullptr;
 }
 
 bool PhysicsEngine::CanCollide(CollisionLayer layer1, CollisionLayer layer2) const

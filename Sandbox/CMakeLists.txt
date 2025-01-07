@@ -58,7 +58,7 @@ target_link_libraries(
     spdlog
     glfw
     glm
-	Jolt
+    Jolt
     magic_enum
 )
 
