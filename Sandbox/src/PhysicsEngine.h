@@ -5,8 +5,6 @@
 #include <Jolt/Renderer/DebugRenderer.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/Core.h>
-#include <glm/glm.hpp>
-#include <spdlog/spdlog.h>
 
 #include "PhysicsUtility.h"
 
@@ -32,11 +30,14 @@ public:
 	NovaBodyID GetBodyID(JoltBodyID joltBodyId);
 
 	NovaBodyID CreateBody(JPH::BodyCreationSettings& inSettings, float mass);
-	NovaBodyID CreateBody(JPH::ShapeSettings * inShapeSettings, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
-	NovaBodyID CreateBody(JPH::Shape * inShape, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
+	NovaBodyID CreateBody(JPH::ShapeSettings* inShapeSettings, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
+	NovaBodyID CreateBody(JPH::Shape* inShape, JPH::RVec3Arg inPosition, JPH::QuatArg inRotation, JPH::EMotionType inMotionType, JPH::ObjectLayer collisionLayer, float mass);
 
 	NovaBodyID CreateAndAddBody(const JPH::Shape* shape, const JPH::Vec3& position, const JPH::Quat& rotation, JPH::EMotionType motionType, JPH::ObjectLayer collisionLayer, float mass);
+	
 	void RemoveBody(NovaBodyID id);
+	void DestroyBody(NovaBodyID id);
+	void RemoveAndDestroyBody(NovaBodyID id);
 
 	std::pair<JPH::Vec3, JPH::Quat> GetBodyTransform(NovaBodyID id);
 	void SetBodyTransform(NovaBodyID id, const JPH::Vec3& position, const JPH::Quat& rotation);
@@ -70,3 +71,13 @@ private:
 	JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
 	JPH::DebugRenderer* debugRenderer;
 };
+
+inline const JoltBodyID MapBodyID(NovaBodyID id)
+{
+	return PhysicsEngine::Get()->GetBodyID(id);
+}
+
+inline const NovaBodyID MapBodyID(JoltBodyID id)
+{
+	return PhysicsEngine::Get()->GetBodyID(id);
+}

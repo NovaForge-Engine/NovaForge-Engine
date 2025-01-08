@@ -1,3 +1,4 @@
+#include <spdlog/spdlog.h>
 #include "PhysicsEngine.h"
 
 PhysicsEngine::PhysicsEngine()
@@ -47,7 +48,7 @@ void PhysicsEngine::Init(float gravityScale)
 void PhysicsEngine::Terminate()
 {
 	JPH::UnregisterTypes();
-	delete JPH::Factory::sInstance;`
+	delete JPH::Factory::sInstance;
 	JPH::Factory::sInstance = nullptr;
 	delete instance;
 }
@@ -149,17 +150,34 @@ NovaBodyID PhysicsEngine::CreateAndAddBody(const JPH::Shape* shape, const JPH::V
 	return bodyID;
 }
 
-//(@Tenzy21 | 04.01.2025) TODO: Separate removing and destroying logic
 void PhysicsEngine::RemoveBody(NovaBodyID id)
+{
+	if (novaToJoltBodyIdTable.find(id) != novaToJoltBodyIdTable.end()) {
+		bodyInterface.RemoveBody(novaToJoltBodyIdTable[id]);
+	}
+	else {
+		spdlog::warn("Jolt | RemoveBody: Trying to remove non-existed body (ID: {})", id);
+	}
+}
+void PhysicsEngine::DestroyBody(NovaBodyID id)
 {
 	if (novaToJoltBodyIdTable.find(id) != novaToJoltBodyIdTable.end())
 	{
 		JoltBodyID bodyID = novaToJoltBodyIdTable[id];
-		bodyInterface.RemoveBody(bodyID);
 		novaToJoltBodyIdTable.erase(id);
+		joltToNovaBodyIdTable.erase(bodyID);
+		bodyInterface.DestroyBody(bodyID);
+	}
+	else {
+		spdlog::warn("Jolt | DestroyBody: Trying to destroy non-existed body (ID: {})", id);
 	}
 }
 
+void PhysicsEngine::RemoveAndDestroyBody(NovaBodyID id)
+{
+	RemoveBody(id);
+	DestroyBody(id);
+}
 
 std::pair<JPH::Vec3, JPH::Quat> PhysicsEngine::GetBodyTransform(NovaBodyID id)
 {
@@ -170,7 +188,6 @@ std::pair<JPH::Vec3, JPH::Quat> PhysicsEngine::GetBodyTransform(NovaBodyID id)
 
 	return {position, rotation};
 }
-
 
 void PhysicsEngine::SetBodyTransform(NovaBodyID id, const JPH::Vec3& position, const JPH::Quat& rotation)
 {

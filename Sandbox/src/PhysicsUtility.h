@@ -10,42 +10,26 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
-#include <Jolt/Physics/Body/BodyID.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include "Jolt/RegisterTypes.h"
 #include <Jolt/Renderer/DebugRenderer.h>
 #include <magic_enum/magic_enum.hpp>
-#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <cstdarg>
 
 using namespace JPH::literals;
+using NovaBodyID = JPH::uint32;
+using JoltBodyID = JPH::BodyID;
 
 void TraceImpl(const char* inFMT, ...);
 
 #ifdef JPH_ENABLE_ASSERTS
 
-    bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine);
+bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine);
 
-#endif //JPH_ENABLE_ASSERTS
-
-using NovaBodyID = JPH::uint32;
-using JoltBodyID = JPH::BodyID;
-
-// (@Tenzy21 | 05.01.2025) Research crash on trying get info for logging
-//inline JoltBodyID MapBodyID(NovaBodyID id)
-//{
-//	return PhysicsEngine::Get()->GetBodyID(id);
-//}
-//
-//inline NovaBodyID MapBodyID(JoltBodyID id)
-//{
-//	return PhysicsEngine::Get()->GetBodyID(id);
-//}
+#endif
 
 enum class CollisionLayer : JPH::ObjectLayer 
 {
@@ -66,22 +50,22 @@ enum class BroadPhaseLayer : JPH::BroadPhaseLayer::Type
 
 constexpr JPH::BroadPhaseLayer::Type broadPhaseLayersCount = magic_enum::enum_count<BroadPhaseLayer>();
 
-inline JPH::ObjectLayer ToJoltLayer(CollisionLayer layer)
+inline const JPH::ObjectLayer ToJoltLayer(CollisionLayer layer)
 {
 	return static_cast<JPH::ObjectLayer>(layer);
 }
 
-inline CollisionLayer FromJoltLayer(JPH::ObjectLayer layer)
+inline const CollisionLayer FromJoltLayer(JPH::ObjectLayer layer)
 {
 	return static_cast<CollisionLayer>(layer);
 }
 
-inline JPH::BroadPhaseLayer ToJoltLayer(BroadPhaseLayer layer)
+inline const JPH::BroadPhaseLayer ToJoltLayer(BroadPhaseLayer layer)
 {
 	return JPH::BroadPhaseLayer(static_cast<JPH::BroadPhaseLayer::Type>(layer));
 }
 
-inline BroadPhaseLayer FromJoltLayer(JPH::BroadPhaseLayer layer)
+inline const BroadPhaseLayer FromJoltLayer(JPH::BroadPhaseLayer layer)
 {
 	return static_cast<BroadPhaseLayer>(layer.GetValue());
 }
@@ -102,7 +86,7 @@ public:
 	virtual const char* GetBroadPhaseLayerName(JPH::BroadPhaseLayer inLayer) const override;
 	const char* GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const;
 
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
+#endif
 };
 
 class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter

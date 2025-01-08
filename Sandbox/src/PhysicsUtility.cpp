@@ -1,5 +1,7 @@
+#include <spdlog/spdlog.h>
 #include "PhysicsUtility.h"
 #include "PhysicsEngine.h"
+
 
 void TraceImpl(const char* message, ...)
 {
@@ -15,13 +17,13 @@ void TraceImpl(const char* message, ...)
 
 #ifdef JPH_ENABLE_ASSERTS
 
-	bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine)
-	{
-		spdlog::critical("Jolt | Assert: {}:{}: ({}) {}", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
-		return false;
-	}
+bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, JPH::uint inLine)
+{
+	spdlog::critical("Jolt | Assert: {}:{}: ({}) {}", inFile, inLine, inExpression, (inMessage != nullptr ? inMessage : ""));
+	return false;
+}
 
-#endif // JPH_ENABLE_ASSERTS
+#endif
 
 
 bool ObjectLayerPairFilterImpl::ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const
@@ -60,7 +62,7 @@ JPH::BroadPhaseLayer BroadPhaseLayerInterfaceImpl::GetBroadPhaseLayer(JPH::Objec
 		return magic_enum::enum_name(inLayer).data();
 	}
 
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
+#endif
 
 bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide(CollisionLayer inLayer1, BroadPhaseLayer inLayer2) const
 {
@@ -74,15 +76,11 @@ bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide(JPH::ObjectLayer inLayer1,
 
 JPH::ValidateResult ContactListener::OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult)
 {
-	// (@Tenzy21 | 05.01.2025) Research crash on logging
-	//spdlog::debug("Contact validate callback | BodyID-1: {}, BodyID-2: {}",MapBodyID(inBody1.GetID()));
+	spdlog::debug("Jolt | Contact validate callback: BodyID-1: {}, BodyID-2: {}", MapBodyID(inBody1.GetID()), MapBodyID(inBody2.GetID()));
 	return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 }
 
-void ContactListener::OnContactAdded(const JPH::Body& inBody1,
-                                       const JPH::Body& inBody2,
-                                       const JPH::ContactManifold& inManifold,
-                                       JPH::ContactSettings& ioSettings)
+void ContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 {
 	// Tenzy21: 02.12.2024
 	// TODO: Use our collider implementation here
@@ -94,36 +92,27 @@ void ContactListener::OnContactAdded(const JPH::Body& inBody1,
 	//	collider1->OnCollision().Execute(collider2);
 	//	collider2->OnCollision().Execute(collider1);
 	//}
-
-	// LOG:
-	// std::cout << "A contact was added" << std::endl;
+	spdlog::debug("Jolt | A contact was added: BodyID-1: {}, BodyID-2: {}", MapBodyID(inBody1.GetID()), MapBodyID(inBody2.GetID()));
 }
 
-void ContactListener::OnContactPersisted(
-	const JPH::Body& inBody1, const JPH::Body& inBody2,
-	const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
+void ContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 {
-	// LOG:
-	// std::cout << "A contact was persisted" << std::endl;
+	spdlog::debug("Jolt | A contact was persisted: BodyID-1: {}, BodyID-2: {}",  MapBodyID(inBody1.GetID()), MapBodyID(inBody2.GetID()));
 }
 
-void ContactListener::OnContactRemoved(
-	const JPH::SubShapeIDPair& inSubShapePair)
+void ContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 {
-	// LOG:
-	// std::cout << "A contact was removed" << std::endl;
+	spdlog::debug("Jolt | A contact was removed: BodyID-1: {}, BodyID-2: {}", MapBodyID(inSubShapePair.GetBody1ID()), MapBodyID(inSubShapePair.GetBody2ID()));
 }
 
 void BodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData)
 {
-	// LOG:
-	// std::cout << "A body got activated" << std::endl;
+	spdlog::debug("Jolt | A body got activated: BodyID: {}", MapBodyID(inBodyID));
 }
 
 void BodyActivationListener::OnBodyDeactivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData)
 {
-	// LOG:
-	// std::cout << "A body went to sleep" << std::endl;
+	spdlog::debug("Jolt | A body went to sleep: BodyID: {}", MapBodyID(inBodyID));
 }
 
 void DebugRenderer::DrawLine(JPH::RVec3Arg inFrom, JPH::RVec3Arg inTo, JPH::ColorArg inColor)
