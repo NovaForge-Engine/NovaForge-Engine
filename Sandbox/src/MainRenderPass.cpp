@@ -69,7 +69,6 @@ bool MainRenderPass::Init(InitParams params)
 		inputAssemblyDesc.topology = nri::Topology::TRIANGLE_LIST;
 
 		nri::RasterizationDesc rasterizationDesc = {};
-		rasterizationDesc.viewportNum = 1;
 		rasterizationDesc.fillMode = nri::FillMode::SOLID;
 		rasterizationDesc.cullMode = nri::CullMode::NONE;
 
