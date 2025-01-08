@@ -12,9 +12,7 @@ int main(int argc, char** argv) {
 	spdlog::info("Application started with startup {}", app.shouldClose);
 	while (app.shouldClose) {
 		app.Update();
-
 		app.Draw();	
-
 	}
 
 

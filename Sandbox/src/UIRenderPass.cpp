@@ -364,9 +364,8 @@ void UIRenderPass::BeginUI()
 	// 
 	// 
 	io.DisplaySize = ImVec2(1280.0f, 720.0f);
-
-
-
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
 
 	//m_TimePrev = timeCur;
 
@@ -430,12 +429,8 @@ void UIRenderPass::BeginUI()
 	ImGui::NewFrame();
 }
 
-void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
-                         nri::Streamer& streamer)
+void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface, nri::Streamer& streamer)
 {
-
-
-	ImGui::Text("Hello, world %d", 123);
 	ImGui::EndFrame();
 	ImGui::Render();
 	const ImDrawData& drawData = *ImGui::GetDrawData();
