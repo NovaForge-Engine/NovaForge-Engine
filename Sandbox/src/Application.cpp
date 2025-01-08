@@ -231,7 +231,9 @@ void Application::Draw()
 	}
 	uiRenderPass.BeginUI();
 
+	mainRenderPass.BeginUI();
 
+	ImGui::ShowMetricsWindow();
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);

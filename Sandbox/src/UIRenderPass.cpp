@@ -207,6 +207,8 @@ bool UIRenderPass::Init(InitParams params)
 	// Descriptor - texture
 	nri::Texture2DViewDesc texture2DViewDesc = {
 		m_FontTexture, nri::Texture2DViewType::SHADER_RESOURCE_2D, format};
+
+
 	if (params.NRI.CreateTexture2DView(texture2DViewDesc, m_FontShaderResource) !=
 	    nri::Result::SUCCESS)
 		return false;
@@ -330,6 +332,15 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 
 				if (rect.width != 0 && rect.height != 0)
 				{
+					//We can apply texture here
+					nri::DescriptorSet* descriptorSet = nullptr;
+					if (drawCmd.GetTexID() != 0)
+					{
+
+						descriptorSet = (nri::DescriptorSet*)drawCmd.GetTexID();
+						NRI.CmdSetDescriptorSet(commandBuffer, 0,
+						                        *descriptorSet, nullptr);
+					}
 					NRI.CmdSetScissors(commandBuffer, &rect, 1);
 					NRI.CmdDrawIndexed(
 						commandBuffer,
@@ -434,8 +445,12 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
                          nri::Streamer& streamer)
 {
 
-
+	ImGui::Begin("ImguiWindow", nullptr, ImGuiWindowFlags_MenuBar);
 	ImGui::Text("Hello, world %d", 123);
+	ImGui::End();
+	
+
+
 	ImGui::EndFrame();
 	ImGui::Render();
 	const ImDrawData& drawData = *ImGui::GetDrawData();

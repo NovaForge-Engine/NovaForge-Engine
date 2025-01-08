@@ -464,3 +464,16 @@ MainRenderPass::MainRenderPass(){
 MainRenderPass::~MainRenderPass(){
     
 }
+
+void MainRenderPass::BeginUI()
+{
+	ImGui::Text("pointer = %p", m_TextureDescriptorSet);
+	ImGui::Text("pointer = %p", (ImTextureID)m_TextureDescriptorSet);
+	ImGui::Image((ImTextureID)m_TextureDescriptorSet,
+	             ImVec2(1280.0f, 720.0f), ImVec2(0.0f, 1.0f),
+	             ImVec2(1.0f, 0.0f));
+}
+
+void MainRenderPass::EndUI()
+{
+}

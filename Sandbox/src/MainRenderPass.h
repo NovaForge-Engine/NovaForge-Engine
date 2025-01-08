@@ -51,7 +51,6 @@ public:
 		nri::CommandQueue* commandQueue;
 	};
 	bool Init(InitParams params);
-
 	void Draw(const nri::CoreInterface& NRI,
 	          const nri::StreamerInterface& streamerInterface,
 	          const nri::SwapChainInterface& swapChainInterface,
@@ -62,7 +61,8 @@ public:
 	          const uint32_t m_RenderWindowWidth,
 	          const uint32_t m_RenderWindowHeight);
 	
-	
+		void BeginUI();
+	void EndUI();
     MainRenderPass();
     ~MainRenderPass();
     private:
@@ -85,5 +85,7 @@ public:
 	std::vector<nri::Memory*> m_MemoryAllocations;
 
 	uint64_t m_GeometryOffset = 0;
+
+
 
 };
