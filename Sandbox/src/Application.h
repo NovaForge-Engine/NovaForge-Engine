@@ -1,9 +1,6 @@
 #pragma once
 
-
-
 #include <NRI.h>
-
 
 #include <Extensions/NRIDeviceCreation.h>
 #include <Extensions/NRIHelper.h>
@@ -21,6 +18,7 @@
 #include "NRIContext.h"
 
 #include "Settings.h"
+#include "PhysicsEngine.h"
 
 
 inline bool m_DebugAPI = false;
@@ -40,13 +38,11 @@ public:
 	void Draw();
 
 
-	private:
+private:
 	Window* window;
-
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
-
 
 	Frame& getCurrentFrame(){return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];}
 
@@ -62,5 +58,17 @@ public:
 	nri::SPIRVBindingOffsets SPIRV_BINDING_OFFSETS = {
 		100, 200, 300, 400}; // just ShaderMake defaults for simplicity
 	nri::AllocationCallbacks m_AllocationCallbacks = {};
+
+#pragma region Physics
+
+public:
+
+	PhysicsEngine* GetPhysicsEngine() { return physicsEngine; }
+
+private:
+
+	PhysicsEngine* physicsEngine;
+
+#pragma endregion Physics
 
 };

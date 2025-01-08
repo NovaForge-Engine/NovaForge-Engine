@@ -2,7 +2,8 @@
 #include <Extensions/NRIDeviceCreation.h>
 
 
-Application::Application()
+Application::Application() 
+	: physicsEngine(PhysicsEngine::Get())
 {
 }
 
@@ -12,7 +13,6 @@ Application::~Application()
 
 bool Application::Init(nri::GraphicsAPI graphicsAPI)
 {
-
 	window = new Window();
 
 	window->Initialize(1280, 720);
@@ -161,23 +161,23 @@ bool Application::Init(nri::GraphicsAPI graphicsAPI)
 	result = uiRenderPass.Init(uiPassParams);
 	spdlog::info("UIRenderPass initialized: {}", result);
 
-
-
-
+	physicsEngine->Init();
 
 	return true;
-
-
 }
 
 void Application::Shutdown()
 {
+	physicsEngine->Terminate();
 	mainRenderPass.Shutdown();
 	uiRenderPass.Shutdown();
 }
 
 void Application::Update()
 {
+
+	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else is updating above
+	physicsEngine->Update();
 }
 
 void Application::Draw()
@@ -238,6 +238,4 @@ void Application::Draw()
 	}
 
 	frameIndex++;
-
-
 }
