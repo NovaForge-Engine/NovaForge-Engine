@@ -200,8 +200,7 @@ static nri::Format MakeSRGBFormat(nri::Format format);
 
 static void PostProcessTexture(const std::string& name, Texture& texture, bool computeAvgColorAndAlphaMode, detexTexture** dTexture, int mipNum);
 bool LoadTexture(const std::string& path, Texture& texture, bool computeAvgColorAndAlphaMode = false);
-void LoadTextureFromMemory(nri::Format format, uint32_t width, uint32_t height,
-                           const uint8_t* pixels, Texture& texture);
+void LoadTextureFromMemory(nri::Format format, uint32_t width, uint32_t height, const uint8_t* pixels, Texture& texture);
 
 
 
