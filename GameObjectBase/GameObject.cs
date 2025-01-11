@@ -1,9 +1,11 @@
-﻿namespace GameObjectsBase
+﻿using System.Collections.Generic;
+
+namespace GameObjectsBase
 {
     public class GameObject
     {
         private ObjectId _id;
-        private List<Component> _components = [];
+        private List<Component> _components = new List<Component>();
         private bool _isActive;
         private string _name = string.Empty;
 

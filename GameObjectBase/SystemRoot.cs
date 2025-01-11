@@ -1,10 +1,13 @@
-﻿namespace GameObjectsBase
+﻿using System;
+using System.Collections.Generic;
+
+namespace GameObjectsBase
 {
     public class SystemRoot
     {
         private const string NewGameObjectName = "GameObject";
 
-        private List<GameObject> _objects = [];
+        private List<GameObject> _objects = new List<GameObject>();
         private ObjectId _lastObjectId = ObjectId.Zero;
 
         public Action<GameObject> OnObjectAdd;

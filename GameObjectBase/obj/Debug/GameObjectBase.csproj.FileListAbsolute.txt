@@ -1,0 +1,6 @@
+E:\GitHub\NovaForge-Engine\GameObjectsBase\GameObjectBase\obj\Debug\GameObjectBase.csproj.AssemblyReference.cache
+E:\GitHub\NovaForge-Engine\GameObjectsBase\GameObjectBase\obj\Debug\GameObjectBase.csproj.CoreCompileInputs.cache
+E:\GitHub\NovaForge-Engine\GameObjectsBase\GameObjectBase\bin\Debug\GameObjectBase.dll
+E:\GitHub\NovaForge-Engine\GameObjectsBase\GameObjectBase\bin\Debug\GameObjectBase.pdb
+E:\GitHub\NovaForge-Engine\GameObjectsBase\GameObjectBase\obj\Debug\GameObjectBase.dll
+E:\GitHub\NovaForge-Engine\GameObjectsBase\GameObjectBase\obj\Debug\GameObjectBase.pdb
