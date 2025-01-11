@@ -18,8 +18,6 @@ struct ImDrawVertOpt
 	uint32_t col;
 };
 
-
-
 class UIRenderPass: public IRenderPass {
 public:
 	void Init() override;

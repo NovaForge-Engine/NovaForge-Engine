@@ -1,5 +1,6 @@
 #include "Application.h"
 #include <Extensions/NRIDeviceCreation.h>
+#include "ImguiThemes.h"
 
 
 Application::Application() 
@@ -286,7 +287,6 @@ void Application::Draw()
 		{
 			ImGui::Text("Selected Object: %s", objects[object_current_idx]);
 
-			// ������ ������� ��� ����������� �������
 			static float position[3] = {0.0f, 0.0f, 0.0f};
 			ImGui::InputFloat3("Position", position);
 
@@ -314,7 +314,6 @@ void Application::Draw()
 			}
 		}
 
-		// ��������� ������
 		ImGui::CollapsingHeader("Camera Settings");
 		{
 			static float cameraPosition[3] = {0.0f, 5.0f, -10.0f};
@@ -327,12 +326,10 @@ void Application::Draw()
 			ImGui::SliderFloat("Field of View", &cameraFov, 1.0f, 90.0f);
 		}
 	}
+	ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
+
 	uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);
-
-
-
-
 
 	mainRenderPass.PrepareFrame();
 	uiRenderPass.PrepareFrame();

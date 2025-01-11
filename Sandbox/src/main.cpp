@@ -4,9 +4,10 @@
 
 
 int main(int argc, char** argv) {
+	constexpr auto api = nri::GraphicsAPI::VK;
 	Application app;
 
-	app.shouldClose = app.Init(argc,argv);
+	app.shouldClose = app.Init(argc, argv);
 
 
 	spdlog::info("Application started with startup {}", app.shouldClose);
