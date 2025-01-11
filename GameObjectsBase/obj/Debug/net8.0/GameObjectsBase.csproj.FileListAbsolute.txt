@@ -1,0 +1,12 @@
+E:\GitHub\NovaForge-Engine\GameObjectsBase\bin\Debug\net8.0\GameObjectsBase.deps.json
+E:\GitHub\NovaForge-Engine\GameObjectsBase\bin\Debug\net8.0\GameObjectsBase.dll
+E:\GitHub\NovaForge-Engine\GameObjectsBase\bin\Debug\net8.0\GameObjectsBase.pdb
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.GeneratedMSBuildEditorConfig.editorconfig
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.AssemblyInfoInputs.cache
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.AssemblyInfo.cs
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.csproj.CoreCompileInputs.cache
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.sourcelink.json
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.dll
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\refint\GameObjectsBase.dll
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\GameObjectsBase.pdb
+E:\GitHub\NovaForge-Engine\GameObjectsBase\obj\Debug\net8.0\ref\GameObjectsBase.dll
