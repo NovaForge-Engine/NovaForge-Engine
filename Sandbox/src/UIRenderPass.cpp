@@ -361,83 +361,11 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 void UIRenderPass::BeginUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
-    //elizoorg 21.11.2024
-	//TODO: We need to setup screen size to imgui
-	//		also we need to provide it with keyboard/mouse events
-	//		and change cursor modes, so glfw context needed to be stored and sent to this function
-
-
-	//// Setup time step
-	//double timeCur = glfwGetTime();
-	//io.DeltaTime = (float)(timeCur - m_TimePrev);
-	//io.DisplaySize =
-	//	ImVec2((float)m_WindowResolution.x, (float)m_WindowResolution.y);
-	// 
-	// 
-	// 
-	// 
+    
 	io.DisplaySize = ImVec2(1280.0f, 720.0f);
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
 
-	//m_TimePrev = timeCur;
-
-	//// Read keyboard modifiers inputs
-	//io.KeyCtrl = IsKeyPressed(Key::LControl) || IsKeyPressed(Key::RControl);
-	//io.KeyShift = IsKeyPressed(Key::LShift) || IsKeyPressed(Key::RShift);
-	//io.KeyAlt = IsKeyPressed(Key::LAlt) || IsKeyPressed(Key::RAlt);
-	//io.KeySuper = false;
-
-	//// Update buttons
-	//for (int32_t i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++)
-	//{
-	//	// If a mouse press event came, always pass it as "mouse held this
-	//	// frame", so we don't miss click-release events that are shorter than 1
-	//	// frame.
-	//	io.MouseDown[i] =
-	//		m_ButtonJustPressed[i] || glfwGetMouseButton(m_Window, i) != 0;
-	//	m_ButtonJustPressed[i] = false;
-	//}
-
-	//// Update mouse position
-	//if (glfwGetWindowAttrib(m_Window, GLFW_FOCUSED) != 0)
-	//{
-	//	if (io.WantSetMousePos)
-	//		glfwSetCursorPos(m_Window, (double)io.MousePos.x,
-	//		                 (double)io.MousePos.y);
-	//	else
-	//	{
-	//		double mouse_x, mouse_y;
-	//		glfwGetCursorPos(m_Window, &mouse_x, &mouse_y);
-	//		io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
-	//	}
-	//}
-
-	//// Update mouse cursor
-	//if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0 &&
-	//    glfwGetInputMode(m_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
-	//{
-	//	ImGuiMouseCursor cursor = ImGui::GetMouseCursor();
-	//	if (cursor == ImGuiMouseCursor_None || io.MouseDrawCursor)
-	//	{
-	//		// Hide OS mouse cursor if imgui is drawing it or if it wants no
-	//		// cursor
-	//		CursorMode(GLFW_CURSOR_HIDDEN);
-	//	}
-	//	else
-	//	{
-	//		// Show OS mouse cursor
-	//		glfwSetCursor(m_Window,
-	//		              m_MouseCursors[cursor]
-	//		                  ? m_MouseCursors[cursor]
-	//		                  : m_MouseCursors[ImGuiMouseCursor_Arrow]);
-	//		CursorMode(GLFW_CURSOR_NORMAL);
-	//	}
-	//}
-
-	// Start the frame. This call will update the io.WantCaptureMouse,
-	// io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not)
-	// to your application.
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
