@@ -14,9 +14,6 @@ int main(int argc, char** argv) {
 		app.Update();
 		app.Draw();	
 	}
-
-
-
 	return 0;
 }
 

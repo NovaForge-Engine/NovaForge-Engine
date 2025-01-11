@@ -2,7 +2,8 @@
 #include <Extensions/NRIDeviceCreation.h>
 
 
-Application::Application()
+Application::Application() 
+	: physicsEngine(PhysicsEngine::Get())
 {
 }
 
@@ -13,7 +14,7 @@ Application::~Application()
 bool Application::Init(int argc,char** argv)
 {
 
-
+	
 	cmdline::parser cmdLine;
 
 	InitCmdLineDefault(cmdLine);
@@ -192,11 +193,14 @@ bool Application::Init(int argc,char** argv)
 	result = uiRenderPass.Init(uiPassParams);
 	spdlog::info("UIRenderPass initialized: {}", result);
 
+	physicsEngine->Init();
+
 	return true;
 }
 
 void Application::Shutdown()
 {
+	physicsEngine->Terminate();
 	mainRenderPass.Shutdown();
 	uiRenderPass.Shutdown();
 }
@@ -210,6 +214,9 @@ void Application::Update()
 		shouldClose = false;
 	}
 
+
+	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else is updating above
+	physicsEngine->Update();
 }
 
 void Application::Draw()
@@ -279,7 +286,7 @@ void Application::Draw()
 		{
 			ImGui::Text("Selected Object: %s", objects[object_current_idx]);
 
-			// Пример свойств для выбираемого объекта
+			// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			static float position[3] = {0.0f, 0.0f, 0.0f};
 			ImGui::InputFloat3("Position", position);
 
@@ -307,7 +314,7 @@ void Application::Draw()
 			}
 		}
 
-		// Настройки камеры
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		ImGui::CollapsingHeader("Camera Settings");
 		{
 			static float cameraPosition[3] = {0.0f, 5.0f, -10.0f};
@@ -401,8 +408,6 @@ void Application::Draw()
 	}
 
 	frameIndex++;
-
-
 }
 
 
