@@ -46,7 +46,8 @@
     <Compile Include="GameObjectsExtensions.cs" />
     <Compile Include="ObjectId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SystemRoot.cs" />
+    <Compile Include="ObjectsHolder.cs" />
+    <Compile Include="Root.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

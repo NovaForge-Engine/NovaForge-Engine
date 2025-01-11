@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace GameObjectsBase
 {
-    public class SystemRoot
+    public class ObjectsHolder
     {
         private const string NewGameObjectName = "GameObject";
 
@@ -16,23 +18,17 @@ namespace GameObjectsBase
 
         public void Update()
         {
-            foreach(var @object in _objects)
+            foreach (var item in _objects.Where(x => x.IsActive))
             {
-                if (@object.IsActive == false)
-                    continue;
-
-                @object.Update();
+                item.Update();
             }
         }
 
         public void FixedUpdate()
         {
-            foreach (var @object in _objects)
+            foreach (var item in _objects.Where(x => x.IsActive))
             {
-                if (@object.IsActive == false)
-                    continue;
-
-                @object.FixedUpdate();
+                item.FixedUpdate();
             }
         }
 

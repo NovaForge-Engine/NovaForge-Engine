@@ -9,14 +9,14 @@ namespace GameObjectsBase
         private bool _isActive;
         private string _name = string.Empty;
 
-        private SystemRoot _root;
+        private ObjectsHolder _root;
 
-        public SystemRoot Root => _root;
+        public ObjectsHolder Root => _root;
         public bool IsActive => _isActive;
         public string Name => _name;
         public ObjectId Id => _id;
 
-        public GameObject(ObjectId id, SystemRoot root, string name)
+        public GameObject(ObjectId id, ObjectsHolder root, string name)
         {
             _id = id;
             _root = root;
