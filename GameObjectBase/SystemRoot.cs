@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace GameObjectsBase
 {
@@ -16,12 +17,24 @@ namespace GameObjectsBase
 
         public void Update()
         {
-            _objects.ForEach(x => x.Update());
+            foreach(var @object in _objects)
+            {
+                if (@object.IsActive == false)
+                    continue;
+
+                @object.Update();
+            }
         }
 
         public void FixedUpdate()
         {
-            _objects.ForEach(x => x.FixedUpdate());
+            foreach (var @object in _objects)
+            {
+                if (@object.IsActive == false)
+                    continue;
+
+                @object.FixedUpdate();
+            }
         }
 
         public GameObject FindObjectById(ObjectId tag) => FindObjectById(tag.Value);
