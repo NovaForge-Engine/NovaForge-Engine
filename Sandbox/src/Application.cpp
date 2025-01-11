@@ -326,6 +326,7 @@ void Application::Draw()
 			ImGui::SliderFloat("Field of View", &cameraFov, 1.0f, 90.0f);
 		}
 	}
+
 	ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);
