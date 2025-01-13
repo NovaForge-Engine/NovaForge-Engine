@@ -23,7 +23,10 @@
 #include "CmdLine.h"
 
 
+#include "ModelLoader.h"
 
+
+constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
 
@@ -53,7 +56,7 @@ public:
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
 	
-
+	nova::ModelLoader loader;
 	
 
 	Frame& getCurrentFrame(){return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];}

@@ -15,7 +15,7 @@
 
 #include "Window.h"
 
-struct Vertex
+struct CustomVertex
 {
 	float position[2];
 
@@ -28,7 +28,7 @@ struct ConstantBufferLayout
 	float scale;
 };
 
-static const Vertex g_VertexData[] = {{-0.71f, -0.50f, 0.0f, 0.0f},
+static const CustomVertex g_VertexData[] = {{-0.71f, -0.50f, 0.0f, 0.0f},
                                       {0.00f, 0.71f, 1.0f, 1.0f},
                                       {0.71f, -0.50f, 0.0f, 1.0f}};
 
