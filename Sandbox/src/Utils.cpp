@@ -96,6 +96,7 @@ inline detexTexture* ToMip(Mip mip) {
 
 
 Texture::~Texture() {
+	std::cout << "~Texture" << std::endl;
 	detexFreeTexture(ToTexture(mips), mipNum);
 }
 
@@ -270,4 +271,37 @@ void LoadTextureFromMemory(nri::Format format, uint32_t width, uint32_t height,
 	texture.format = format;
 	texture.alphaMode = AlphaMode::OPAQUE;
 	texture.mips = (Mip*)dTexture;
+}
+
+bool LoadTextureFromMemory(const std::string& name, const uint8_t* data,
+                                  int dataSize, Texture& texture,
+                                  bool computeAvgColorAndAlphaMode)
+{
+	printf("Loading embedded texture '%s'...\n", name.c_str());
+
+	int x, y, comp;
+	unsigned char* image = stbi_load_from_memory((stbi_uc const*)data, dataSize,
+	                                             &x, &y, &comp, STBI_rgb_alpha);
+	if (!image)
+	{
+		printf("Could not read memory for embedded texture %s. Reason: %s",
+		       name.c_str(), stbi_failure_reason());
+		return false;
+	}
+	detexTexture** dTexture = (detexTexture**)malloc(sizeof(detexTexture*));
+	dTexture[0] = (detexTexture*)malloc(sizeof(detexTexture));
+	dTexture[0]->format = DETEX_PIXEL_FORMAT_RGBA8;
+	dTexture[0]->width = x;
+	dTexture[0]->height = y;
+	dTexture[0]->width_in_blocks = x;
+	dTexture[0]->height_in_blocks = y;
+	size_t size = x * y * detexGetPixelSize(DETEX_PIXEL_FORMAT_RGBA8);
+	dTexture[0]->data = (uint8_t*)malloc(size);
+	memcpy(dTexture[0]->data, image, size);
+	stbi_image_free(image);
+
+	const int kMipNum = 1;
+	PostProcessTexture(name, texture, computeAvgColorAndAlphaMode, dTexture,
+	                   kMipNum);
+	return true;
 }

@@ -203,6 +203,10 @@ bool LoadTexture(const std::string& path, Texture& texture, bool computeAvgColor
 void LoadTextureFromMemory(nri::Format format, uint32_t width, uint32_t height,
                            const uint8_t* pixels, Texture& texture);
 
+bool LoadTextureFromMemory(const std::string& name, const uint8_t* data,
+                           int dataSize, Texture& texture,
+                           bool computeAvgColorAndAlphaMode);
+
 
 
 #define NRI_ABORT_ON_FALSE(result) \
