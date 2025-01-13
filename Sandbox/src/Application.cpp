@@ -39,7 +39,7 @@ bool Application::Init(int argc, char** argv)
 	ReadCmdLineDefault(cmdLine);
 	ReadCmdLine(cmdLine);
 
-	window = new Window();
+	window = new nova::Window();
 
 	window->Initialize(1280, 720, cmdLine.get<std::string>("api"));
 
@@ -148,13 +148,13 @@ bool Application::Init(int argc, char** argv)
 			    nri::Result::SUCCESS)
 				return false;
 
-			const BackBuffer backBuffer = {colorAttachment,
+			const nova::BackBuffer backBuffer = {colorAttachment,
 			                               swapChainTextures[i]};
 			window->m_SwapChainBuffers[i] = backBuffer;
 		}
 	}
 
-	for (Frame& frame : window->GetFrames())
+	for (nova::Frame& frame : window->GetFrames())
 	{
 		if (NRI.CreateCommandAllocator(*m_CommandQueue,
 		                               frame.commandAllocator) !=
@@ -224,7 +224,7 @@ void Application::Update()
 void Application::Draw()
 {
 	const uint32_t bufferedFrameIndex = frameIndex % BUFFERED_FRAME_MAX_NUM;
-	const Frame& frame = window->GetFrames()[bufferedFrameIndex];
+	const nova::Frame& frame = window->GetFrames()[bufferedFrameIndex];
 	nri::CommandBuffer* commandBuffer = frame.commandBuffer;
 
 	if (frameIndex >= BUFFERED_FRAME_MAX_NUM)
@@ -351,7 +351,8 @@ void Application::Draw()
 	const uint32_t currentTextureIndex =
 		NRI.AcquireNextSwapChainTexture(*m_SwapChain);
 
-	BackBuffer& backBuffer = window->m_SwapChainBuffers[currentTextureIndex];
+	nova::BackBuffer& backBuffer =
+		window->m_SwapChainBuffers[currentTextureIndex];
 	{ //MainPass
 		mainRenderPass.Draw(NRI, NRI, NRI, NRI, *commandBuffer, frame, backBuffer,
 							bufferedFrameIndex, window->m_RenderWindowWidth,

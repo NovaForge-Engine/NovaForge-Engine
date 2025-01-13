@@ -21,8 +21,9 @@
 #include <include/GamepadManager.h>
 
 #include "Settings.h"
-
+#if defined _WIN32
 #include <WinUser.h>
+#endif
 
 
 void GLFW_ErrorCallback(int32_t error, const char* message);
@@ -39,6 +40,8 @@ void GLFW_ErrorCallback(int32_t error, const char* message);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action,
 				 int mods);
 
+namespace nova
+{
 
 struct BackBuffer
 {
@@ -97,3 +100,5 @@ class Window
 
 	
 };
+
+} // namespace nova

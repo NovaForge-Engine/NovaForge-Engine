@@ -344,8 +344,9 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
                           const nri::StreamerInterface& streamerInterface,
 						  const nri::SwapChainInterface& swapChainInterface,
                           const nri::StreamerInterface& streamer,
-                          nri::CommandBuffer& commandBuffer, const Frame& frame,
-                          const BackBuffer& currentBackBuffer,
+                          nri::CommandBuffer& commandBuffer,
+                          const nova::Frame& frame,
+                          const nova::BackBuffer& currentBackBuffer,
                           const uint32_t currentTextureIndex,const uint32_t m_RenderWindowWidth, const uint32_t m_RenderWindowHeight)
 {
 	 nri::Dim_t windowWidth = (nri::Dim_t)m_RenderWindowWidth;

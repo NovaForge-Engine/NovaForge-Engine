@@ -32,7 +32,7 @@ public:
 		nri::HelperInterface& helperInterface;
 		nri::Device& device;
 		nri::Format renderTargetFormat;
-		Window* window;
+		nova::Window* window;
 	};
 	
 	bool Init(InitParams params);

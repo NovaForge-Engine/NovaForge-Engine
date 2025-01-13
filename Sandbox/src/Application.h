@@ -51,7 +51,7 @@ public:
 
 	bool shouldClose = false;
 	private:
-	Window* window;
+	nova::Window* window;
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
@@ -59,7 +59,10 @@ public:
 	nova::ModelLoader loader;
 	
 
-	Frame& getCurrentFrame(){return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];}
+	nova::Frame& getCurrentFrame()
+	{
+		return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];
+	}
 
 	NRIInterface NRI = {};
 	nri::Device* m_Device = nullptr;

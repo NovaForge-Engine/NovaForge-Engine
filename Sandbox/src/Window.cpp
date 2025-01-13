@@ -1,5 +1,5 @@
 #include "Window.h"
-
+using namespace nova;
 void GLFW_ErrorCallback(int32_t error, const char* message)
 {
 	printf("GLFW error[%d]: %s\n", error, message);
