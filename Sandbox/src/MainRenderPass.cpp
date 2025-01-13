@@ -42,19 +42,19 @@ bool MainRenderPass::Init(InitParams params)
 
 		nri::VertexStreamDesc vertexStreamDesc = {};
 		vertexStreamDesc.bindingSlot = 0;
-		vertexStreamDesc.stride = sizeof(Vertex);
+		vertexStreamDesc.stride = sizeof(CustomVertex);
 
 		nri::VertexAttributeDesc vertexAttributeDesc[2] = {};
 		{
 			vertexAttributeDesc[0].format = nri::Format::RG32_SFLOAT;
 			vertexAttributeDesc[0].streamIndex = 0;
-			vertexAttributeDesc[0].offset = GetOffsetOf(&Vertex::position);
+			vertexAttributeDesc[0].offset = GetOffsetOf(&CustomVertex::position);
 			vertexAttributeDesc[0].d3d = {"POSITION", 0};
 			vertexAttributeDesc[0].vk.location = {0};
 
 			vertexAttributeDesc[1].format = nri::Format::RG32_SFLOAT;
 			vertexAttributeDesc[1].streamIndex = 0;
-			vertexAttributeDesc[1].offset = GetOffsetOf(&Vertex::uv);
+			vertexAttributeDesc[1].offset = GetOffsetOf(&CustomVertex::uv);
 			vertexAttributeDesc[1].d3d = {"TEXCOORD", 0};
 			vertexAttributeDesc[1].vk.location = {1};
 		}
