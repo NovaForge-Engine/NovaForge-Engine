@@ -1,4 +1,6 @@
 #include "MainRenderPass.h"
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 constexpr uint32_t BuFFERED_FRAME_MAX_NUM = 2;
 
@@ -399,11 +401,10 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 	                                          sizeof(ConstantBufferLayout));
 	 if (commonConstants)
 	{
-		commonConstants->color[0] = 0.8f;
-		commonConstants->color[1] = 0.5f;
-		commonConstants->color[2] = 0.1f;
-		commonConstants->scale = m_Scale;
-
+		 commonConstants->projectionMatrix =
+			 glm::perspective(glm::radians(90.0f),(float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
+		commonConstants->viewMatrix =
+			 glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
 		NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);
 	}
 

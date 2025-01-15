@@ -4,8 +4,8 @@
 
 NRI_RESOURCE( cbuffer, CommonConstants, b, 0, 0 )
 {
-    float3 color;
-    float scale;
+    float4x4 gProj;
+    float4x4 gView;
 };
 
 struct Input
@@ -33,9 +33,11 @@ Attributes main(in Input input)
     float4 T = input.Tangent * 2.0 - 1.0;
     float3 V = -input.Position;    
 
-    output.Position = float4(input.Position,1.0);
-    output.Normal= float4(N,input.TexCoord.x);
-    output.View = float4(V,input.TexCoord.y);
+    output.Position = mul( gView , float4(input.Position,1));
+    output.Position = mul( gProj , output.Position);
+
+    output.Normal= float4( N, input.TexCoord.x);
+    output.View = float4( V, input.TexCoord.y);
     output.Tangent = T;
 
     return output;

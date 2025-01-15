@@ -25,8 +25,8 @@ struct CustomVertex
 
 struct ConstantBufferLayout
 {
-	float color[3];
-	float scale;
+	glm::mat4x4 projectionMatrix;
+	glm::mat4x4 viewMatrix;
 };
 
 static const CustomVertex g_VertexData[] = {{-0.71f, -0.50f, 0.0f, 0.0f},
