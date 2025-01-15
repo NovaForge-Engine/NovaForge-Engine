@@ -9,7 +9,7 @@ ModelLoader::~ModelLoader()
 {
 }
 
-bool ModelLoader::LoadModel(std::string filename)
+bool ModelLoader::LoadModel(nova::Scene& scene, std::string filename)
 {
 	spdlog::info("Loading model {}", filename);
 	Assimp::Importer importer;
@@ -23,36 +23,79 @@ bool ModelLoader::LoadModel(std::string filename)
 	this->directory_ = filename.substr(0, filename.find_last_of("/\\"));
 	std::cout << this->directory_ << std::endl;
 
-	processNode(pScene->mRootNode, pScene);
-	return true;
+	processNode(scene,pScene->mRootNode, pScene);
 
+	
+	return true;
 }
 
-void ModelLoader::processNode(aiNode* node, const aiScene* scene)
+void ModelLoader::processNode(nova::Scene& scene,aiNode* node, const aiScene* assimp_scene)
 {
 	spdlog::info("Processing node {}", node->mName.C_Str());
+
+	uint32_t meshOffset = scene.meshes.size();
+	meshOffset = meshOffset + node->mNumMeshes;
+	scene.meshes.resize(meshOffset);
+	
 	for (int i = 0; i < node->mNumMeshes; i++)
 	{
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes_.push_back(this->processMesh(mesh, scene));
+		spdlog::info("Processing mesh {}", node->mMeshes[i]);
+		aiMesh* mesh = assimp_scene->mMeshes[node->mMeshes[i]];
+		this->processMesh(scene,mesh, assimp_scene);
 	}
 
 	for (int i = 0; i < node->mNumChildren; i++)
 	{
-		this->processNode(node->mChildren[i], scene);
+		spdlog::info("Processing child {}", node->mChildren[i]->mName.C_Str());
+		this->processNode(scene,node->mChildren[i], assimp_scene);
 	}
+
+
 }
 
-Mesh ModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
+bool ModelLoader::processMesh(nova::Scene& scene,aiMesh* mesh, const aiScene* assimp_scene)
 {
 	spdlog::info("Processing mesh {}", mesh->mName.C_Str());
 	std::vector<Vertex> vertices;
 	std::vector<uint8_t> indices;
 	std::vector<Texture> textures;
 
+	uint32_t meshOffset = scene.meshes.size()-1;
+	
+	size_t totalIndices = scene.indices.size();
+	size_t totalVertices = scene.vertices.size();
+
+	Mesh& final_mesh = scene.meshes[meshOffset];
+	spdlog::info("Mesh offset {}", meshOffset);
+	spdlog::info("Total vertices {}", totalVertices);
+	spdlog::info("Total indices {}", totalIndices);
+
+
+
+
+	final_mesh.vertexOffset=totalVertices;
+	final_mesh.indexOffset=totalIndices;
+
+	final_mesh.indexNum = mesh->mNumFaces * 3;
+	final_mesh.vertexNum = mesh->mNumVertices;
+
+	totalVertices += mesh->mNumVertices;
+	uint32_t indexCount = 0; 
+	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+	{
+		aiFace face = mesh->mFaces[i];
+		indexCount += face.mNumIndices;
+			
+	}
+	totalIndices += indexCount;
+
+	scene.vertices.resize(totalVertices);
+	
+	
+
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
-		Vertex vert;
+		Vertex& vert = scene.vertices[final_mesh.vertexOffset+i];
 		vert.position[0] = mesh->mVertices[i].x;
 		vert.position[1] = mesh->mVertices[i].y;
 		vert.position[2] = mesh->mVertices[i].z;
@@ -65,45 +108,45 @@ Mesh ModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 
 		if (mesh->mNormals)
 			{
-			vert.N = float4_to_unorm<10, 10, 10, 2>(
-				glm::vec4(glm::vec3(mesh->mNormals->x, mesh->mNormals->y,
-			                        mesh->mNormals->z) *
+			vert.N = float4_to_unorm<10, 10, 10, 2>(glm::vec4(
+					glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y,
+			                  mesh->mNormals[i].z) *
 			                      0.5f +
 			                  0.5f,
 			              0.0f));
 			}
-
-		vertices.push_back(std::move(vert));
 	}
+
+
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
 		aiFace face = mesh->mFaces[i];
 		for (uint8_t j = 0; j < face.mNumIndices; j++)
-			indices.push_back(face.mIndices[j]);
+			scene.indices.push_back(face.mIndices[j]);
 	}
 	if (mesh->mMaterialIndex >= 0)
 	{
 		spdlog::info("Processing material {}", mesh->mMaterialIndex);
 
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		aiMaterial* material = assimp_scene->mMaterials[mesh->mMaterialIndex];
 
 		std::vector<Texture> diffuseMaps = this->loadMaterialTextures(material,
-			aiTextureType_DIFFUSE, "texture_diffuse",scene);
+			aiTextureType_DIFFUSE, "texture_diffuse",assimp_scene);
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		std::vector<Texture> specularMaps = this->loadMaterialTextures(material,
-			aiTextureType_SPECULAR, "texture_specular",scene);
+			aiTextureType_SPECULAR, "texture_specular",assimp_scene);
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		std::vector<Texture> normalMaps = this->loadMaterialTextures(material,
-			aiTextureType_NORMALS, "texture_normal",scene);
+			aiTextureType_NORMALS, "texture_normal",assimp_scene);
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 		std::vector<Texture> heightMaps = this->loadMaterialTextures(material,
-			aiTextureType_EMISSIVE, "texture_emissive",scene);
+			aiTextureType_EMISSIVE, "texture_emissive",assimp_scene);
 		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 	}
 	spdlog::info("Finished processing mesh {}", mesh->mName.C_Str());
-	return Mesh(vertices, indices, textures);
+	return true;
 
 }
 

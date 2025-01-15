@@ -2,10 +2,14 @@
 
 constexpr uint32_t BuFFERED_FRAME_MAX_NUM = 2;
 
-bool MainRenderPass::Init(InitParams params)
+bool MainRenderPass::Init(InitParams& params)
 {
 
 	const nri::DeviceDesc& deviceDesc = params.NRI.GetDeviceDesc(params.m_Device);
+
+	m_Scene = *params.scene;
+
+
 	ShaderCodeStorage shaderCodeStorage;
 	{
 		nri::DescriptorRangeDesc descriptorRangeConstant[1];
@@ -42,21 +46,33 @@ bool MainRenderPass::Init(InitParams params)
 
 		nri::VertexStreamDesc vertexStreamDesc = {};
 		vertexStreamDesc.bindingSlot = 0;
-		vertexStreamDesc.stride = sizeof(CustomVertex);
+		vertexStreamDesc.stride = sizeof(Vertex);
 
-		nri::VertexAttributeDesc vertexAttributeDesc[2] = {};
+		nri::VertexAttributeDesc vertexAttributeDesc[4] = {};
 		{
-			vertexAttributeDesc[0].format = nri::Format::RG32_SFLOAT;
-			vertexAttributeDesc[0].streamIndex = 0;
-			vertexAttributeDesc[0].offset = GetOffsetOf(&CustomVertex::position);
+			vertexAttributeDesc[0].format = nri::Format::RGB32_SFLOAT;
+			vertexAttributeDesc[0].offset =
+				GetOffsetOf(&Vertex::position);
 			vertexAttributeDesc[0].d3d = {"POSITION", 0};
-			vertexAttributeDesc[0].vk.location = {0};
+			vertexAttributeDesc[0].vk = {0};
 
-			vertexAttributeDesc[1].format = nri::Format::RG32_SFLOAT;
-			vertexAttributeDesc[1].streamIndex = 0;
-			vertexAttributeDesc[1].offset = GetOffsetOf(&CustomVertex::uv);
+			vertexAttributeDesc[1].format = nri::Format::RG16_SFLOAT;
+			vertexAttributeDesc[1].offset =
+				GetOffsetOf(&Vertex::uv);
 			vertexAttributeDesc[1].d3d = {"TEXCOORD", 0};
-			vertexAttributeDesc[1].vk.location = {1};
+			vertexAttributeDesc[1].vk = {1};
+
+			vertexAttributeDesc[2].format = nri::Format::R10_G10_B10_A2_UNORM;
+			vertexAttributeDesc[2].offset =
+				GetOffsetOf(&Vertex::N);
+			vertexAttributeDesc[2].d3d = {"NORMAL", 0};
+			vertexAttributeDesc[2].vk = {2};
+
+			vertexAttributeDesc[3].format = nri::Format::R10_G10_B10_A2_UNORM;
+			vertexAttributeDesc[3].offset =
+				GetOffsetOf(&Vertex::T);
+			vertexAttributeDesc[3].d3d = {"TANGENT", 0};
+			vertexAttributeDesc[3].vk = {3};
 		}
 
 		nri::VertexInputDesc vertexInputDesc = {};
@@ -132,9 +148,6 @@ bool MainRenderPass::Init(InitParams params)
 	const uint32_t constantBufferSize =
 		Align((uint32_t)sizeof(ConstantBufferLayout),
 	          deviceDesc.constantBufferOffsetAlignment);
-	const uint64_t indexDataSize = sizeof(g_IndexData);
-	constexpr uint64_t indexDataAlignedSize = Align(indexDataSize, 16);
-	const uint64_t vertexDataSize = sizeof(g_VertexData);
 
 	{
 		 //Texture
@@ -155,60 +168,80 @@ bool MainRenderPass::Init(InitParams params)
 			nri::BufferDesc bufferDesc = {};
 			bufferDesc.size = constantBufferSize * BUFFERED_FRAME_MAX_NUM;
 			bufferDesc.usage = nri::BufferUsageBits::CONSTANT_BUFFER;
+			nri::Buffer* buffer;
 			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc,
-			                            m_ConstantBuffer) !=
+			                            buffer) !=
 			    nri::Result::SUCCESS)
 			{
 				return false;
 			};
-		}
+			m_Buffers.push_back(buffer);
+		
 
-		{ // Geometry buffer
-			nri::BufferDesc bufferDesc = {};
-			bufferDesc.size = indexDataAlignedSize + vertexDataSize;
-			bufferDesc.usage = nri::BufferUsageBits::VERTEX_BUFFER |
-			                   nri::BufferUsageBits::INDEX_BUFFER;
-			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc,
-			                     m_GeometryBuffer) !=
+			// Index buffer
+			bufferDesc.size = GetByteSizeOf(m_Scene.indices);
+			bufferDesc.usage = nri::BufferUsageBits::INDEX_BUFFER;
+			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc, buffer) !=
 			    nri::Result::SUCCESS)
 			{
 				return false;
 			};
+			m_Buffers.push_back(buffer);
+			// Vertex buffer
+			bufferDesc.size = GetByteSizeOf(m_Scene.vertices);
+			bufferDesc.usage = nri::BufferUsageBits::VERTEX_BUFFER;
+			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc,
+			                            buffer) !=
+			    nri::Result::SUCCESS)
+			{
+				return false;
+			};
+			m_Buffers.push_back(buffer);
+
 		}
-		m_GeometryOffset = indexDataAlignedSize;
 	}
 
-	nri::ResourceGroupDesc resourceGroupDesc = {};
-	resourceGroupDesc.memoryLocation = nri::MemoryLocation::HOST_UPLOAD;
-	resourceGroupDesc.bufferNum = 1;
-	resourceGroupDesc.buffers = &m_ConstantBuffer;
-
-	m_MemoryAllocations.resize(1, nullptr);
-	if (params.helperInterface.AllocateAndBindMemory(
-			params.m_Device, resourceGroupDesc,
-	                              m_MemoryAllocations.data()) !=
-	    nri::Result::SUCCESS)
 	{
-		return false;
-	};
+		nri::ResourceGroupDesc resourceGroupDesc = {};
 
-	resourceGroupDesc.memoryLocation = nri::MemoryLocation::DEVICE;
-	resourceGroupDesc.bufferNum = 1;
-	resourceGroupDesc.buffers = &m_GeometryBuffer;
-	resourceGroupDesc.textureNum = 1;
-	resourceGroupDesc.textures = &m_Texture;
+		resourceGroupDesc.bufferNum = 1;
+		resourceGroupDesc.buffers = &m_Buffers[0];
+		resourceGroupDesc.memoryLocation = nri::MemoryLocation::HOST_UPLOAD;
 
-	m_MemoryAllocations.resize(
-		1 + params.helperInterface.CalculateAllocationNumber(params.m_Device,
-	                                                         resourceGroupDesc),
-		nullptr);
-	if (params.helperInterface.AllocateAndBindMemory(
-			params.m_Device, resourceGroupDesc,
-	                                          m_MemoryAllocations.data() + 1) !=
-	    nri::Result::SUCCESS)
-	{
-		return false;
-	};
+		size_t baseAllocation = m_MemoryAllocations.size();
+		m_MemoryAllocations.resize(baseAllocation + 1);
+
+
+
+		if (params.helperInterface.AllocateAndBindMemory(params.m_Device,
+		                                   resourceGroupDesc,m_MemoryAllocations.data()+baseAllocation ) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+
+		resourceGroupDesc.bufferNum = 2;
+		resourceGroupDesc.buffers=&m_Buffers[1];
+		resourceGroupDesc.textures = &m_Texture;
+		resourceGroupDesc.memoryLocation = nri::MemoryLocation::DEVICE;
+		resourceGroupDesc.textureNum = 1;
+
+		baseAllocation= m_MemoryAllocations.size();
+		const size_t allocationNum =
+			params.helperInterface.CalculateAllocationNumber(params.m_Device,
+		                                                     resourceGroupDesc);
+		m_MemoryAllocations.resize(baseAllocation + allocationNum);
+		if (params.helperInterface.AllocateAndBindMemory(params.m_Device,
+		                                   resourceGroupDesc,m_MemoryAllocations.data()+baseAllocation ) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+
+
+
+
+	}
 
 
 
@@ -241,7 +274,7 @@ bool MainRenderPass::Init(InitParams params)
 		for (uint32_t i = 0; i < BUFFERED_FRAME_MAX_NUM; i++)
 		{
 			nri::BufferViewDesc bufferViewDesc = {};
-			bufferViewDesc.buffer = m_ConstantBuffer;
+			bufferViewDesc.buffer = m_Buffers[CONSTANT_BUFFER];
 			bufferViewDesc.viewType = nri::BufferViewType::CONSTANT;
 			bufferViewDesc.offset = i * constantBufferSize;
 			bufferViewDesc.size = constantBufferSize;
@@ -296,12 +329,6 @@ bool MainRenderPass::Init(InitParams params)
 	}
 
 	{ // Upload data
-		std::vector<uint8_t> geometryBufferData(indexDataAlignedSize +
-		                                        vertexDataSize);
-		memcpy(&geometryBufferData[0], g_IndexData, indexDataSize);
-		memcpy(&geometryBufferData[indexDataAlignedSize], g_VertexData,
-		       vertexDataSize);
-
 		std::array<nri::TextureSubresourceUploadDesc, 16> subresources;
 		for (uint32_t mip = 0; mip < texture.GetMipNum(); mip++)
 			texture.GetSubresource(subresources[mip], mip);
@@ -312,21 +339,31 @@ bool MainRenderPass::Init(InitParams params)
 		textureData.after = {nri::AccessBits::SHADER_RESOURCE,
 		                     nri::Layout::SHADER_RESOURCE};
 
-		nri::BufferUploadDesc bufferData = {};
-		bufferData.buffer = m_GeometryBuffer;
-		bufferData.data = &geometryBufferData[0];
-		bufferData.dataSize = geometryBufferData.size();
-		bufferData.after = {nri::AccessBits::INDEX_BUFFER |
-		                    nri::AccessBits::VERTEX_BUFFER};
+		nri::BufferUploadDesc bufferData[] = {
+			{m_Scene.vertices.data(),
+			 GetByteSizeOf(m_Scene.vertices),
+		     m_Buffers[VERTEX_BUFFER],
+			 0,
+			 {nri::AccessBits::VERTEX_BUFFER}},
+			{m_Scene.indices.data(),
+		     GetByteSizeOf(m_Scene.indices),
+		     m_Buffers[INDEX_BUFFER],
+		     0,
+				 {nri::AccessBits::INDEX_BUFFER}}};
+
+	
 
 		if (params.helperInterface.UploadData(*params.commandQueue,
 		                                      &textureData, 1,
-		                                      &bufferData,
-		                                      1) != nri::Result::SUCCESS)
+		                                      bufferData,
+		                                      GetCountOf(bufferData)) != nri::Result::SUCCESS)
 		{
 			return false;
 			};
 	}
+
+
+
 
 
 return true;
@@ -357,7 +394,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 
 	 ConstantBufferLayout* commonConstants =
-		(ConstantBufferLayout*)NRI.MapBuffer(*m_ConstantBuffer,
+		 (ConstantBufferLayout*)NRI.MapBuffer(*m_Buffers[CONSTANT_BUFFER],
 	                                          frame.constantBufferViewOffset,
 	                                          sizeof(ConstantBufferLayout));
 	 if (commonConstants)
@@ -367,7 +404,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 		commonConstants->color[2] = 0.1f;
 		commonConstants->scale = m_Scale;
 
-		NRI.UnmapBuffer(*m_ConstantBuffer);
+		NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);
 	}
 
 
@@ -422,23 +459,34 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 				NRI.CmdSetPipelineLayout(commandBuffer, *m_PipelineLayout);
 				NRI.CmdSetPipeline(commandBuffer, *m_Pipeline);
 				NRI.CmdSetRootConstants(commandBuffer, 0, &m_Transparency, 4);
-				NRI.CmdSetIndexBuffer(commandBuffer, *m_GeometryBuffer, 0,
-				                      nri::IndexType::UINT16);
-				NRI.CmdSetVertexBuffers(commandBuffer, 0, 1, &m_GeometryBuffer,
-				                        &m_GeometryOffset);
+				
 				NRI.CmdSetDescriptorSet(commandBuffer, 0, *m_DescriptorSets[0],
 				                        nullptr);
 				NRI.CmdSetDescriptorSet(commandBuffer, 1,
 				                        *m_TextureDescriptorSet, nullptr);
 
-				nri::Rect scissor = {0, 0, windowWidth, windowHeight};
-				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
-				NRI.CmdDrawIndexed(commandBuffer, {3, 1, 0, 0, 0});
 
-				scissor = {(int16_t)halfWidth, (int16_t)halfHeight, halfWidth,
-				           halfHeight};
+				nri::Rect scissor = {(int16_t)halfWidth, (int16_t)halfHeight,
+				                     halfWidth, halfHeight};
 				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
 				NRI.CmdDraw(commandBuffer, {3, 1, 0, 0});
+				scissor = {0, 0, windowWidth, windowHeight};
+
+				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
+	
+				for (const Mesh& mesh : m_Scene.meshes)
+				{
+					NRI.CmdSetIndexBuffer(commandBuffer, *m_Buffers[INDEX_BUFFER], 0,
+					                      sizeof(uint32_t) == 2
+					                          ? nri::IndexType::UINT16
+					                          : nri::IndexType::UINT32);
+					constexpr uint64_t offset = 0;
+					NRI.CmdSetVertexBuffers(commandBuffer, 0, 1, &m_Buffers[VERTEX_BUFFER],
+					                        &offset);
+					NRI.CmdDrawIndexed(commandBuffer, {mesh.indexNum,1,mesh.indexOffset,(int32_t)mesh.vertexOffset,0});
+				}
+
+				
 			}
 
 			{

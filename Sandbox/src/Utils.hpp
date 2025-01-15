@@ -3,6 +3,9 @@
 #undef OPAQUE
 #undef TRANSPARENT
 
+#include "fmath/f16.hpp"
+#include "glm/detail/func_packing_simd.inl"
+
 #include <NRI.h>
 #include <vector>
 #include <string>
@@ -56,6 +59,11 @@ constexpr uint32_t GetCountOf(T const (&)[N]) {
 template <typename T, typename A>
 constexpr T Align(T x, A alignment) {
     return (T)((size_t(x) + (size_t)alignment - 1) & ~((size_t)alignment - 1));
+}
+
+template<typename T> constexpr size_t GetByteSizeOf(const std::vector<T>& v)
+{
+	return v.size() * sizeof(decltype(v.back()));
 }
 
 struct Annotation {
@@ -208,12 +216,37 @@ bool LoadTextureFromMemory(const std::string& name, const uint8_t* data,
                            bool computeAvgColorAndAlphaMode);
 
 
+#define NRI_ABORT_ON_FAILURE(result)                                           \
+	if ((result) != nri::Result::SUCCESS)                                      \
+		exit(1);
 
-#define NRI_ABORT_ON_FALSE(result) \
-    if (!(result)) \
-        exit(1);
+#define NRI_ABORT_ON_FALSE(result)                                             \
+	if (!(result))                                                             \
+		exit(1);
 
 
-#define NRI_ABORT_ON_FAILURE(result) \
-    if ((result) != nri::Result::SUCCESS) \
-        exit(1);
+
+struct UnpackedVertex
+{
+	float vertices[3];
+	float uv[2];
+	float normals[3];
+	float tangents[4];
+};
+
+
+struct Vertex
+{
+	float position[3];
+	float16_t2 uv;
+	uint32_t N;
+	uint32_t T;
+};
+
+struct Mesh
+{
+	uint32_t vertexOffset;
+	uint32_t indexOffset;
+	uint32_t indexNum;
+	uint32_t vertexNum;
+};

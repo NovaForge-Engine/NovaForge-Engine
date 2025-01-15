@@ -168,12 +168,25 @@ bool Application::Init(int argc, char** argv)
 
 	}
 	bool result;
+
+
+	result = loader.LoadModel(
+		scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+
+	if (!result)
+	{
+		spdlog::error("Failed to load Sponza model");
+		return false;
+	}
+
+
 	MainRenderPass::InitParams passParams = {
 		.NRI = NRI,
 		.helperInterface = NRI,
 		.m_Device = *m_Device,
 		.renderTargetFormat = swapChainFormat,
 		.commandQueue = m_CommandQueue,
+		.scene = &scene
 	};
 	result = mainRenderPass.Init(passParams);
 	spdlog::info("MainRenderPass initialized: {}", result);
@@ -192,7 +205,7 @@ bool Application::Init(int argc, char** argv)
 	physicsEngine->Init();
 
 
-	//loader.LoadModel(GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	
 	//loader.LoadModel(GetFullPath("PZ18.ma", DataFolder::SCENES));
 	//loader.LoadModel(GetFullPath("PZ19.ma", DataFolder::SCENES));
 	//loader.LoadModel(GetFullPath("fhead.stl", DataFolder::SCENES));

@@ -24,6 +24,7 @@
 
 
 #include "ModelLoader.h"
+#include "Scene.hpp"
 
 
 constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
@@ -57,6 +58,7 @@ public:
 	UIRenderPass uiRenderPass;
 	
 	nova::ModelLoader loader;
+	nova::Scene scene;
 	
 
 	nova::Frame& getCurrentFrame()
