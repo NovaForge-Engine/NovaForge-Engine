@@ -6,9 +6,9 @@
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
-#include "mono/metadata/object.h"
-#include "mono/metadata/mono-debug.h"
-#include "mono/metadata/threads.h"
+#include <mono/metadata/object.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 struct ScriptEngineData
 {
@@ -98,45 +98,52 @@ void PrintAssemblyTypes(MonoAssembly* assembly)
 
 void ScriptEngine::InitMono()
 {
-	mono_set_assemblies_path("mono/build/bin");
-	MonoDomain* rootDomain = mono_jit_init("");
-	// Replace Nova_CORE_ASSERT with assert for now
+	mono_set_assemblies_path("");
+
+	MonoDomain* rootDomain = mono_jit_init("NovaJITRuntime");
 	assert(rootDomain != nullptr);
+
 	// Store the root domain pointer
 	s_Data->RootDomain = rootDomain;
+
 	// Create an App Domain
-    s_Data->AppDomain =
-					mono_domain_create_appdomain(const_cast<char*>(""), nullptr);
+    s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("NovaScriptRuntime"), nullptr);
 	mono_domain_set(s_Data->AppDomain, true);
+
 	// Move this maybe
-	s_Data->CoreAssembly =
-		LoadCSharpAssembly("");
+	s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/ScriptingSandbox.dll");
 	PrintAssemblyTypes(s_Data->CoreAssembly);
+
 	MonoImage* assemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
-	MonoClass* monoClass = mono_class_from_name(assemblyImage, "", "");
+	MonoClass* monoClass = mono_class_from_name(assemblyImage, "", "CSharpTesting");
 
 	// 1. create an object (and call constructor)
 	MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
 	mono_runtime_object_init(instance);
+
 	// 2. call function
-	MonoMethod* printMessageFunc =
-		mono_class_get_method_from_name(monoClass, "PrintMessage", 0);
+	MonoMethod* printMessageFunc = mono_class_get_method_from_name(monoClass, "PrintMessage", 0);
 	mono_runtime_invoke(printMessageFunc, instance, nullptr, nullptr);
+
 	// 3. call function with param
-	MonoMethod* printIntFunc =
-		mono_class_get_method_from_name(monoClass, "PrintInt", 1);
+	MonoMethod* printIntFunc = mono_class_get_method_from_name(monoClass, "PrintInt", 1);
+
 	int value = 5;
 	void* param = &value;
+
 	mono_runtime_invoke(printIntFunc, instance, &param, nullptr);
-	MonoMethod* printIntsFunc =
-		mono_class_get_method_from_name(monoClass, "PrintInts", 2);
+
+	MonoMethod* printIntsFunc = mono_class_get_method_from_name(monoClass, "PrintInts", 2);
 	int value2 = 508;
-	void* params[2] = {&value, &value2};
+	void* params[2] = 
+	{
+		&value,
+		&value2
+	};
 	mono_runtime_invoke(printIntsFunc, instance, params, nullptr);
-	MonoString* monoString =
-		mono_string_new(s_Data->AppDomain, "Hello World from C++!");
-	MonoMethod* printCustomMessageFunc =
-		mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
+
+	MonoString* monoString = mono_string_new(s_Data->AppDomain, "Hello World from C++!");
+	MonoMethod* printCustomMessageFunc = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
 	void* stringParam = monoString;
 	mono_runtime_invoke(printCustomMessageFunc, instance, &stringParam,
                      nullptr);

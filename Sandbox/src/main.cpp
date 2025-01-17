@@ -39,6 +39,8 @@
 #include "assimp/postprocess.h"
 #include <utility>
 
+#include "ScriptingSystem/ScriptEngine.h"
+
 Assimp::Importer importer;
 
 
@@ -728,6 +730,9 @@ bool Sample::Create(int _argc, char** _argv)
 
 int main(int argc, char** argv) {
 	nri::GraphicsAPI api = nri::GraphicsAPI::D3D12;
+
+	ScriptEngine scriptEngine;
+	scriptEngine.Init();
 
 	Sample sample;
 
