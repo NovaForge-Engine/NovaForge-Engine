@@ -20,5 +20,3 @@ float16_t2 float2_to_float16_t2(const glm::vec2& v)
 
 	return r;
 }
-
-

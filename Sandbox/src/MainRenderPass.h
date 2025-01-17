@@ -1,20 +1,16 @@
 #pragma once
 #include "IRenderPass.h"
 #include "NRI.h"
-#include "Utils.hpp"
-
-
+#include "Scene.hpp"
 #include "Settings.h"
+#include "Utils.hpp"
+#include "Window.h"
 
-#include <NRI.h>
 #include <Extensions/NRIHelper.h>
 #include <Extensions/NRIStreamer.h>
 #include <Extensions/NRISwapChain.h>
+#include <NRI.h>
 #include <NRIDescs.h>
-
-
-#include "Window.h"
-#include "Scene.hpp"
 
 struct CustomVertex
 {
@@ -30,8 +26,8 @@ struct ConstantBufferLayout
 };
 
 static const CustomVertex g_VertexData[] = {{-0.71f, -0.50f, 0.0f, 0.0f},
-                                      {0.00f, 0.71f, 1.0f, 1.0f},
-                                      {0.71f, -0.50f, 0.0f, 1.0f}};
+                                            {0.00f, 0.71f, 1.0f, 1.0f},
+                                            {0.71f, -0.50f, 0.0f, 1.0f}};
 
 static const uint16_t g_IndexData[] = {0, 1, 2};
 
@@ -39,8 +35,8 @@ constexpr uint32_t CONSTANT_BUFFER = 0;
 constexpr uint32_t INDEX_BUFFER = 1;
 constexpr uint32_t VERTEX_BUFFER = 2;
 
-
-class MainRenderPass: public IRenderPass{
+class MainRenderPass : public IRenderPass
+{
 public:
 	void Init() override;
 	void Draw() override;
@@ -54,7 +50,7 @@ public:
 		nri::Device& m_Device;
 		nri::Format renderTargetFormat;
 		nri::CommandQueue* commandQueue;
-		nova::Scene *scene;
+		nova::Scene* scene;
 	};
 	bool Init(InitParams& params);
 	void Draw(const nri::CoreInterface& NRI,
@@ -66,12 +62,13 @@ public:
 	          const uint32_t currentTextureIndex,
 	          const uint32_t m_RenderWindowWidth,
 	          const uint32_t m_RenderWindowHeight);
-	
-		void BeginUI();
+
+	void BeginUI();
 	void EndUI();
-    MainRenderPass();
-    ~MainRenderPass();
-    private:
+	MainRenderPass();
+	~MainRenderPass();
+
+private:
 	float m_Transparency = 1.0f;
 	float m_Scale = 1.0f;
 
@@ -86,8 +83,15 @@ public:
 	nri::Texture* m_Texture = nullptr;
 	nri::DescriptorPool* m_DescriptorPool = nullptr;
 
+	nri::Format m_DepthFormat = nri::Format::UNKNOWN;
+	nri::Descriptor* m_DepthAttachment = nullptr;
 
 	std::vector<nri::Buffer*> m_Buffers;
+
+	std::vector<nri::Texture*> m_Textures;
+
+	glm::mat4x4 m_ProjectionMatrix;
+	glm::mat4x4 m_ViewMatrix;
 
 	std::vector<nri::Descriptor*> m_Descriptors;
 	std::vector<nri::DescriptorSet*> m_DescriptorSets;
@@ -95,8 +99,6 @@ public:
 	std::vector<nri::Memory*> m_MemoryAllocations;
 
 	uint64_t m_GeometryOffset = 0;
-	
+
 	nova::Scene m_Scene;
-
-
 };

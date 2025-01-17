@@ -1,7 +1,6 @@
 #pragma once
-#include <string>
 #include <imgui.h>
-
+#include <string>
 
 using DockSpaceName = std::string;
 
@@ -28,6 +27,12 @@ struct DockingSplit
 	ImGuiDockNodeFlags nodeFlags = ImGuiDockNodeFlags_None;
 
 	// Constructor
-	DockingSplit(const DockSpaceName& initialDock_ = "", const DockSpaceName& newDock_ = "", ImGuiDir direction_ = ImGuiDir_Down, float ratio_ = 0.25f, ImGuiDockNodeFlags nodeFlags_ = ImGuiDockNodeFlags_None)
-		: initialDock(initialDock_), newDock(newDock_), direction(direction_), ratio(ratio_), nodeFlags(nodeFlags_) {}
+	DockingSplit(const DockSpaceName& initialDock_ = "",
+	             const DockSpaceName& newDock_ = "",
+	             ImGuiDir direction_ = ImGuiDir_Down, float ratio_ = 0.25f,
+	             ImGuiDockNodeFlags nodeFlags_ = ImGuiDockNodeFlags_None)
+		: initialDock(initialDock_), newDock(newDock_), direction(direction_),
+		  ratio(ratio_), nodeFlags(nodeFlags_)
+	{
+	}
 };

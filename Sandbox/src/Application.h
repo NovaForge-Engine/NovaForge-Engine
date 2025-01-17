@@ -1,31 +1,24 @@
 #pragma once
 
-#include <NRI.h>
+#include "CmdLine.h"
+#include "MainRenderPass.h"
+#include "ModelLoader.h"
+#include "NRIContext.h"
+#include "PhysicsEngine.h"
+#include "Scene.hpp"
+#include "Settings.h"
+#include "UIRenderPass.h"
+#include "Window.h"
 
 #include <Extensions/NRIDeviceCreation.h>
 #include <Extensions/NRIHelper.h>
-#include <Extensions/NRIStreamer.h>
 #include <Extensions/NRILowLatency.h>
 #include <Extensions/NRIMeshShader.h>
 #include <Extensions/NRIRayTracing.h>
 #include <Extensions/NRIResourceAllocator.h>
+#include <Extensions/NRIStreamer.h>
 #include <Extensions/NRISwapChain.h>
-
-#include "MainRenderPass.h"
-#include "UIRenderPass.h"
-
-#include "Window.h"
-#include "NRIContext.h"
-
-#include "Settings.h"
-#include "PhysicsEngine.h"
-
-#include "CmdLine.h"
-
-
-#include "ModelLoader.h"
-#include "Scene.hpp"
-
+#include <NRI.h>
 
 constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
@@ -37,11 +30,10 @@ public:
 	Application();
 	~Application();
 
-	bool Init(int argc,char **argv);
+	bool Init(int argc, char** argv);
 	void Shutdown();
 	void Update();
 	void Draw();
-
 
 	void InitCmdLine([[maybe_unused]] cmdline::parser& cmdLine) {}
 
@@ -51,15 +43,15 @@ public:
 	void ReadCmdLineDefault(cmdline::parser& cmdLine);
 
 	bool shouldClose = false;
-	private:
+
+private:
 	nova::Window* window;
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
-	
+
 	nova::ModelLoader loader;
 	nova::Scene scene;
-	
 
 	nova::Frame& getCurrentFrame()
 	{
@@ -85,13 +77,10 @@ public:
 #pragma region Physics
 
 public:
-
 	PhysicsEngine* GetPhysicsEngine() { return physicsEngine; }
 
 private:
-
 	PhysicsEngine* physicsEngine;
 
 #pragma endregion Physics
-
 };

@@ -3,10 +3,8 @@ using namespace nova;
 
 Scene::Scene()
 {
-
 }
 
 Scene::~Scene()
 {
-
 }

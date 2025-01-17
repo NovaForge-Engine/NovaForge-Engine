@@ -1,8 +1,7 @@
 #include "UIRenderPass.h"
 
-#include "Utils.hpp"
 #include "Packing.h"
-
+#include "Utils.hpp"
 
 void UIRenderPass::Init()
 {
@@ -30,14 +29,15 @@ bool UIRenderPass::Init(InitParams params)
 
 	ImGui_ImplGlfw_InitForOther(params.window->GetGLFWWindow(), true);
 
-	//elizoorg 21.11.2024
-	//TODO: m_DpiMode should also be provided to this function which should be stored into window class
+	// elizoorg 21.11.2024
+	// TODO: m_DpiMode should also be provided to this function which should be
+	// stored into window class
 	/*if (m_DpiMode != 0)
 	{
-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
-		float unused;
-		glfwGetMonitorContentScale(monitor, &contentScale, &unused);
+	    float unused;
+	    glfwGetMonitorContentScale(monitor, &contentScale, &unused);
 	}*/
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -98,7 +98,8 @@ bool UIRenderPass::Init(InitParams params)
 			nri::StageBits::VERTEX_SHADER | nri::StageBits::FRAGMENT_SHADER;
 
 		if (params.NRI.CreatePipelineLayout(params.device, pipelineLayoutDesc,
-		                             m_PipelineLayout) != nri::Result::SUCCESS)
+		                                    m_PipelineLayout) !=
+		    nri::Result::SUCCESS)
 			return false;
 
 		ShaderCodeStorage shaderCodeStorage;
@@ -169,8 +170,9 @@ bool UIRenderPass::Init(InitParams params)
 		graphicsPipelineDesc.shaders = shaders;
 		graphicsPipelineDesc.shaderNum = GetCountOf(shaders);
 
-		if (params.NRI.CreateGraphicsPipeline(params.device, graphicsPipelineDesc,
-		                               m_Pipeline) != nri::Result::SUCCESS)
+		if (params.NRI.CreateGraphicsPipeline(
+				params.device, graphicsPipelineDesc, m_Pipeline) !=
+		    nri::Result::SUCCESS)
 			return false;
 	}
 
@@ -210,9 +212,8 @@ bool UIRenderPass::Init(InitParams params)
 	nri::Texture2DViewDesc texture2DViewDesc = {
 		m_FontTexture, nri::Texture2DViewType::SHADER_RESOURCE_2D, format};
 
-
-	if (params.NRI.CreateTexture2DView(texture2DViewDesc, m_FontShaderResource) !=
-	    nri::Result::SUCCESS)
+	if (params.NRI.CreateTexture2DView(
+			texture2DViewDesc, m_FontShaderResource) != nri::Result::SUCCESS)
 		return false;
 
 	Texture texture;
@@ -235,7 +236,8 @@ bool UIRenderPass::Init(InitParams params)
 		return false;
 
 	nri::CommandQueue* commandQueue = nullptr;
-	params.NRI.GetCommandQueue(params.device, nri::CommandQueueType::GRAPHICS, commandQueue);
+	params.NRI.GetCommandQueue(params.device, nri::CommandQueueType::GRAPHICS,
+	                           commandQueue);
 	{
 		nri::TextureSubresourceUploadDesc subresource = {};
 		texture.GetSubresource(subresource, 0);
@@ -246,8 +248,9 @@ bool UIRenderPass::Init(InitParams params)
 		textureData.after = {nri::AccessBits::SHADER_RESOURCE,
 		                     nri::Layout::SHADER_RESOURCE};
 
-		if (params.helperInterface.UploadData(*commandQueue, &textureData, 1, nullptr,
-		                               0) != nri::Result::SUCCESS)
+		if (params.helperInterface.UploadData(*commandQueue, &textureData, 1,
+		                                      nullptr,
+		                                      0) != nri::Result::SUCCESS)
 			return false;
 	}
 
@@ -259,23 +262,24 @@ bool UIRenderPass::Init(InitParams params)
 		descriptorPoolDesc.samplerMaxNum = 1;
 
 		if (params.NRI.CreateDescriptorPool(params.device, descriptorPoolDesc,
-		                             m_DescriptorPool) != nri::Result::SUCCESS)
+		                                    m_DescriptorPool) !=
+		    nri::Result::SUCCESS)
 			return false;
 	}
 
 	// Descriptor set
 	{
-		if (params.NRI.AllocateDescriptorSets(*m_DescriptorPool, *m_PipelineLayout, 0,
-		                               &m_DescriptorSet, 1,
-		                               0) != nri::Result::SUCCESS)
+		if (params.NRI.AllocateDescriptorSets(
+				*m_DescriptorPool, *m_PipelineLayout, 0, &m_DescriptorSet, 1,
+				0) != nri::Result::SUCCESS)
 			return false;
 
 		nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc[] = {
 			{&m_FontShaderResource, 1}, {&m_Sampler, 1}};
 
 		params.NRI.UpdateDescriptorRanges(*m_DescriptorSet, 0,
-		                           GetCountOf(descriptorRangeUpdateDesc),
-		                           descriptorRangeUpdateDesc);
+		                                  GetCountOf(descriptorRangeUpdateDesc),
+		                                  descriptorRangeUpdateDesc);
 	}
 
 	return true;
@@ -284,15 +288,14 @@ bool UIRenderPass::Init(InitParams params)
 void UIRenderPass::Draw(const nri::CoreInterface& NRI,
                         const nri::StreamerInterface& streamerInterface,
                         nri::Streamer& streamer,
-                        nri::CommandBuffer& commandBuffer,
-                        float sdrScale, bool isSrgb)
+                        nri::CommandBuffer& commandBuffer, float sdrScale,
+                        bool isSrgb)
 {
 	float consts[4];
 	consts[0] = 1.0f / ImGui::GetIO().DisplaySize.x;
 	consts[1] = 1.0f / ImGui::GetIO().DisplaySize.y;
 	consts[2] = sdrScale;
 	consts[3] = isSrgb ? 1.0f : 0.0f;
-
 
 	Annotation annotation(NRI, commandBuffer, "UI");
 
@@ -334,7 +337,7 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 
 				if (rect.width != 0 && rect.height != 0)
 				{
-					//We can apply texture here
+					// We can apply texture here
 					nri::DescriptorSet* descriptorSet = nullptr;
 					if (drawCmd.GetTexID() != 0)
 					{
@@ -353,15 +356,12 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 		}
 		vertexOffset += drawList.VtxBuffer.Size;
 	}
-
 }
-
-
 
 void UIRenderPass::BeginUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
-    
+
 	io.DisplaySize = ImVec2(1280.0f, 720.0f);
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
@@ -370,7 +370,8 @@ void UIRenderPass::BeginUI()
 	ImGui::NewFrame();
 }
 
-void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface, nri::Streamer& streamer)
+void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
+                         nri::Streamer& streamer)
 {
 	ImGui::EndFrame();
 	ImGui::Render();
@@ -422,7 +423,6 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface, nri::S
 	m_IbOffset = streamerInterface.AddStreamerBufferUpdateRequest(
 		streamer, bufferUpdateRequestDesc);
 	m_VbOffset = m_IbOffset + indexDataSize;
-
 }
 
 UIRenderPass::~UIRenderPass()

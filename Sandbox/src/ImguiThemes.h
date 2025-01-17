@@ -2,8 +2,8 @@
 #include <imgui.h>
 #include <magic_enum/magic_enum.hpp>
 
-
-enum ImGuiTheme {
+enum ImGuiTheme
+{
 	ImGuiTheme_ImGuiColorsClassic = 0,
 	ImGuiTheme_ImGuiColorsDark,
 	ImGuiTheme_SoDark_AccentRed

@@ -4,8 +4,8 @@
 
 NRI_RESOURCE( cbuffer, CommonConstants, b, 0, 0 )
 {
-    float3 color;
-    float scale;
+    float4x4 gProj;
+    float4x4 gView;
 };
 
 struct PushConstants
@@ -26,12 +26,14 @@ struct Attributes
     float4 Tangent : TEXCOORD2;
 };
 
+[earlydepthstencil]
 float4 main( in Attributes input ) : SV_Target
 {
     float4 output;
     float2 uv = float2( input.Normal.w, input.View.w );
-    output.xyz = g_DiffuseTexture.Sample( g_Sampler, uv).xyz * color;
+    output.xyz = g_DiffuseTexture.Sample( g_Sampler, uv).xyz;
     output.w = g_PushConstants.transparency;
+    //output = input.Normal;
 
     return output;
 }

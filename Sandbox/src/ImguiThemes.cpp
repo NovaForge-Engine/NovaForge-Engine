@@ -1,9 +1,9 @@
 #include "ImguiThemes.h"
 
-
 namespace ThemeTweakImpl
 {
-	void ApplyRounding(ImGuiStyle& ioStyle, float rounding, float scrollbarRatio)
+	void ApplyRounding(ImGuiStyle& ioStyle, float rounding,
+	                   float scrollbarRatio)
 	{
 		ioStyle.WindowRounding = rounding;
 		ioStyle.ChildRounding = rounding;
@@ -14,7 +14,8 @@ namespace ThemeTweakImpl
 		ioStyle.ScrollbarRounding = rounding * scrollbarRatio;
 	}
 
-	void ApplyAlphaMultiplier(ImGuiStyle& ioStyle, float alphaMultiplier, ImGuiStyle& referenceStyle)
+	void ApplyAlphaMultiplier(ImGuiStyle& ioStyle, float alphaMultiplier,
+	                          ImGuiStyle& referenceStyle)
 	{
 		for (int i = 0; i < ImGuiCol_COUNT; ++i)
 		{
@@ -23,14 +24,19 @@ namespace ThemeTweakImpl
 			const ImVec4& colRef = referenceStyle.Colors[i];
 			bool apply = false;
 			{
-				bool isWindowBackground = (colEnum == ImGuiCol_FrameBg) || (colEnum == ImGuiCol_WindowBg) || (colEnum == ImGuiCol_ChildBg);
+				bool isWindowBackground = (colEnum == ImGuiCol_FrameBg) ||
+				                          (colEnum == ImGuiCol_WindowBg) ||
+				                          (colEnum == ImGuiCol_ChildBg);
 				bool isAlreadyTransparent = col.w < 1.00f;
-				bool isDimColor = (colEnum == ImGuiCol_ModalWindowDimBg) || (colEnum == ImGuiCol_NavWindowingDimBg);
-				if (!isDimColor && (isAlreadyTransparent || isWindowBackground)) {
+				bool isDimColor = (colEnum == ImGuiCol_ModalWindowDimBg) ||
+				                  (colEnum == ImGuiCol_NavWindowingDimBg);
+				if (!isDimColor && (isAlreadyTransparent || isWindowBackground))
+				{
 					apply = true;
 				}
 			}
-			if (apply) {
+			if (apply)
+			{
 				col.w = alphaMultiplier * colRef.w;
 				if (col.w < 0.)
 					col.w = 0.;
@@ -40,7 +46,9 @@ namespace ThemeTweakImpl
 		}
 	}
 
-	void ApplySaturationMultiplier(ImGuiStyle& ioStyle, float saturationMultiplier, ImGuiStyle& referenceStyle)
+	void ApplySaturationMultiplier(ImGuiStyle& ioStyle,
+	                               float saturationMultiplier,
+	                               ImGuiStyle& referenceStyle)
 	{
 		for (int i = 0; i < ImGuiCol_COUNT; ++i)
 		{
@@ -50,7 +58,8 @@ namespace ThemeTweakImpl
 			float h, s, v;
 			ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, h, s, v);
 			float h_ref, s_ref, v_ref;
-			ImGui::ColorConvertRGBtoHSV(colRef.x, colRef.y, colRef.z, h_ref, s_ref, v_ref);
+			ImGui::ColorConvertRGBtoHSV(colRef.x, colRef.y, colRef.z, h_ref,
+			                            s_ref, v_ref);
 			s = s_ref * saturationMultiplier;
 			ImGui::ColorConvertHSVtoRGB(h, s, v, col.x, col.y, col.z);
 		}
@@ -105,7 +114,9 @@ namespace ThemeTweakImpl
 		return r;
 	}
 
-	void ApplyValueMultiplier(ImGuiStyle& style, float valueMultiplier, ImGuiStyle& referenceStyle, ColorCategory category)
+	void ApplyValueMultiplier(ImGuiStyle& style, float valueMultiplier,
+	                          ImGuiStyle& referenceStyle,
+	                          ColorCategory category)
 	{
 		for (int i = 0; i < ImGuiCol_COUNT; ++i)
 		{
@@ -118,31 +129,40 @@ namespace ThemeTweakImpl
 				float h, s, v;
 				ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, h, s, v);
 				float h_ref, s_ref, v_ref;
-				ImGui::ColorConvertRGBtoHSV(colRef.x, colRef.y, colRef.z, h_ref, s_ref, v_ref);
+				ImGui::ColorConvertRGBtoHSV(colRef.x, colRef.y, colRef.z, h_ref,
+				                            s_ref, v_ref);
 				v = v_ref * valueMultiplier;
 				ImGui::ColorConvertHSVtoRGB(h, s, v, col.x, col.y, col.z);
 			}
 		}
 	}
 
-	void ApplyValueMultiplierFront(ImGuiStyle& style, float valueMultiplier, ImGuiStyle& referenceStyle)
+	void ApplyValueMultiplierFront(ImGuiStyle& style, float valueMultiplier,
+	                               ImGuiStyle& referenceStyle)
 	{
-		ApplyValueMultiplier(style, valueMultiplier, referenceStyle, ColorCategory::ColorFront);
+		ApplyValueMultiplier(style, valueMultiplier, referenceStyle,
+		                     ColorCategory::ColorFront);
 	}
 
-	void ApplyValueMultiplierBg(ImGuiStyle& style, float valueMultiplier, ImGuiStyle& referenceStyle)
+	void ApplyValueMultiplierBg(ImGuiStyle& style, float valueMultiplier,
+	                            ImGuiStyle& referenceStyle)
 	{
-		ApplyValueMultiplier(style, valueMultiplier, referenceStyle, ColorCategory::ColorBg);
+		ApplyValueMultiplier(style, valueMultiplier, referenceStyle,
+		                     ColorCategory::ColorBg);
 	}
 
-	void ApplyValueMultiplierText(ImGuiStyle& style, float valueMultiplier, ImGuiStyle& referenceStyle)
+	void ApplyValueMultiplierText(ImGuiStyle& style, float valueMultiplier,
+	                              ImGuiStyle& referenceStyle)
 	{
-		ApplyValueMultiplier(style, valueMultiplier, referenceStyle, ColorCategory::ColorText);
+		ApplyValueMultiplier(style, valueMultiplier, referenceStyle,
+		                     ColorCategory::ColorText);
 	}
 
-	void ApplyValueMultiplierFrameBg(ImGuiStyle& style, float valueMultiplier, ImGuiStyle& referenceStyle)
+	void ApplyValueMultiplierFrameBg(ImGuiStyle& style, float valueMultiplier,
+	                                 ImGuiStyle& referenceStyle)
 	{
-		ApplyValueMultiplier(style, valueMultiplier, referenceStyle, ColorCategory::ColorFrameBg);
+		ApplyValueMultiplier(style, valueMultiplier, referenceStyle,
+		                     ColorCategory::ColorFrameBg);
 	}
 
 	void ApplyHue(ImGuiStyle& style, float hue)
@@ -158,7 +178,7 @@ namespace ThemeTweakImpl
 		}
 	}
 
-}
+} // namespace ThemeTweakImpl
 
 namespace ThemesImpl
 {
@@ -196,8 +216,10 @@ namespace ThemesImpl
 		colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
 		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
-		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
-		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
+		colors[ImGuiCol_ScrollbarGrabHovered] =
+			ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
+		colors[ImGuiCol_ScrollbarGrabActive] =
+			ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
 		colors[ImGuiCol_CheckMark] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
 		colors[ImGuiCol_SliderGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
 		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
@@ -217,13 +239,15 @@ namespace ThemesImpl
 		colors[ImGuiCol_TabHovered] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 		colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.20f, 0.20f, 0.36f);
 		colors[ImGuiCol_TabUnfocused] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
-		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+		colors[ImGuiCol_TabUnfocusedActive] =
+			ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 		colors[ImGuiCol_DockingPreview] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
 		colors[ImGuiCol_DockingEmptyBg] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
 		colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
 		colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
 		colors[ImGuiCol_PlotHistogram] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
-		colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_PlotHistogramHovered] =
+			ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
 		colors[ImGuiCol_TableHeaderBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
 		colors[ImGuiCol_TableBorderStrong] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
 		colors[ImGuiCol_TableBorderLight] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
@@ -232,7 +256,8 @@ namespace ThemesImpl
 		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
 		colors[ImGuiCol_DragDropTarget] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
 		colors[ImGuiCol_NavHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
-		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 0.70f);
+		colors[ImGuiCol_NavWindowingHighlight] =
+			ImVec4(1.00f, 0.00f, 0.00f, 0.70f);
 		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.20f);
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
 
@@ -263,11 +288,13 @@ namespace ThemesImpl
 
 		return style;
 	}
-}
+} // namespace ThemesImpl
 
 ThemeInfo gThemeInfos[] = {
-	{ImGuiTheme_ImGuiColorsClassic, "ImGuiColorsClassic", ThemesImpl::ImGui_StyleColorsClassic()},
-	{ImGuiTheme_ImGuiColorsDark, "ImGuiColorsDark", ThemesImpl::ImGui_StyleColorsDark()},
+	{ImGuiTheme_ImGuiColorsClassic, "ImGuiColorsClassic",
+     ThemesImpl::ImGui_StyleColorsClassic()},
+	{ImGuiTheme_ImGuiColorsDark, "ImGuiColorsDark",
+     ThemesImpl::ImGui_StyleColorsDark()},
 	{ImGuiTheme_SoDark_AccentRed, "SoDark_AccentRed", ThemesImpl::SoDark(0.f)}};
 
 const char* ImGuiTheme_Name(ImGuiTheme theme)
@@ -308,5 +335,3 @@ void ApplyTheme(ImGuiTheme theme)
 	ImGuiStyle style = ThemeToStyle(theme);
 	ImGui::GetStyle() = style;
 }
-
-

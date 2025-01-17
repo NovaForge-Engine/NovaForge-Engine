@@ -1,10 +1,10 @@
 #include "Application.h"
-#include <Extensions/NRIDeviceCreation.h>
+
 #include "ImguiThemes.h"
 
+#include <Extensions/NRIDeviceCreation.h>
 
-Application::Application()
-	: physicsEngine(PhysicsEngine::Get())
+Application::Application() : physicsEngine(PhysicsEngine::Get())
 {
 }
 
@@ -45,16 +45,15 @@ bool Application::Init(int argc, char** argv)
 
 	nri::AdapterDesc bestAdapterDesc = {};
 	uint32_t adapterDecscNum = 1;
-	if (
-		nriEnumerateAdapters(&bestAdapterDesc, adapterDecscNum) !=
-		nri::Result::SUCCESS)
+	if (nriEnumerateAdapters(&bestAdapterDesc, adapterDecscNum) !=
+	    nri::Result::SUCCESS)
 	{
 		return false;
 	}
 
 	auto graphicsAPI = nri::GraphicsAPI::D3D12;
-	if (cmdLine.get<std::string>("api") == "VULKAN" || cmdLine.get<
-		    std::string>("api") == "VK")
+	if (cmdLine.get<std::string>("api") == "VULKAN" ||
+	    cmdLine.get<std::string>("api") == "VK")
 		graphicsAPI = nri::GraphicsAPI::VK;
 
 	nri::DeviceCreationDesc deviceCreationDesc = {};
@@ -72,24 +71,24 @@ bool Application::Init(int argc, char** argv)
 		return false;
 	}
 
-	if (nri::nriGetInterface(
-		    *m_Device, "nri::CoreInterface", sizeof(nri::CoreInterface),
-			(nri::CoreInterface*)& NRI) != nri::Result::SUCCESS)
+	if (nri::nriGetInterface(*m_Device, "nri::CoreInterface",
+	                         sizeof(nri::CoreInterface),
+	                         (nri::CoreInterface*)&NRI) != nri::Result::SUCCESS)
 	{
 		return false;
 	}
 	if (nri::nriGetInterface(
-		    *m_Device, "nri::HelperInterface", sizeof(nri::HelperInterface),
+			*m_Device, "nri::HelperInterface", sizeof(nri::HelperInterface),
 			(nri::HelperInterface*)&NRI) != nri::Result::SUCCESS)
 		return false;
 
 	if (nri::nriGetInterface(
-		    *m_Device, "nri::StreamerInterface", sizeof(nri::StreamerInterface),
+			*m_Device, "nri::StreamerInterface", sizeof(nri::StreamerInterface),
 			(nri::StreamerInterface*)&NRI) != nri::Result::SUCCESS)
 		return false;
 
 	if (nri::nriGetInterface(*m_Device, "nri::SwapChainInterface",
-	                    sizeof(nri::SwapChainInterface),
+	                         sizeof(nri::SwapChainInterface),
 	                         (nri::SwapChainInterface*)&NRI) !=
 	    nri::Result::SUCCESS)
 		return false;
@@ -123,10 +122,10 @@ bool Application::Init(int argc, char** argv)
 		swapChainDesc.commandQueue = m_CommandQueue;
 		swapChainDesc.format = nri::SwapChainFormat::BT709_G22_8BIT;
 		swapChainDesc.verticalSyncInterval = window->m_VsyncInterval;
-		swapChainDesc.width = static_cast<uint16_t>(window->
-			m_RenderOutputWidth);
-		swapChainDesc.height = static_cast<uint16_t>(window->
-			m_RenderOutputHeight);
+		swapChainDesc.width =
+			static_cast<uint16_t>(window->m_RenderOutputWidth);
+		swapChainDesc.height =
+			static_cast<uint16_t>(window->m_RenderOutputHeight);
 		swapChainDesc.textureNum = SWAP_CHAIN_TEXTURE_NUM;
 		if ((NRI.CreateSwapChain(*m_Device, swapChainDesc, m_SwapChain)) !=
 		    nri::Result::SUCCESS)
@@ -149,7 +148,7 @@ bool Application::Init(int argc, char** argv)
 				return false;
 
 			const nova::BackBuffer backBuffer = {colorAttachment,
-			                               swapChainTextures[i]};
+			                                     swapChainTextures[i]};
 			window->m_SwapChainBuffers[i] = backBuffer;
 		}
 	}
@@ -165,10 +164,8 @@ bool Application::Init(int argc, char** argv)
 		                            frame.commandBuffer) !=
 		    nri::Result::SUCCESS)
 			return false;
-
 	}
 	bool result;
-
 
 	result = loader.LoadModel(
 		scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
@@ -179,37 +176,31 @@ bool Application::Init(int argc, char** argv)
 		return false;
 	}
 
-
-	MainRenderPass::InitParams passParams = {
-		.NRI = NRI,
-		.helperInterface = NRI,
-		.m_Device = *m_Device,
-		.renderTargetFormat = swapChainFormat,
-		.commandQueue = m_CommandQueue,
-		.scene = &scene
-	};
+	MainRenderPass::InitParams passParams = {.NRI = NRI,
+	                                         .helperInterface = NRI,
+	                                         .m_Device = *m_Device,
+	                                         .renderTargetFormat =
+	                                             swapChainFormat,
+	                                         .commandQueue = m_CommandQueue,
+	                                         .scene = &scene};
 	result = mainRenderPass.Init(passParams);
 	spdlog::info("MainRenderPass initialized: {}", result);
 
-	UIRenderPass::InitParams uiPassParams = {
-		.NRI = NRI,
-		.helperInterface = NRI,
-		.device = *m_Device,
-		.renderTargetFormat = swapChainFormat,
-		.window = window
-	};
+	UIRenderPass::InitParams uiPassParams = {.NRI = NRI,
+	                                         .helperInterface = NRI,
+	                                         .device = *m_Device,
+	                                         .renderTargetFormat =
+	                                             swapChainFormat,
+	                                         .window = window};
 
 	result = uiRenderPass.Init(uiPassParams);
 	spdlog::info("UIRenderPass initialized: {}", result);
 
 	physicsEngine->Init();
 
-
-	
-	//loader.LoadModel(GetFullPath("PZ18.ma", DataFolder::SCENES));
-	//loader.LoadModel(GetFullPath("PZ19.ma", DataFolder::SCENES));
-	//loader.LoadModel(GetFullPath("fhead.stl", DataFolder::SCENES));
-
+	// loader.LoadModel(GetFullPath("PZ18.ma", DataFolder::SCENES));
+	// loader.LoadModel(GetFullPath("PZ19.ma", DataFolder::SCENES));
+	// loader.LoadModel(GetFullPath("fhead.stl", DataFolder::SCENES));
 
 	return true;
 }
@@ -230,13 +221,15 @@ void Application::Update()
 		shouldClose = false;
 	}
 
-	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else is updating above
+	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else
+	//is updating above
 	physicsEngine->Update();
 }
 
 void Application::Draw()
 {
 	const uint32_t bufferedFrameIndex = frameIndex % BUFFERED_FRAME_MAX_NUM;
+	spdlog::info("Drawing frame {}", bufferedFrameIndex);
 	const nova::Frame& frame = window->GetFrames()[bufferedFrameIndex];
 	nri::CommandBuffer* commandBuffer = frame.commandBuffer;
 
@@ -249,22 +242,19 @@ void Application::Draw()
 	{
 		ImGui::Begin("Engine Interface");
 		ImGui::StyleColorsDark();
-		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		// ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("New Scene"))
 				{
-
 				}
 				if (ImGui::MenuItem("Open Scene"))
 				{
-
 				}
 				if (ImGui::MenuItem("Save Scene"))
 				{
-
 				}
 
 				ImGui::EndMenu();
@@ -274,11 +264,9 @@ void Application::Draw()
 			{
 				if (ImGui::MenuItem("Undo"))
 				{
-
 				}
 				if (ImGui::MenuItem("Redo"))
 				{
-
 				}
 
 				ImGui::EndMenu();
@@ -293,12 +281,10 @@ void Application::Draw()
 		ImGui::Text("Current Scene: Scene1");
 		if (ImGui::Button("Load Scene"))
 		{
-
 		}
 
 		if (ImGui::Button("Save Scene"))
 		{
-
 		}
 
 		ImGui::Separator();
@@ -323,7 +309,6 @@ void Application::Draw()
 
 			if (ImGui::Button("Delete Object"))
 			{
-
 			}
 		}
 
@@ -363,23 +348,26 @@ void Application::Draw()
 
 	const uint32_t currentTextureIndex =
 		NRI.AcquireNextSwapChainTexture(*m_SwapChain);
+	spdlog::info("Current texture index {}", currentTextureIndex);
 
 	nova::BackBuffer& backBuffer =
 		window->m_SwapChainBuffers[currentTextureIndex];
-	{ //MainPass
-		mainRenderPass.Draw(NRI, NRI, NRI, NRI, *commandBuffer, frame, backBuffer,
-							bufferedFrameIndex, window->m_RenderWindowWidth,
-							window->m_RenderWindowHeight);
+	{ // MainPass
+		mainRenderPass.Draw(NRI, NRI, NRI, NRI, *commandBuffer, frame,
+		                    backBuffer, bufferedFrameIndex,
+		                    window->m_RenderWindowWidth,
+		                    window->m_RenderWindowHeight);
 	}
-	
-	{	//UI
+
+	{ // UI
 		nri::AttachmentsDesc attachmentsDesc = {};
 		attachmentsDesc.colorNum = 1;
 		attachmentsDesc.colors = &backBuffer.colorAttachment;
 
 		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
 		{
-			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f, true);
+			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f,
+			                  true);
 		}
 		NRI.CmdEndRendering(*commandBuffer);
 
@@ -430,7 +418,6 @@ void Application::Draw()
 	frameIndex++;
 }
 
-
 void Application::InitCmdLineDefault(cmdline::parser& cmdLine)
 {
 #if _WIN32
@@ -439,17 +426,15 @@ void Application::InitCmdLineDefault(cmdline::parser& cmdLine)
 	std::string graphicsAPI = "VULKAN";
 #endif
 	cmdLine.add("help", '?', "print this message");
-	cmdLine.add<std::string>(
-		"api", 'a', "graphics API: D3D12 or VULKAN", false, graphicsAPI,
-		cmdline::oneof<std::string>("D3D12", "VULKAN"));
+	cmdLine.add<std::string>("api", 'a', "graphics API: D3D12 or VULKAN", false,
+	                         graphicsAPI,
+	                         cmdline::oneof<std::string>("D3D12", "VULKAN"));
 	cmdLine.add("debugAPI", 0, "enable graphics API validation layer");
 	cmdLine.add("debugNRI", 0, "enable NRI validation layer");
-
 }
 
 void Application::ReadCmdLineDefault(cmdline::parser& cmdLine)
 {
 	m_DebugAPI = cmdLine.exist("debugAPI");
 	m_DebugNRI = cmdLine.exist("debugNRI");
-
 }

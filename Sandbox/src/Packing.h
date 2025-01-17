@@ -1,11 +1,10 @@
 #pragma once
+#include "fmath/f16.hpp"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "fmath/f16.hpp"
 // For value_ptr
-// © 2021 NVIDIA Corporation
-
-
+// ï¿½ 2021 NVIDIA Corporation
 
 uint32_t float2_to_unorm_16_16(const glm::vec2& v);
 float16_t2 float2_to_float16_t2(const glm::vec2& v);

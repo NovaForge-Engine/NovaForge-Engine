@@ -19,3 +19,4 @@ build
 .idea/
 vendor/mono/
 _Data/Scenes/
+cmake-build-debug/

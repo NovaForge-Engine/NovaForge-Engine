@@ -5,20 +5,18 @@
 #include <vector>
 namespace nova
 {
-	
 
-
-class Scene
-{
+	class Scene
+	{
 	public:
-	Scene();
-	~Scene();
+		Scene();
+		~Scene();
 
-public:
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
-	std::vector<Texture*> textures;
-	std::vector<Mesh> meshes;
-};
+	public:
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture*> textures;
+		std::vector<Mesh> meshes;
+	};
 
-}
+} // namespace nova

@@ -1,16 +1,15 @@
 #pragma once
 #include "IRenderPass.h"
-#include <NRI.h>
+#include "Window.h"
+#include "imgui_impl_glfw.h"
+
 #include <Extensions/NRIHelper.h>
 #include <Extensions/NRIStreamer.h>
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <NRI.h>
 #include <imgui.h>
 #include <vector>
-
-#include "imgui_impl_glfw.h"
-#include "Window.h"
-
-#include <GLFW/glfw3native.h>
-#include <GLFW/glfw3.h>
 
 struct ImDrawVertOpt
 {
@@ -19,7 +18,8 @@ struct ImDrawVertOpt
 	uint32_t col;
 };
 
-class UIRenderPass: public IRenderPass {
+class UIRenderPass : public IRenderPass
+{
 public:
 	void Init() override;
 	void Draw() override;
@@ -34,10 +34,8 @@ public:
 		nri::Format renderTargetFormat;
 		nova::Window* window;
 	};
-	
-	bool Init(InitParams params);
 
-	
+	bool Init(InitParams params);
 
 	void Draw(const nri::CoreInterface& NRI,
 	          const nri::StreamerInterface& streamerInterface,
@@ -52,7 +50,6 @@ public:
 	~UIRenderPass();
 
 private:
-
 	std::vector<uint8_t> m_UiData;
 	nri::DescriptorPool* m_DescriptorPool = nullptr;
 	nri::DescriptorSet* m_DescriptorSet = nullptr;
@@ -66,8 +63,4 @@ private:
 	double m_TimePrev = 0.0;
 	uint64_t m_IbOffset = 0;
 	uint64_t m_VbOffset = 0;
-
-
-
 };
-
