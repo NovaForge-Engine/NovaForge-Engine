@@ -1,15 +1,18 @@
 #pragma once
 #include "IRenderPass.h"
-#include "Window.h"
-#include "imgui_impl_glfw.h"
-
+#include <NRI.h>
 #include <Extensions/NRIHelper.h>
 #include <Extensions/NRIStreamer.h>
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-#include <NRI.h>
 #include <imgui.h>
 #include <vector>
+
+#include "imgui_impl_glfw.h"
+#include "Window.h"
+
+#include <GLFW/glfw3native.h>
+#include <GLFW/glfw3.h>
+
+
 
 struct ImDrawVertOpt
 {

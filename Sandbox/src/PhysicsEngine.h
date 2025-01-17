@@ -1,13 +1,12 @@
 #pragma once
 
-#include "PhysicsUtility.h"
-
-#include <Jolt/Core/Core.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Renderer/DebugRenderer.h>
+#include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Core/Core.h>
 
+#include "PhysicsUtility.h"
 class PhysicsEngine
 {
 public:

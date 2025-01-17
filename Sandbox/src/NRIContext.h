@@ -1,8 +1,9 @@
 #pragma once
+#include <NRI.h>
 #include <Extensions/NRIHelper.h>
 #include <Extensions/NRIStreamer.h>
 #include <Extensions/NRISwapChain.h>
-#include <NRI.h>
+
 
 struct NRIInterface : public nri::CoreInterface,
 					  public nri::HelperInterface,

@@ -1,8 +1,7 @@
 #pragma once
-#include "fmath/f16.hpp"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "fmath/f16.hpp"
 // For value_ptr
 // � 2021 NVIDIA Corporation
 

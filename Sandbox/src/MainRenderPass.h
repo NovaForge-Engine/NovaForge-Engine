@@ -1,16 +1,21 @@
 #pragma once
 #include "IRenderPass.h"
 #include "NRI.h"
-#include "Scene.hpp"
-#include "Settings.h"
 #include "Utils.hpp"
-#include "Window.h"
 
+
+#include "Settings.h"
+
+#include <NRI.h>
 #include <Extensions/NRIHelper.h>
 #include <Extensions/NRIStreamer.h>
 #include <Extensions/NRISwapChain.h>
-#include <NRI.h>
 #include <NRIDescs.h>
+
+
+#include "Window.h"
+#include "Scene.hpp"
+
 
 struct CustomVertex
 {

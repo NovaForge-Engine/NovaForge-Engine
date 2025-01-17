@@ -1,24 +1,32 @@
 #pragma once
-
-#include "CmdLine.h"
-#include "MainRenderPass.h"
-#include "ModelLoader.h"
-#include "NRIContext.h"
-#include "PhysicsEngine.h"
-#include "Scene.hpp"
-#include "Settings.h"
-#include "UIRenderPass.h"
-#include "Window.h"
+#include <NRI.h>
 
 #include <Extensions/NRIDeviceCreation.h>
 #include <Extensions/NRIHelper.h>
+#include <Extensions/NRIStreamer.h>
 #include <Extensions/NRILowLatency.h>
 #include <Extensions/NRIMeshShader.h>
 #include <Extensions/NRIRayTracing.h>
 #include <Extensions/NRIResourceAllocator.h>
-#include <Extensions/NRIStreamer.h>
 #include <Extensions/NRISwapChain.h>
-#include <NRI.h>
+
+#include "MainRenderPass.h"
+#include "UIRenderPass.h"
+
+#include "Window.h"
+#include "NRIContext.h"
+
+#include "Settings.h"
+#include "PhysicsEngine.h"
+
+#include "CmdLine.h"
+
+
+#include "ModelLoader.h"
+#include "Scene.hpp"
+
+
+
 
 constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;

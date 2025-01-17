@@ -1,16 +1,22 @@
 #pragma once
-#include "Packing.h"
-#include "Scene.hpp"
-#include "Utils.hpp"
-#include "fmath/f16.hpp"
+#include <iostream>
+#include <string>
+
+
 
 #include <assimp/Importer.hpp>
-#include <assimp/material.h>
-#include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <iostream>
+#include <assimp/postprocess.h>
+#include <assimp/material.h>
+
+#include "Utils.hpp"
+
+#include "fmath/f16.hpp"
+#include "Packing.h"
+#include "Scene.hpp"
+
 #include <spdlog/spdlog.h>
-#include <string>
+
 
 namespace nova
 {

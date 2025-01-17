@@ -24,12 +24,15 @@
 
 void GLFW_ErrorCallback(int32_t error, const char* message);
 
+#include <stdint.h>
+
+#include <NRI.h>
+#include <Extensions/NRISwapChain.h>
+
 #include "imgui_impl_glfw.h"
 
-#include <Extensions/NRISwapChain.h>
-#include <NRI.h>
-#include <stdint.h>
 #include <string>
+
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action,
                  int mods);

@@ -6,12 +6,12 @@
 #include "fmath/f16.hpp"
 #include "glm/detail/func_packing_simd.inl"
 
-#include <Extensions/NRIHelper.h>
 #include <NRI.h>
-#include <array>
-#include <detex.h>
-#include <string>
 #include <vector>
+#include <string>
+#include <array>
+#include <Extensions/NRIHelper.h>
+#include <detex.h>
 struct Texture;
 
 typedef std::vector<std::vector<uint8_t>> ShaderCodeStorage;
