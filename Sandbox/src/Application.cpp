@@ -169,6 +169,8 @@ bool Application::Init(int argc, char** argv)
 
 	result = loader.LoadModel(
 		scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	result = loader.LoadModel(
+		scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 
 	if (!result)
 	{
@@ -241,6 +243,7 @@ void Application::Draw()
 	uiRenderPass.BeginUI();
 	{
 		ImGui::Begin("Engine Interface");
+		mainRenderPass.BeginUI();
 		ImGui::StyleColorsDark();
 		// ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 		if (ImGui::BeginMenuBar())

@@ -453,6 +453,18 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 	// Record
 	NRI.BeginCommandBuffer(commandBuffer, m_DescriptorPool);
 	{
+		{ // Copy upload requests to destinations
+			Annotation annotation(NRI, commandBuffer, "Streamer");
+
+			// TODO: is barrier from "SHADER_RESOURCE" to "COPY_DESTINATION"
+			// needed here for "Buffer::InstanceData"?
+
+			//streamerInterface.CmdUploadStreamerUpdateRequests(
+				//commandBuffer, streamer);
+		}
+
+
+
 
 		nri::TextureBarrierDesc textureBarrierDescs = {};
 		textureBarrierDescs.texture = currentBackBuffer.texture;

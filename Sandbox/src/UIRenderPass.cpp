@@ -346,6 +346,11 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 						NRI.CmdSetDescriptorSet(commandBuffer, 0,
 						                        *descriptorSet, nullptr);
 					}
+					else
+					{
+						NRI.CmdSetDescriptorSet(commandBuffer, 0,
+						                        *m_DescriptorSet, nullptr);
+					}
 					NRI.CmdSetScissors(commandBuffer, &rect, 1);
 					NRI.CmdDrawIndexed(
 						commandBuffer,
