@@ -54,11 +54,11 @@ namespace nova
 		uint64_t constantBufferViewOffset;
 	};
 
-	class Window
+	class NovaWindow
 	{
 	public:
-		Window();
-		~Window();
+		NovaWindow();
+		~NovaWindow();
 
 		bool Initialize(int width, int height, std::string api);
 		void Update();

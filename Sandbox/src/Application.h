@@ -53,7 +53,7 @@ public:
 	bool shouldClose = false;
 
 private:
-	nova::Window* window;
+	nova::NovaWindow* window;
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;

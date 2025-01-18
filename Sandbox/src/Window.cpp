@@ -17,15 +17,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action,
 	                                                      action, mods);
 }
 
-Window::Window()
+NovaWindow::NovaWindow()
 {
 }
 
-Window::~Window()
+NovaWindow::~NovaWindow()
 {
 }
 
-bool Window::Initialize(int width, int height, std::string api)
+bool NovaWindow::Initialize(int width, int height, std::string api)
 {
 	glfwSetErrorCallback(GLFW_ErrorCallback);
 
@@ -112,14 +112,14 @@ bool Window::Initialize(int width, int height, std::string api)
 	                         &NovaEngine::InputManager::mousePositionCallback);
 }
 
-void Window::Update()
+void NovaWindow::Update()
 {
 }
 
-void Window::Render()
+void NovaWindow::Render()
 {
 }
 
-void Window::Shutdown()
+void NovaWindow::Shutdown()
 {
 }

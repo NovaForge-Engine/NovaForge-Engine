@@ -39,7 +39,7 @@ bool Application::Init(int argc, char** argv)
 	ReadCmdLineDefault(cmdLine);
 	ReadCmdLine(cmdLine);
 
-	window = new nova::Window();
+	window = new nova::NovaWindow();
 
 	window->Initialize(1280, 720, cmdLine.get<std::string>("api"));
 
