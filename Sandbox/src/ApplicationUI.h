@@ -34,6 +34,6 @@ struct AppState
 	ImFont* LargeIconFont = nullptr;
 };
 
-DockingParams CreateDefaultLayout(AppState& appState);
+std::vector<DockingParams> CreateDefaultLayout(AppState& appState);
 std::vector<DockingSplit> CreateDefaultDockingSplits();
 std::vector<DockableWindow> CreateDockableWindows(AppState& appState);

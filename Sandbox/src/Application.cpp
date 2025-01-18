@@ -236,16 +236,19 @@ void Application::Draw()
 
 	uiRenderPass.BeginUI();
 	{
+		//(@Tenzy21)TODO: Add ImGuiWindowFlags_MenuBar flag into main window
 		static bool pOpen = true;
-		//ImGui::Begin("MainDockSpace", &pOpen, DockingDetails::WindowFlagsNothing());
 		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
-		ImGui::DockSpace(mainDockspaceId, ImVec2(1280.0f, 720.0f));
+		ImGui::DockSpace(mainDockspaceId, ImVec2(0.0f, 0.0f), dockingParams.mainDockSpaceNodeFlags);
 		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
 		if (dockingParams.layoutReset) {
 			dockingParams.layoutReset = false;
+			ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 			ImGui::SetWindowPos(ImVec2(0, 0));
-			dockingParams = CreateDefaultLayout(appState);
+			
+			auto layout = CreateDefaultLayout(appState);
+			dockingParams = layout[0];
 
 			ImGui::DockBuilderRemoveNodeChildNodes(mainDockspaceId);
 			for (const auto& dockingSplit : dockingParams.dockingSplits) {
@@ -276,8 +279,6 @@ void Application::Draw()
 			}
 			ImGui::End();
 		}
-
-		//ImGui::End();S
 	}
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);

@@ -4,7 +4,6 @@
 void GuiWindowViewport(AppState& appState)
 {
 	ImGui::Text("Viewport here");
-	ImGui::ShowDemoWindow();
 }
 
 void GuiWindowAssetBrowser(AppState& appState)
@@ -32,12 +31,13 @@ void GuiWindowLogger(AppState& appState)
 	ImGui::Text("Logger here");
 }
 
-DockingParams CreateDefaultLayout(AppState& appState)
+std::vector<DockingParams> CreateDefaultLayout(AppState& appState)
 {
 	DockingParams dockingParams;
 	dockingParams.dockingSplits = CreateDefaultDockingSplits();
 	dockingParams.dockableWindows = CreateDockableWindows(appState);
-	return dockingParams;
+
+	return {dockingParams};
 }
 
 std::vector<DockingSplit> CreateDefaultDockingSplits()
@@ -46,25 +46,25 @@ std::vector<DockingSplit> CreateDefaultDockingSplits()
 	splitViewportToAssetBrowser.initialDock = "MainDockSpace";
 	splitViewportToAssetBrowser.newDock = "AssetBrowserSpace";
 	splitViewportToAssetBrowser.direction = ImGuiDir_Down;
-	splitViewportToAssetBrowser.ratio = 0.2f;
+	splitViewportToAssetBrowser.ratio = 0.5f;
 
 	DockingSplit splitViewportToOutliner;
 	splitViewportToOutliner.initialDock = "MainDockSpace";
 	splitViewportToOutliner.newDock = "OutlinerSpace";
 	splitViewportToOutliner.direction = ImGuiDir_Left;
-	splitViewportToOutliner.ratio = 0.25f;
+	splitViewportToOutliner.ratio = 0.5f;
 
 	DockingSplit splitViewportToInspector;
 	splitViewportToInspector.initialDock = "MainDockSpace";
 	splitViewportToInspector.newDock = "InspectorSpace";
 	splitViewportToInspector.direction = ImGuiDir_Right;
-	splitViewportToInspector.ratio = 0.25f;
+	splitViewportToInspector.ratio = 0.75f;
 
 	DockingSplit splitViewportToStartPanel;
 	splitViewportToStartPanel.initialDock = "MainDockSpace";
 	splitViewportToStartPanel.newDock = "StartPanelSpace";
 	splitViewportToStartPanel.direction = ImGuiDir_Up;
-	splitViewportToStartPanel.ratio = 0.1f;
+	splitViewportToStartPanel.ratio = 0.25f;
 
 	DockingSplit splitAssetBrowserToLogger;
 	splitAssetBrowserToLogger.initialDock = "AssetBrowserSpace";
@@ -85,15 +85,15 @@ std::vector<DockingSplit> CreateDefaultDockingSplits()
 
 std::vector<DockableWindow> CreateDockableWindows(AppState& appState)
 {
-	DockableWindow startPanelWindow;
-	startPanelWindow.label = "Start Panel";
-	startPanelWindow.dockSpaceName = "StartPanelSpace";
-	startPanelWindow.GuiFunction = [&] { GuiWindowStartPanel(appState); };
-
 	DockableWindow viewportWindow;
 	viewportWindow.label = "Viewport";
 	viewportWindow.dockSpaceName = "MainDockSpace";
 	viewportWindow.GuiFunction = [&appState]() { GuiWindowViewport(appState); };
+
+	DockableWindow startPanelWindow;
+	startPanelWindow.label = "Start Panel";
+	startPanelWindow.dockSpaceName = "StartPanelSpace";
+	startPanelWindow.GuiFunction = [&] { GuiWindowStartPanel(appState); };
 
 	DockableWindow outlinerWindow;
 	outlinerWindow.label = "Outliner";

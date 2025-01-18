@@ -180,8 +180,7 @@ struct DockingParams
 	// `optional<ImGuiID> dockSpaceIdFromName(const std::string&
 	// dockSpaceName)`: returns the ImGuiID corresponding to the dockspace with
 	// this name
-	std::optional<ImGuiID>
-	DockSpaceIdFromName(const std::string& dockSpaceName);
+	std::optional<ImGuiID> DockSpaceIdFromName(const std::string& dockSpaceName);
 };
 
 // (@Tenzy21) TODO: Move somewhere else
