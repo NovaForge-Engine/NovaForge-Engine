@@ -110,6 +110,8 @@ bool NovaWindow::Initialize(int width, int height, std::string api)
 	                      &NovaEngine::InputManager::mouseScrollCallback);
 	glfwSetCursorPosCallback(m_Window,
 	                         &NovaEngine::InputManager::mousePositionCallback);
+
+	return true;
 }
 
 void NovaWindow::Update()

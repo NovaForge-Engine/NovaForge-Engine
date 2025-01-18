@@ -186,6 +186,9 @@ bool Application::Init(int argc, char** argv)
 	                                         .commandQueue = m_CommandQueue,
 	                                         .scene = &scene};
 	result = mainRenderPass.Init(passParams);
+
+	appState.outputTexture = mainRenderPass.m_TextureShaderResource;
+
 	spdlog::info("MainRenderPass initialized: {}", result);
 
 	UIRenderPass::InitParams uiPassParams = {.NRI = NRI,

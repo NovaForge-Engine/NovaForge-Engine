@@ -72,6 +72,7 @@ public:
 	void EndUI();
 	MainRenderPass();
 	~MainRenderPass();
+	nri::Descriptor* m_TextureShaderResource = nullptr;
 
 private:
 	float m_Transparency = 1.0f;
@@ -80,7 +81,7 @@ private:
 	nri::PipelineLayout* m_PipelineLayout = nullptr;
 	nri::Pipeline* m_Pipeline = nullptr;
 	nri::DescriptorSet* m_TextureDescriptorSet = nullptr;
-	nri::Descriptor* m_TextureShaderResource = nullptr;
+
 	nri::Descriptor* m_Sampler = nullptr;
 	nri::Buffer* m_ConstantBuffer = nullptr;
 	nri::Buffer* m_VertexBuffer = nullptr;

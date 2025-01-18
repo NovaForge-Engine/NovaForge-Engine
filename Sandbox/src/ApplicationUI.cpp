@@ -3,7 +3,10 @@
 
 void GuiWindowViewport(AppState& appState)
 {
-	ImGui::Text("Viewport here");
+	//ImGui::Text("Viewport here");
+	ImVec2 windowSize = ImGui::GetWindowSize();
+	ImGui::Image((ImTextureID)appState.outputTexture, ImVec2(windowSize.x, windowSize.y),
+	             ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 }
 
 void GuiWindowAssetBrowser(AppState& appState)

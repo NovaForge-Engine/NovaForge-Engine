@@ -1,4 +1,5 @@
 #include "DockingParams.h"
+#include <NRIDescs.h>
 
 struct MyAppSettings
 {	
@@ -32,6 +33,7 @@ struct AppState
 	ImFont* ColorFont = nullptr;
 	ImFont* EmojiFont = nullptr;
 	ImFont* LargeIconFont = nullptr;
+	nri::Descriptor* outputTexture = nullptr;
 };
 
 std::vector<DockingParams> CreateDefaultLayout(AppState& appState);
