@@ -6,6 +6,13 @@
 
 using DockSpaceName = std::string;
 
+namespace SplitIdsHelper
+{
+	bool ContainsSplit(const DockSpaceName& dockSpaceName);
+	ImGuiID GetSplitId(const DockSpaceName& dockSpaceName);
+	void SetSplitId(const DockSpaceName& dockSpaceName, ImGuiID imguiId);
+}
+
 struct DockingSplit
 {
 	//  id of the space that should be split.

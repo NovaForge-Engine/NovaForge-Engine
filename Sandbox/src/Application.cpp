@@ -233,101 +233,23 @@ void Application::Draw()
 	}
 	uiRenderPass.BeginUI();
 	{
-		ImGui::Begin("Engine Interface");
-		ImGui::StyleColorsDark();
-		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
-		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("File")) {
-				if (ImGui::MenuItem("New Scene")) {
+		//static bool pOpen = true;
+		//ImGui::Begin("MainDockSpace", &pOpen, DockingDetails::WindowFlagsNothing());
+		//ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
+		//ImGui::DockSpace(mainDockspaceId, ImVec2(0.0f, 0.0f));
+		//SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
-				}
-				if (ImGui::MenuItem("Open Scene")) {
+		//dockingParams = CreateDefaultLayout(appState);
+		//for (const auto& dockingSplit : dockingParams.dockingSplits) {
+		//	DockingDetails::DoSplit(dockingSplit);
+		//}
+		//for (const auto& dockableWindow : dockingParams.dockableWindows) {
+		//	ImGui::DockBuilderDockWindow(dockableWindow.label.c_str(), SplitIdsHelper::GetSplitId(dockableWindow.dockSpaceName));
+		//}
 
-				}
-				if (ImGui::MenuItem("Save Scene")) {
-
-				}
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Edit")) {
-				if (ImGui::MenuItem("Undo")) {
-
-				}
-				if (ImGui::MenuItem("Redo")) {
-
-				}
-
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
-		}
-		ImGui::DockSpace(ImGui::GetID("DockSpace"));
-		ImGui::End();
-
-		ImGui::CollapsingHeader("Scene Management");
-		ImGui::Text("Current Scene: Scene1");
-		if (ImGui::Button("Load Scene")) {
-
-		}
-
-		if (ImGui::Button("Save Scene")) {
-
-		}
-
-		ImGui::Separator();
-
-		static const char* objects[] = {"Sphere", "Cube", "Light"};
-		static int object_current_idx = 0;
-		ImGui::ListBox("Objects", &object_current_idx, objects, IM_ARRAYSIZE(objects), 4);
-
-		ImGui::CollapsingHeader("Object Inspector");
-		{
-			ImGui::Text("Selected Object: %s", objects[object_current_idx]);
-
-			static float position[3] = {0.0f, 0.0f, 0.0f};
-			ImGui::InputFloat3("Position", position);
-
-			static float rotation[3] = {0.0f, 0.0f, 0.0f};
-			ImGui::InputFloat3("Rotation", rotation);
-
-			static float scale[3] = {1.0f, 1.0f, 1.0f};
-			ImGui::InputFloat3("Scale", scale);
-
-			if (ImGui::Button("Delete Object")) {
-
-			}
-		}
-
-		ImGui::CollapsingHeader("Material Editor");
-		{
-			static char materialName[50] = "New Material";
-			ImGui::InputText("Material Name", materialName,
-			                 IM_ARRAYSIZE(materialName));
-
-			static float color[3] = {1.0f, 0.5f, 0.5f};
-			ImGui::ColorEdit3("Color", color);
-
-			if (ImGui::Button("Create Material")) {
-			}
-		}
-
-		ImGui::CollapsingHeader("Camera Settings");
-		{
-			static float cameraPosition[3] = {0.0f, 5.0f, -10.0f};
-			ImGui::InputFloat3("Position", cameraPosition);
-
-			static float cameraRotation[3] = {0.0f, 0.0f, 0.0f};
-			ImGui::InputFloat3("Rotation", cameraRotation);
-
-			static float cameraFov = 45.0f;
-			ImGui::SliderFloat("Field of View", &cameraFov, 1.0f, 90.0f);
-		}
+		//ImGui::End();
 	}
-
-	ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
+	//ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);

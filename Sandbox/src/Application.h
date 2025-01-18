@@ -17,6 +17,9 @@
 #include "Window.h"
 #include "NRIContext.h"
 
+#include "ApplicationUI.h"
+#include "DockingDetails.h"
+
 #include "Settings.h"
 #include "PhysicsEngine.h"
 
@@ -53,8 +56,8 @@ public:
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
 	
-
-	
+	AppState appState;
+	DockingParams dockingParams;
 
 	Frame& getCurrentFrame(){return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];}
 
