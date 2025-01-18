@@ -60,6 +60,10 @@ private:
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
+
+	nova::ModelLoader loader;
+	nova::Scene scene;
+
 	
 	AppState appState;
 	DockingParams dockingParams;
