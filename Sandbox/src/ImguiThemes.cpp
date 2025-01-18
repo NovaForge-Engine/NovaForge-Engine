@@ -1,4 +1,5 @@
 #include "ImguiThemes.h"
+#include <magic_enum/magic_enum.hpp>
 
 namespace ThemeTweakImpl
 {

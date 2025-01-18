@@ -16,6 +16,9 @@
 #include "Window.h"
 #include "NRIContext.h"
 
+#include "ApplicationUI.h"
+#include "DockingDetails.h"
+
 #include "Settings.h"
 #include "PhysicsEngine.h"
 
@@ -57,9 +60,9 @@ private:
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
-
-	nova::ModelLoader loader;
-	nova::Scene scene;
+	
+	AppState appState;
+	DockingParams dockingParams;
 
 	nova::Frame& getCurrentFrame()
 	{
