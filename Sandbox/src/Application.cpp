@@ -343,7 +343,7 @@ void Application::Draw()
 	}
 	ApplyTheme(ImGuiTheme_SoDark_AccentRed);
 
-	uiRenderPass.EndUI(NRI, *m_Streamer);
+	uiRenderPass.EndUI(NRI, *m_Streamer, NRI, NRI, m_CommandQueue);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);
 
 	mainRenderPass.PrepareFrame();

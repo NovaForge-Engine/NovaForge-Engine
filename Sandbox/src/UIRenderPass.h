@@ -47,7 +47,9 @@ public:
 
 	void BeginUI();
 	void EndUI(const nri::StreamerInterface& streamerInterface,
-	           nri::Streamer& streamer);
+	           nri::Streamer& streamer, const nri::CoreInterface& NRI,
+	           nri::HelperInterface& helperInterface,
+	           nri::CommandQueue* commandBuffer);
 
 	UIRenderPass();
 	~UIRenderPass();
@@ -56,10 +58,14 @@ private:
 	std::vector<uint8_t> m_UiData;
 	nri::DescriptorPool* m_DescriptorPool = nullptr;
 	nri::DescriptorSet* m_DescriptorSet = nullptr;
+	nri::DescriptorSet* otherDescriptorSet = nullptr;
 	nri::Descriptor* m_FontShaderResource = nullptr;
 	nri::Descriptor* m_Sampler = nullptr;
 	nri::Pipeline* m_Pipeline = nullptr;
 	nri::PipelineLayout* m_PipelineLayout = nullptr;
+
+	nri::Descriptor* test = nullptr;
+
 	nri::Texture* m_FontTexture = nullptr;
 	nri::Memory* m_FontTextureMemory = nullptr;
 	GLFWcursor* m_MouseCursors[ImGuiMouseCursor_COUNT] = {};

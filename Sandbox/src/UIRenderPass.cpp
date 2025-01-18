@@ -257,9 +257,9 @@ bool UIRenderPass::Init(InitParams params)
 	// Descriptor pool
 	{
 		nri::DescriptorPoolDesc descriptorPoolDesc = {};
-		descriptorPoolDesc.descriptorSetMaxNum = 1;
-		descriptorPoolDesc.textureMaxNum = 1;
-		descriptorPoolDesc.samplerMaxNum = 1;
+		descriptorPoolDesc.descriptorSetMaxNum = 2;
+		descriptorPoolDesc.textureMaxNum = 2;
+		descriptorPoolDesc.samplerMaxNum = 2;
 
 		if (params.NRI.CreateDescriptorPool(params.device, descriptorPoolDesc,
 		                                    m_DescriptorPool) !=
@@ -280,7 +280,17 @@ bool UIRenderPass::Init(InitParams params)
 		params.NRI.UpdateDescriptorRanges(*m_DescriptorSet, 0,
 		                                  GetCountOf(descriptorRangeUpdateDesc),
 		                                  descriptorRangeUpdateDesc);
+
+		if (params.NRI.AllocateDescriptorSets(
+				*m_DescriptorPool, *m_PipelineLayout, 0, &otherDescriptorSet, 1,
+				0) != nri::Result::SUCCESS)
+			return false;
+
+
 	}
+
+
+
 
 	return true;
 }
@@ -303,7 +313,7 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 	NRI.CmdSetPipelineLayout(commandBuffer, *m_PipelineLayout);
 	NRI.CmdSetPipeline(commandBuffer, *m_Pipeline);
 	NRI.CmdSetRootConstants(commandBuffer, 0, consts, sizeof(consts));
-	NRI.CmdSetDescriptorSet(commandBuffer, 0, *m_DescriptorSet, nullptr);
+
 
 	nri::Buffer* geometryBuffer =
 		streamerInterface.GetStreamerDynamicBuffer(streamer);
@@ -341,10 +351,15 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 					nri::DescriptorSet* descriptorSet = nullptr;
 					if (drawCmd.GetTexID() != 0)
 					{
+						//elizoorg 18.01.2025
+						//FIXME: This descriptor set should be created from this descriptor pool, otherwise not working
+						//descriptorSet = (nri::DescriptorSet*)drawCmd.GetTexID();
+						//NRI.CmdSetDescriptorSet(commandBuffer, 0,
+						//                        *descriptorSet, nullptr);
 
-						descriptorSet = (nri::DescriptorSet*)drawCmd.GetTexID();
-						NRI.CmdSetDescriptorSet(commandBuffer, 0,
-						                        *descriptorSet, nullptr);
+							NRI.CmdSetDescriptorSet(commandBuffer, 0,
+						                        *otherDescriptorSet, nullptr);
+
 					}
 					else
 					{
@@ -376,7 +391,9 @@ void UIRenderPass::BeginUI()
 }
 
 void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
-                         nri::Streamer& streamer)
+                         nri::Streamer& streamer, const nri::CoreInterface& NRI,
+                         nri::HelperInterface& helperInterface,
+                         nri::CommandQueue* commandBuffer)
 {
 	ImGui::EndFrame();
 	ImGui::Render();
@@ -401,6 +418,25 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
 	for (int32_t n = 0; n < drawData.CmdListsCount; n++)
 	{
 		const ImDrawList& drawList = *drawData.CmdLists[n];
+
+		for (int32_t i = 0; i < drawList.CmdBuffer.Size; i++)
+		{
+			const ImDrawCmd& drawCmd = drawList.CmdBuffer[i];
+			if (drawCmd.GetTexID() != 0)
+			{
+				helperInterface.WaitForIdle(*commandBuffer);
+				nri::Descriptor* test =
+					(nri::Descriptor*)drawCmd.GetTexID();
+				nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc[] = {
+					{&test, 1}, {&m_Sampler, 1}};
+
+				NRI.UpdateDescriptorRanges(
+					*otherDescriptorSet, 0,
+					GetCountOf(descriptorRangeUpdateDesc),
+					descriptorRangeUpdateDesc);
+
+			}
+		}
 
 		for (int32_t i = 0; i < drawList.VtxBuffer.Size; i++)
 		{
@@ -428,6 +464,9 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
 	m_IbOffset = streamerInterface.AddStreamerBufferUpdateRequest(
 		streamer, bufferUpdateRequestDesc);
 	m_VbOffset = m_IbOffset + indexDataSize;
+
+
+
 }
 
 UIRenderPass::~UIRenderPass()
