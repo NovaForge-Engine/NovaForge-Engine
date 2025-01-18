@@ -1,4 +1,7 @@
 #pragma once
+
+#include "PhysicsEngine.h"
+
 #include <NRI.h>
 
 #include <Extensions/NRIDeviceCreation.h>
@@ -20,7 +23,7 @@
 #include "DockingDetails.h"
 
 #include "Settings.h"
-#include "PhysicsEngine.h"
+
 
 #include "CmdLine.h"
 
