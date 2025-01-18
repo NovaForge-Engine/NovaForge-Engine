@@ -194,6 +194,8 @@ bool Application::Init(int argc,char** argv)
 	result = uiRenderPass.Init(uiPassParams);
 	spdlog::info("UIRenderPass initialized: {}", result);
 
+	dockingParams.layoutReset = true;
+
 	physicsEngine->Init();
 
 	return true;
@@ -231,25 +233,52 @@ void Application::Draw()
 		NRI.Wait(*m_FrameFence, 1 + frameIndex - BUFFERED_FRAME_MAX_NUM);
 		NRI.ResetCommandAllocator(*frame.commandAllocator);
 	}
+
 	uiRenderPass.BeginUI();
 	{
-		//static bool pOpen = true;
+		static bool pOpen = true;
 		//ImGui::Begin("MainDockSpace", &pOpen, DockingDetails::WindowFlagsNothing());
-		//ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
-		//ImGui::DockSpace(mainDockspaceId, ImVec2(0.0f, 0.0f));
-		//SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
+		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
+		ImGui::DockSpace(mainDockspaceId, ImVec2(1280.0f, 720.0f));
+		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
-		//dockingParams = CreateDefaultLayout(appState);
-		//for (const auto& dockingSplit : dockingParams.dockingSplits) {
-		//	DockingDetails::DoSplit(dockingSplit);
-		//}
-		//for (const auto& dockableWindow : dockingParams.dockableWindows) {
-		//	ImGui::DockBuilderDockWindow(dockableWindow.label.c_str(), SplitIdsHelper::GetSplitId(dockableWindow.dockSpaceName));
-		//}
+		if (dockingParams.layoutReset) {
+			dockingParams.layoutReset = false;
+			ImGui::SetWindowPos(ImVec2(0, 0));
+			dockingParams = CreateDefaultLayout(appState);
 
-		//ImGui::End();
+			ImGui::DockBuilderRemoveNodeChildNodes(mainDockspaceId);
+			for (const auto& dockingSplit : dockingParams.dockingSplits) {
+				DockingDetails::DoSplit(dockingSplit);
+			}
+			for (const auto& dockableWindow : dockingParams.dockableWindows) {
+				ImGui::DockBuilderDockWindow(dockableWindow.label.c_str(), SplitIdsHelper::GetSplitId(dockableWindow.dockSpaceName));
+			}
+			ImGui::DockBuilderFinish(mainDockspaceId);
+			ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
+		}
+
+		for (auto& dockableWindow : dockingParams.dockableWindows) {
+			if (dockableWindow.windowSize.x > 0.f)
+				ImGui::SetNextWindowSize(dockableWindow.windowSize, dockableWindow.windowSizeCondition);
+			if (dockableWindow.windowPosition.x > 0.f)
+				ImGui::SetNextWindowPos(dockableWindow.windowPosition, dockableWindow.windowPositionCondition);
+
+			bool not_collapsed = true;
+			if (dockableWindow.canBeClosed) {
+				not_collapsed = ImGui::Begin(dockableWindow.label.c_str(), &dockableWindow.isVisible, dockableWindow.imGuiWindowFlags);
+			}
+			else {
+				not_collapsed = ImGui::Begin(dockableWindow.label.c_str(), nullptr, dockableWindow.imGuiWindowFlags);
+			}
+			if (not_collapsed && dockableWindow.GuiFunction) {
+				dockableWindow.GuiFunction();
+			}
+			ImGui::End();
+		}
+
+		//ImGui::End();S
 	}
-	//ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);
@@ -329,7 +358,6 @@ void Application::Draw()
 
 	frameIndex++;
 }
-
 
 void Application::InitCmdLineDefault(cmdline::parser& cmdLine)
 {

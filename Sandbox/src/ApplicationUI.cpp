@@ -3,32 +3,33 @@
 
 void GuiWindowViewport(AppState& appState)
 {
+	ImGui::Text("Viewport here");
 	ImGui::ShowDemoWindow();
 }
 
 void GuiWindowAssetBrowser(AppState& appState)
 {
-	ImGui::Separator();
+	ImGui::Text("AssetBrowser here");
 }
 
 void GuiWindowOutliner(AppState& appState)
 {
-	ImGui::Separator();
+	ImGui::Text("Outliner here");
 }
 
 void GuiWindowInspector(AppState& appState)
 {
-	ImGui::Separator();
+	ImGui::Text("Inspector here");
 }
 
 void GuiWindowStartPanel(AppState& appState)
 {
-	ImGui::Separator();
+	ImGui::Text("StartPanel here");
 }
 
 void GuiWindowLogger(AppState& appState)
 {
-	ImGui::Separator();
+	ImGui::Text("Logger here");
 }
 
 DockingParams CreateDefaultLayout(AppState& appState)
