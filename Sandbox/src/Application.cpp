@@ -4,8 +4,10 @@
 
 #include <Extensions/NRIDeviceCreation.h>
 
-Application::Application() 
+Application::Application()
 	: physicsEngine(PhysicsEngine::Get()), scriptEngine(ScriptEngine::Get())
+{
+}
 
 Application::~Application()
 {
