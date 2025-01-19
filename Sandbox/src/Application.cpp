@@ -3,7 +3,7 @@
 
 
 Application::Application() 
-	: physicsEngine(PhysicsEngine::Get())
+	: physicsEngine(PhysicsEngine::Get()), scriptEngine(ScriptEngine::Get())
 {
 }
 
@@ -163,6 +163,8 @@ bool Application::Init(nri::GraphicsAPI graphicsAPI)
 
 	physicsEngine->Init();
 
+	scriptEngine->Init();
+
 	return true;
 }
 
@@ -178,6 +180,8 @@ void Application::Update()
 
 	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else is updating above
 	physicsEngine->Update();
+	
+	scriptEngine->OnMonoUpdate();
 }
 
 void Application::Draw()
@@ -191,6 +195,8 @@ void Application::Draw()
 		NRI.ResetCommandAllocator(*frame.commandAllocator);
 	}
 	uiRenderPass.BeginUI();
+
+	scriptEngine->OnMonoDrawGui();
 
 	uiRenderPass.EndUI(NRI,*m_Streamer);
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);

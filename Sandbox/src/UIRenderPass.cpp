@@ -419,13 +419,13 @@ void UIRenderPass::BeginUI()
 	// Start the frame. This call will update the io.WantCaptureMouse,
 	// io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not)
 	// to your application.
+	// 
 	ImGui::NewFrame();
 }
 
 void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
                          nri::Streamer& streamer)
 {
-
 
 	ImGui::Text("Hello, world %d", 123);
 	ImGui::EndFrame();

@@ -20,6 +20,8 @@
 #include "Settings.h"
 #include "PhysicsEngine.h"
 
+#include "ScriptingSystem/ScriptEngine.h"
+
 
 inline bool m_DebugAPI = false;
 inline bool m_DebugNRI = false;
@@ -68,6 +70,8 @@ public:
 private:
 
 	PhysicsEngine* physicsEngine;
+	ScriptEngine* scriptEngine;
+
 
 #pragma endregion Physics
 

@@ -10,6 +10,8 @@
 #include <mono/metadata/mono-debug.h>
 #include <mono/metadata/threads.h>
 
+#include <imgui.h>
+
 struct ScriptEngineData
 {
 	MonoDomain* RootDomain = nullptr;
@@ -18,6 +20,16 @@ struct ScriptEngineData
 };
 
 static ScriptEngineData* s_Data = nullptr;
+
+ScriptEngine* ScriptEngine::instance = nullptr;
+
+ScriptEngine* ScriptEngine::Get()
+{
+	if (!instance)
+		instance = new ScriptEngine();
+	return instance;
+}
+
 void ScriptEngine::Init()
 {
 	s_Data = new ScriptEngineData();
@@ -94,7 +106,7 @@ void PrintAssemblyTypes(MonoAssembly* assembly)
 
 void ScriptEngine::InitMono()
 {
-	//mono_set_assemblies_path("");
+	mono_set_assemblies_path("lib\\mono\\4.5");
 
 	MonoDomain* rootDomain = mono_jit_init("NovaJITRuntime");
 	assert(rootDomain != nullptr);
@@ -102,64 +114,41 @@ void ScriptEngine::InitMono()
 	// Store the root domain pointer
 	s_Data->RootDomain = rootDomain;
 
-	// Create an App Domain
     s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("NovaScriptRuntime"), nullptr);
 	mono_domain_set(s_Data->AppDomain, true);
 
-	// Move this maybe
-	s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/ScriptingSandbox.dll");
+	s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/GameObjectBase.dll");
 	PrintAssemblyTypes(s_Data->CoreAssembly);
 
 	MonoImage* assemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
-	MonoClass* monoClass = mono_class_from_name(assemblyImage, "", "CSharpTesting");
-	
-	//class ScriptEngine
-	//MonoMethod* methodStart;
-	//MonoMethod* methodUpdate;
+	MonoClass* monoRoot = mono_class_from_name(assemblyImage, "GameObjectBase", "Root");
 
-	//void ScriptEngine::InitMono()
-	//MonoImage* assemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
-	//MonoClass* monoRoot = mono_class_from_name(assemblyImage, "", "Root");
-	//methodStart = mono_class_get_method_from_name(monoRoot, "Start", 0);
-	//methodUpdate = mono_class_get_method_from_name(monoRoot, "Update", 0);
-	
-	//void ScriptEngine::OnMonoStart()
-	//mono_runtime_invoke(methodStart, nullptr, nullptr, nullptr);
+	monoInstance = mono_object_new(s_Data->AppDomain, monoRoot);
 
-	//void ScriptEngine::OnMonoUpdate()
-	//mono_runtime_invoke(methodUpdate, nullptr, nullptr, nullptr);
+	void* cntx = ImGui::GetCurrentContext();
 
-	// 1. create an object (and call constructor)
-	MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
-	mono_runtime_object_init(instance);
+	ImGuiMemAllocFunc allocFunc = nullptr;
+	ImGuiMemFreeFunc freeFunc = nullptr;
+	void* userData = nullptr;
 
-	// 2. call function
-	MonoMethod* printMessageFunc = mono_class_get_method_from_name(monoClass, "PrintMessage", 0);
-	mono_runtime_invoke(printMessageFunc, instance, nullptr, nullptr);
+	ImGui::GetAllocatorFunctions(&allocFunc, &freeFunc, &userData);
 
-	// 3. call function with param
-	MonoMethod* printIntFunc = mono_class_get_method_from_name(monoClass, "PrintInt", 1);
+	MonoMethod* monoRootInitialize = mono_class_get_method_from_name(monoRoot, "Initialize", 3);
+	void* params[3] = {&cntx, &allocFunc, &freeFunc};
+	mono_runtime_invoke(monoRootInitialize, monoInstance, params, nullptr);
 
-	int value = 5;
-	void* param = &value;
+	methodUpdate = mono_class_get_method_from_name(monoRoot, "Update", 0);
+	methodDrawGui = mono_class_get_method_from_name(monoRoot, "DrawGui", 0);
+}
 
-	mono_runtime_invoke(printIntFunc, instance, &param, nullptr);
+void ScriptEngine::OnMonoDrawGui()
+{
+	mono_runtime_invoke(methodDrawGui, monoInstance, nullptr, nullptr);
+}
 
-	MonoMethod* printIntsFunc = mono_class_get_method_from_name(monoClass, "PrintInts", 2);
-	int value2 = 508;
-	void* params[2] = 
-	{
-		&value,
-		&value2
-	};
-	mono_runtime_invoke(printIntsFunc, instance, params, nullptr);
-
-	MonoString* monoString = mono_string_new(s_Data->AppDomain, "Hello World from C++!");
-	MonoMethod* printCustomMessageFunc = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
-	void* stringParam = monoString;
-	mono_runtime_invoke(printCustomMessageFunc, instance, &stringParam,
-                     nullptr);
-	assert(false);
+void ScriptEngine::OnMonoUpdate()
+{
+	mono_runtime_invoke(methodUpdate, monoInstance, nullptr, nullptr);
 }
 
 void ScriptEngine::ShutdownMono()
