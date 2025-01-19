@@ -165,12 +165,10 @@ bool Application::Init(int argc, char** argv)
 		    nri::Result::SUCCESS)
 			return false;
 	}
-	bool result;
+	bool result = true;
 
-	result = loader.LoadModel(
-		scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
-	result = loader.LoadModel(
-		scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 
 	if (!result)
 	{
@@ -251,13 +249,15 @@ void Application::Draw()
 		//(@Tenzy21)TODO: Add ImGuiWindowFlags_MenuBar flag into main window
 		static bool pOpen = true;
 		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
-		ImGui::DockSpace(mainDockspaceId, ImVec2(0.0f, 0.0f), dockingParams.mainDockSpaceNodeFlags);
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		ImGui::DockSpaceOverViewport(mainDockspaceId, viewport);
 		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
 		if (dockingParams.layoutReset) {
 			dockingParams.layoutReset = false;
-			ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 			ImGui::SetWindowPos(ImVec2(0, 0));
+			ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 			
 			auto layout = CreateDefaultLayout(appState);
 			dockingParams = layout[0];

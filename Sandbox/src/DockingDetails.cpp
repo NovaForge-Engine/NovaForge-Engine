@@ -6,8 +6,14 @@ namespace DockingDetails
 {
    ImGuiWindowFlags WindowFlagsNothing()
    {
-       ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar 
-          | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+       ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking 
+          | ImGuiWindowFlags_NoCollapse 
+          | ImGuiWindowFlags_NoScrollbar 
+          | ImGuiWindowFlags_NoTitleBar
+          | ImGuiWindowFlags_NoResize
+          | ImGuiWindowFlags_NoMove
+          | ImGuiWindowFlags_NoBringToFrontOnFocus 
+          | ImGuiWindowFlags_NoNavFocus;
        return windowFlags;
    }
 
