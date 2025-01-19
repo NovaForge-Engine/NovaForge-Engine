@@ -41,9 +41,9 @@
 [submodule "vendor/magic_enum"]
 	path = vendor/magic_enum
 	url = https://github.com/Neargye/magic_enum
-[submodule "vendor/--force"]
-	path = vendor/--force
-	url = https://github.com/TartanLlama/expected
 [submodule "vendor/expected"]
 	path = vendor/expected
 	url = https://github.com/TartanLlama/expected
+[submodule "vendor/watcher"]
+	path = vendor/watcher
+	url = https://github.com/e-dant/watcher

@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "include/AssetDatabaseMigration.h"
+
 #include "include/AssetCache.h"
 
 namespace NovaEngine {
@@ -46,6 +47,26 @@ AssetDatabase::AssetDatabase() {
     prepLongtermStmt(_un.c_str(), &_updateName);
     prepLongtermStmt(_qkd.c_str(), &_queryKnownDeps);
     prepLongtermStmt(_ppq.c_str(), &_productProductQuery);
+    
+    // Run DB setup
+    sqlite3_stmt *stmt;
+    const char* tail = DB_SETUP_COMMANDS.c_str();
+    const char * zSql = DB_SETUP_COMMANDS.c_str();
+    do {
+        int prepResult = sqlite3_prepare_v2(_assetDB, zSql, -1, &stmt, &tail);
+        if (prepResult != SQLITE_OK) {
+            throw std::runtime_error(fmt::format("Unable to prep statement: error #{}\nStatement: {:?}", prepResult, DB_SETUP_COMMANDS));
+        }
+        int stepResult = SQLITE_ROW;
+        do {
+            stepResult = sqlite3_step(stmt);
+        } while (stepResult == SQLITE_ROW);
+        if (stepResult != SQLITE_DONE) {
+            throwStmt(stmt, stepResult);
+        }
+        zSql = tail; 
+        sqlite3_finalize(stmt);
+    } while (*zSql != '\0');
 }
 
 void AssetDatabase::throwStmt(sqlite3_stmt *stmt, const int& error) const {
@@ -75,7 +96,8 @@ void AssetDatabase::prepLongtermStmt(const char *zSql, sqlite3_stmt **stmt) {
 
 void AssetDatabase::bindPathHash(sqlite3_stmt *stmt, const char *name, const std::filesystem::path& path) const {
     std::vector<unsigned char> pathHash(picosha2::k_digest_size); 
-    picosha2::hash256(path.begin(), path.end(), pathHash.begin(), pathHash.end());
+    auto pathStr = path.string();
+    picosha2::hash256(pathStr.begin(), pathStr.end(), pathHash.begin(), pathHash.end());
     bindBlob(stmt, name, (void*)pathHash.data(), static_cast<int>(pathHash.size()));
 }
 

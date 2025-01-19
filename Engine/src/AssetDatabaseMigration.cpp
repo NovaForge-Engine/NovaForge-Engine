@@ -9,6 +9,7 @@ AssetDatabaseMigration::AssetDatabaseMigration() {
     if (openResult != SQLITE_OK) {
         throw std::runtime_error(fmt::format("Couldn't load asset DB for migration purposes: error #{}", openResult));
     }
+    executeMultipleBindlessStatements(DB_SETUP_COMMANDS.c_str());
     const char* versionStmt = "SELECT version FROM TableVersions;";
     prepStmt(versionStmt, &_checkVersion);
     const char* tableStmt = "PRAGMA table_list(:TABLENAME);";

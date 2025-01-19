@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef NOVA_ASSET_DATABASE_MIGRATION_H
+#define NOVA_ASSET_DATABASE_MIGRATION_H
+
 #include <sqlite3.h>
 #include <fmt/format.h>
 
@@ -8,8 +11,8 @@
 
 namespace NovaEngine {
 
-const char * DB_FILE_NAME = "assetDb.sqlite";
-const char * DB_SETUP_COMMANDS = "PRAGMA foreign_keys = ON;";
+constexpr std::string DB_FILE_NAME = "assetDb.sqlite";
+const std::string DB_SETUP_COMMANDS = "PRAGMA foreign_keys = ON;";
 
 struct TableInfo {
     std::string name;
@@ -102,3 +105,5 @@ struct AssetDatabaseMigration {
 };
 
 } // namespace NovaEngine
+
+#endif // NOVA_ASSET_DATABASE_MIGRATION_H

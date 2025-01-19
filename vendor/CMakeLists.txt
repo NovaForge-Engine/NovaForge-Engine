@@ -39,18 +39,20 @@ target_include_directories(assimp INTERFACE
 )
 
 # vendor/filewatch
-add_library (filewatch INTERFACE "filewatch/FileWatch.hpp")
+# add_library (filewatch INTERFACE "filewatch/FileWatch.hpp")
+# target_compile_definitions (filewatch PRIVATE ${COMPILE_DEFINITIONS})
+# set_property (TARGET filewatch PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+#target_include_directories(filewatch INTERFACE ${CMAKE_SOURCE_DIR}/vendor/filewatch)
+
+# vendor/watcher
+add_library (filewatch INTERFACE "watcher/include/wtr/watcher.hpp")
 target_compile_definitions (filewatch PRIVATE ${COMPILE_DEFINITIONS})
 set_property (TARGET filewatch PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(filewatch INTERFACE ${CMAKE_SOURCE_DIR}/vendor/filewatch)
+target_include_directories(filewatch INTERFACE ${CMAKE_SOURCE_DIR}/vendor/watcher/include/wtr)
 
 # vendor/PicoSHA2
 add_subdirectory("PicoSHA2")
 set_property(TARGET picosha2 PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-
-# vendor/magic_enum
-add_subdirectory("magic_enum")
-set_property(TARGET magic_enum PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 
 # vendor/expected
 add_subdirectory("expected")

@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef NOVA_ASSET_MANAGER_H
+#define NOVA_ASSET_MANAGER_H
+
 #include <filesystem>
 
 #include "include/Export.h"
@@ -19,7 +22,6 @@ class ENGINE_DLL AssetManager: public Singleton<AssetManager> {
     void renameFile(const std::filesystem::path& oldPath, const std::filesystem::path& newPath);
     void updateFile(const std::filesystem::path& file);
     bool needsRebuild(const ProductAsset& file);
-    void rebuildFile(const std::filesystem::path& file);
     void removeFile(const std::filesystem::path& file);
 
     void scheduleRegularJob(const AssetBuildJob* job);
@@ -40,3 +42,5 @@ class ENGINE_DLL AssetManager: public Singleton<AssetManager> {
 };
 
 } // namespace NovaEngine
+
+#endif // NOVA_ASSET_MANAGER_H

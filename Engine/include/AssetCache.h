@@ -1,11 +1,12 @@
 #pragma once
 
+#ifndef NOVA_ASSET_CACHE_H
+#define NOVA_ASSET_CACHE_H
+
 #include <sqlite3.h>
 #include <fmt/format.h>
 
 #include <filesystem>
-#include <map>
-#include <ranges>
 
 #include "Singleton.h"
 #include "include/ProductAsset.h"
@@ -13,16 +14,7 @@
 
 namespace NovaEngine {
 
-using SourceConstIter = std::vector<SourceAsset>::const_iterator;
-using SourceConstRange = std::ranges::subrange<SourceConstIter>;
-using SourceConstPointerIter = std::vector<SourceAsset*>::const_iterator;
-using SourceConstPointerRange = std::ranges::subrange<SourceConstPointerIter>;
-using ProductConstIter = std::vector<ProductAsset>::const_iterator;
-using ProductConstRange = std::ranges::subrange<ProductConstIter>;
-using ProductConstPointerIter = std::vector<ProductAsset*>::const_iterator;
-using ProductConstPointerRange = std::ranges::subrange<ProductConstPointerIter>;
-
-struct AssetDatabase: public Singleton<AssetDatabase> {
+struct ENGINE_DLL AssetDatabase: public Singleton<AssetDatabase> {
     AssetDatabase();
     ~AssetDatabase();
 
@@ -137,58 +129,60 @@ struct AssetDatabase: public Singleton<AssetDatabase> {
 
     template<typename T>
     T getColumn(sqlite3_stmt *stmt, const char* colName) const;
+};
 
-    template<> std::vector<uint8_t> getColumn<std::vector<uint8_t>>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        int size = sqlite3_column_bytes(stmt, iCol);
-        std::string res{(const char *)sqlite3_column_text(stmt, iCol)};
-        std::vector<uint8_t> result;
-        result.resize(size);
-        std::copy(res.begin(), res.end(), result.begin());
-        return result;
-    };
-    template<> const void * getColumn<const void *>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        int size = sqlite3_column_bytes(stmt, iCol);
-        auto result = (unsigned char *)malloc(size);
-        memcpy((char *)result, (const char *)sqlite3_column_blob(stmt, iCol), size);
-        return result;
-    };
-    template<> std::filesystem::file_time_type getColumn<std::filesystem::file_time_type>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        auto result = sqlite3_column_text(stmt, iCol);
-        // maaxxaam @ 08.01.25
-        // TODO: can we avoid casting to std::tm?
-        std::tm tm = {};
-        std::istringstream ss{std::string(reinterpret_cast<const char *>(result))};
-        ss >> std::get_time(&tm, "%FT%T");
-        auto res = std::chrono::file_clock::from_sys(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
-        return res;
-    };
-    template<> std::string getColumn<std::string>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        return {(const char *)sqlite3_column_text(stmt, iCol)};
-    };
-    template<> const unsigned char * getColumn<const unsigned char *>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        // Add one to account for '\0'
-        int size = sqlite3_column_bytes(stmt, iCol) + 1;
-        auto result = (unsigned char *)malloc(size);
-        strncpy((char *)result, (const char *)sqlite3_column_text(stmt, iCol), size);
-        return result;
-    };
-    template<> double getColumn<double>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        return sqlite3_column_double(stmt, iCol);
-    };
-    template<> int getColumn<int>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        return sqlite3_column_int(stmt, iCol);
-    };
-    template<> long long getColumn<long long>(sqlite3_stmt *stmt, const char* colName) const {
-        int iCol = findColumn(stmt, colName);
-        return sqlite3_column_int64(stmt, iCol);
-    };
+template<> inline std::vector<uint8_t> AssetDatabase::getColumn<std::vector<uint8_t>>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    int size = sqlite3_column_bytes(stmt, iCol);
+    std::string res{(const char *)sqlite3_column_text(stmt, iCol)};
+    std::vector<uint8_t> result;
+    result.resize(size);
+    std::copy(res.begin(), res.end(), result.begin());
+    return result;
+};
+template<> inline const void * AssetDatabase::getColumn<const void *>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    int size = sqlite3_column_bytes(stmt, iCol);
+    auto result = (unsigned char *)malloc(size);
+    memcpy((char *)result, (const char *)sqlite3_column_blob(stmt, iCol), size);
+    return result;
+};
+template<> inline std::filesystem::file_time_type AssetDatabase::getColumn<std::filesystem::file_time_type>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    auto result = sqlite3_column_text(stmt, iCol);
+    // maaxxaam @ 08.01.25
+    // TODO: can we avoid casting to std::tm?
+    std::tm tm = {};
+    std::istringstream ss{std::string(reinterpret_cast<const char *>(result))};
+    ss >> std::get_time(&tm, "%FT%T");
+    auto res = std::chrono::file_clock::from_sys(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
+    return res;
+};
+template<> inline std::string AssetDatabase::getColumn<std::string>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    return {(const char *)sqlite3_column_text(stmt, iCol)};
+};
+template<> inline const unsigned char * AssetDatabase::getColumn<const unsigned char *>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    // Add one to account for '\0'
+    int size = sqlite3_column_bytes(stmt, iCol) + 1;
+    auto result = (unsigned char *)malloc(size);
+    strncpy((char *)result, (const char *)sqlite3_column_text(stmt, iCol), size);
+    return result;
+};
+template<> inline double AssetDatabase::getColumn<double>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    return sqlite3_column_double(stmt, iCol);
+};
+template<> inline int AssetDatabase::getColumn<int>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    return sqlite3_column_int(stmt, iCol);
+};
+template<> inline long long AssetDatabase::getColumn<long long>(sqlite3_stmt *stmt, const char* colName) const {
+    int iCol = findColumn(stmt, colName);
+    return sqlite3_column_int64(stmt, iCol);
 };
 
 } // namespace NovaEngine
+
+#endif // NOVA_ASSET_CACHE_H
