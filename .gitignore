@@ -16,3 +16,5 @@ out/
 vcpkg_installed/
 _Shaders/
 build
+.idea/
+vendor/mono/

@@ -22,3 +22,12 @@
 [submodule "vendor/mono"]
 	path = vendor/mono
 	url = https://gitlab.winehq.org/mono/mono
+[submodule "vendor/joltphysics"]
+	path = vendor/joltphysics
+	url = https://github.com/jrouwe/JoltPhysics
+[submodule "vendor/magic_enum"]
+	path = vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum
+[submodule "vendor/entt"]
+	path = vendor/entt
+	url = https://github.com/skypjack/entt

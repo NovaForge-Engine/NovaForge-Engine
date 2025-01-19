@@ -13,21 +13,23 @@ include_directories(include)
 
 SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# elizoorg 25.09.2024
-# TODO: We can setup all project files as glob
-set(HEADER_FILES 
-	include/Engine.h
-	include/Export.h
+file(GLOB_RECURSE SRCFILES 	
+	RELATIVE ${PROJECT_SOURCE_DIR}
+	./*.cpp;
+	./*.c;
+	./*.cxx;
+	./*.h;
+	./*.hpp;
 )
 
+source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SRCFILES})
 
 
-set(MODULE_FILES
-	src/Engine.cpp
-)
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_library(novaengine SHARED ${MODULE_FILES} ${HEADER_FILES})
+add_library(novaengine SHARED ${SRCFILES})
 
 
 
@@ -35,6 +37,9 @@ target_link_libraries(
 	novaengine 
 	assimp
 	imgui
+	glfw
+	EnTT
+	glm
 )
 
 

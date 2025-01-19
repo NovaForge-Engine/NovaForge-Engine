@@ -9,7 +9,7 @@
 4) После клонирования и установки на нужную вветку пишем:
    `git submodule update --init --recursive --depth 1`
 5) Запустить CMake
-6) Выбрать нужный preset `Windows-x64-Debug`
+6) Выбрать нужный preset `Windows-x64-Debug)
 7) Нажать на кнопки Configure и Generate
 Опционально: если конфигурация производится не через CMake достаточно открыть NovaForge-Engine как папку в любом редакторе и работать с расширением CMake внутри вашего редактора
 8) Внутри папки build будет находится novaforge.sln
