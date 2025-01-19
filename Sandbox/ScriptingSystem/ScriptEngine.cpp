@@ -57,21 +57,17 @@ MonoAssembly* LoadCSharpAssembly(const std::string& assemblyPath)
 {
 	uint32_t fileSize = 0;
 	char* fileData = ReadBytes(assemblyPath, &fileSize);
-	// NOTE: We can't use this image for anything other than loading the
-	// assembly because this image doesn't have a reference to the assembly
 	MonoImageOpenStatus status;
 	MonoImage* image =
 		mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
 	if (status != MONO_IMAGE_OK)
 	{
 		const char* errorMessage = mono_image_strerror(status);
-		// Log some error message using the errorMessage data
 		return nullptr;
 	}
 	MonoAssembly* assembly =
 		mono_assembly_load_from_full(image, assemblyPath.c_str(), &status, 0);
 	mono_image_close(image);
-	// Don't forget to free the file data
 	delete[] fileData;
 	return assembly;
 }
@@ -98,7 +94,7 @@ void PrintAssemblyTypes(MonoAssembly* assembly)
 
 void ScriptEngine::InitMono()
 {
-	mono_set_assemblies_path("");
+	//mono_set_assemblies_path("");
 
 	MonoDomain* rootDomain = mono_jit_init("NovaJITRuntime");
 	assert(rootDomain != nullptr);
@@ -116,6 +112,22 @@ void ScriptEngine::InitMono()
 
 	MonoImage* assemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 	MonoClass* monoClass = mono_class_from_name(assemblyImage, "", "CSharpTesting");
+	
+	//class ScriptEngine
+	//MonoMethod* methodStart;
+	//MonoMethod* methodUpdate;
+
+	//void ScriptEngine::InitMono()
+	//MonoImage* assemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
+	//MonoClass* monoRoot = mono_class_from_name(assemblyImage, "", "Root");
+	//methodStart = mono_class_get_method_from_name(monoRoot, "Start", 0);
+	//methodUpdate = mono_class_get_method_from_name(monoRoot, "Update", 0);
+	
+	//void ScriptEngine::OnMonoStart()
+	//mono_runtime_invoke(methodStart, nullptr, nullptr, nullptr);
+
+	//void ScriptEngine::OnMonoUpdate()
+	//mono_runtime_invoke(methodUpdate, nullptr, nullptr, nullptr);
 
 	// 1. create an object (and call constructor)
 	MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
