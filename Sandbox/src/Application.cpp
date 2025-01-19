@@ -245,14 +245,13 @@ void Application::Draw()
 
 	uiRenderPass.BeginUI();
 	{
+		scriptEngine->OnMonoDrawGui();
+
 		//(@Tenzy21)TODO: Add ImGuiWindowFlags_MenuBar flag into main window
 		static bool pOpen = true;
 		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-		scriptEngine->OnMonoDrawGui();
-
-		uiRenderPass.EndUI(NRI,*m_Streamer);
 		ImGui::DockSpaceOverViewport(mainDockspaceId, viewport);
 		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
