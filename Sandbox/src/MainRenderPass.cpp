@@ -192,6 +192,10 @@ bool MainRenderPass::Init(InitParams& params)
 			m_Textures.push_back(depthTexture);
 		}
 
+		{
+			m_Textures.push_back(params.outputTexture);
+		}
+
 		{ // Constant buffer
 			nri::BufferDesc bufferDesc = {};
 			bufferDesc.size = constantBufferSize * BUFFERED_FRAME_MAX_NUM;
@@ -224,6 +228,13 @@ bool MainRenderPass::Init(InitParams& params)
 			m_Buffers.push_back(buffer);
 		}
 	}
+
+		
+
+
+
+
+
 
 	{
 		// From this we should make a arrays of nri::Texture and upload them
@@ -277,6 +288,19 @@ bool MainRenderPass::Init(InitParams& params)
 		{
 			return false;
 		};
+		//Output Texture
+		nri::Descriptor* output;
+		nri::Texture2DViewDesc outputTexture2DViewDesc = {
+			params.outputTexture, nri::Texture2DViewType::SHADER_RESOURCE_2D,
+			params.renderTargetFormat
+		};
+		if (params.NRI.CreateTexture2DView(outputTexture2DViewDesc,
+		                                   output) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+		outputDesc = output;
 
 		// Sampler
 		nri::SamplerDesc samplerDesc = {};
@@ -423,7 +447,8 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
                           const nova::BackBuffer& currentBackBuffer,
                           const uint32_t currentTextureIndex,
                           const uint32_t m_RenderWindowWidth,
-                          const uint32_t m_RenderWindowHeight)
+	const uint32_t m_RenderWindowHeight, nri::Descriptor* outputTextureDesc,
+	nri::Texture* outputTexture)
 {
 	nri::Dim_t windowWidth = (nri::Dim_t)m_RenderWindowWidth;
 	nri::Dim_t windowHeight = (nri::Dim_t)m_RenderWindowHeight;
@@ -464,9 +489,9 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 		}
 
 		nri::TextureBarrierDesc textureBarrierDescs = {};
-		textureBarrierDescs.texture = currentBackBuffer.texture;
-		textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
-		                             nri::Layout::COLOR_ATTACHMENT};
+		textureBarrierDescs.texture = outputTexture;
+		textureBarrierDescs.after = {nri::AccessBits::SHADER_RESOURCE,
+		                             nri::Layout::SHADER_RESOURCE};
 		textureBarrierDescs.layerNum = 1;
 		textureBarrierDescs.mipNum = 1;
 
@@ -478,7 +503,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 		nri::AttachmentsDesc attachmentsDesc = {};
 		attachmentsDesc.colorNum = 1;
-		attachmentsDesc.colors = &currentBackBuffer.colorAttachment;
+		attachmentsDesc.colors = &outputDesc;
 		attachmentsDesc.depthStencil = m_DepthAttachment;
 
 		constexpr nri::Color32f COLOR_0 = {1.0f, 1.0f, 0.0f, 1.0f};

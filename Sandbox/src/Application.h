@@ -29,7 +29,7 @@
 
 
 #include "ModelLoader.h"
-#include "Scene.hpp"
+#include "MeshRegistry.hpp"
 
 
 
@@ -65,7 +65,13 @@ private:
 	UIRenderPass uiRenderPass;
 
 	nova::ModelLoader loader;
-	nova::Scene scene;
+	nova::MeshRegistry scene;
+
+
+	nri::Descriptor* sceneTextureDesc = nullptr;
+	nri::Texture* sceneTexture = nullptr;
+
+	nri::Descriptor* sceneStorageTexture = nullptr;
 
 	
 	AppState appState;

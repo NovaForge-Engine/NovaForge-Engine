@@ -153,6 +153,7 @@ bool Application::Init(int argc, char** argv)
 		}
 	}
 
+
 	for (nova::Frame& frame : window->GetFrames())
 	{
 		if (NRI.CreateCommandAllocator(*m_CommandQueue,
@@ -167,7 +168,7 @@ bool Application::Init(int argc, char** argv)
 	}
 	bool result = true;
 
-	result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	//result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 
 	if (!result)
@@ -176,16 +177,37 @@ bool Application::Init(int argc, char** argv)
 		return false;
 	}
 
-	MainRenderPass::InitParams passParams = {.NRI = NRI,
-	                                         .helperInterface = NRI,
-	                                         .m_Device = *m_Device,
-	                                         .renderTargetFormat =
-	                                             swapChainFormat,
-	                                         .commandQueue = m_CommandQueue,
-	                                         .scene = &scene};
+	
+	{
+		nri::TextureDesc textureDesc = {};
+		textureDesc.type = nri::TextureType::TEXTURE_2D;
+		textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
+		textureDesc.format = swapChainFormat;
+		textureDesc.width = static_cast<uint16_t>(window->m_RenderOutputWidth);
+		textureDesc.height = static_cast<uint16_t>(window->m_RenderOutputHeight);
+		textureDesc.mipNum = 1;
+		textureDesc.layerNum = 1;
+		NRI.CreateTexture(*m_Device, textureDesc, sceneTexture);
+	}
+
+
+
+	MainRenderPass::InitParams passParams = {
+		.NRI = NRI,
+		.helperInterface = NRI,
+		.m_Device = *m_Device,
+		.renderTargetFormat = swapChainFormat,
+		.commandQueue = m_CommandQueue,
+		.scene = &scene,
+		.outputTexture = sceneTexture,
+		.outputTextureDesc = sceneTextureDesc,
+
+	};								
+	
+
 	result = mainRenderPass.Init(passParams);
 
-	appState.outputTexture = mainRenderPass.m_TextureShaderResource;
+	appState.outputTexture = mainRenderPass.outputDesc;
 
 	spdlog::info("MainRenderPass initialized: {}", result);
 
@@ -309,7 +331,7 @@ void Application::Draw()
 		mainRenderPass.Draw(NRI, NRI, NRI, NRI, *commandBuffer, frame,
 		                    backBuffer, bufferedFrameIndex,
 		                    window->m_RenderWindowWidth,
-		                    window->m_RenderWindowHeight);
+		                    window->m_RenderWindowHeight,sceneTextureDesc,sceneTexture);
 	}
 
 	{ // UI

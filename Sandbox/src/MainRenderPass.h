@@ -14,7 +14,7 @@
 
 
 #include "Window.h"
-#include "Scene.hpp"
+#include "MeshRegistry.hpp"
 
 
 struct CustomVertex
@@ -55,7 +55,9 @@ public:
 		nri::Device& m_Device;
 		nri::Format renderTargetFormat;
 		nri::CommandQueue* commandQueue;
-		nova::Scene* scene;
+		nova::MeshRegistry* scene;
+		nri::Texture* outputTexture;
+		nri::Descriptor* outputTextureDesc;
 	};
 	bool Init(InitParams& params);
 	void Draw(const nri::CoreInterface& NRI,
@@ -66,13 +68,14 @@ public:
 	          const nova::BackBuffer& currentBackBuffer,
 	          const uint32_t currentTextureIndex,
 	          const uint32_t m_RenderWindowWidth,
-	          const uint32_t m_RenderWindowHeight);
+	          const uint32_t m_RenderWindowHeight,nri::Descriptor* outputTextureDesc,nri::Texture* outputTexture );
 
 	void BeginUI();
 	void EndUI();
 	MainRenderPass();
 	~MainRenderPass();
 	nri::Descriptor* m_TextureShaderResource = nullptr;
+	nri::Descriptor* outputDesc = nullptr;
 
 private:
 	float m_Transparency = 1.0f;
@@ -106,5 +109,5 @@ private:
 
 	uint64_t m_GeometryOffset = 0;
 
-	nova::Scene m_Scene;
+	nova::MeshRegistry m_Scene;
 };

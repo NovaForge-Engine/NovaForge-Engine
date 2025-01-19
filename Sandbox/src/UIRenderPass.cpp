@@ -102,6 +102,8 @@ bool UIRenderPass::Init(InitParams params)
 		    nri::Result::SUCCESS)
 			return false;
 
+
+
 		ShaderCodeStorage shaderCodeStorage;
 		nri::ShaderDesc shaders[] = {
 			LoadShader(deviceDesc.graphicsAPI, "UI.vs", shaderCodeStorage),

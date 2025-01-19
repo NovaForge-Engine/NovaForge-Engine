@@ -13,7 +13,7 @@
 
 #include "fmath/f16.hpp"
 #include "Packing.h"
-#include "Scene.hpp"
+#include "MeshRegistry.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -27,10 +27,10 @@ namespace nova
 		ModelLoader();
 		~ModelLoader();
 
-		bool LoadModel(nova::Scene& scene, std::string filename);
-		void processNode(nova::Scene& scene, aiNode* node,
+		bool LoadModel(nova::MeshRegistry& scene, std::string filename);
+		void processNode(nova::MeshRegistry& scene, aiNode* node,
 		                 const aiScene* assimp_scene);
-		bool processMesh(nova::Scene& scene, aiMesh* mesh,
+		bool processMesh(nova::MeshRegistry& scene, aiMesh* mesh,
 		                 const aiScene* assimp_scene);
 
 		std::vector<Texture> loadMaterialTextures(aiMaterial* mat,

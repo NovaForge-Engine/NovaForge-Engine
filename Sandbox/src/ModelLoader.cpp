@@ -9,7 +9,7 @@ ModelLoader::~ModelLoader()
 {
 }
 
-bool ModelLoader::LoadModel(nova::Scene& scene, std::string filename)
+bool ModelLoader::LoadModel(nova::MeshRegistry& scene, std::string filename)
 {
 	spdlog::info("Loading model {}", filename);
 	Assimp::Importer importer;
@@ -31,7 +31,7 @@ bool ModelLoader::LoadModel(nova::Scene& scene, std::string filename)
 	return true;
 }
 
-void ModelLoader::processNode(nova::Scene& scene, aiNode* node,
+void ModelLoader::processNode(nova::MeshRegistry& scene, aiNode* node,
                               const aiScene* assimp_scene)
 {
 	spdlog::info("Processing node {}", node->mName.C_Str());
@@ -54,7 +54,7 @@ void ModelLoader::processNode(nova::Scene& scene, aiNode* node,
 	}
 }
 
-bool ModelLoader::processMesh(nova::Scene& scene, aiMesh* mesh,
+bool ModelLoader::processMesh(nova::MeshRegistry& scene, aiMesh* mesh,
                               const aiScene* assimp_scene)
 {
 	spdlog::info("Processing mesh {}", mesh->mName.C_Str());
