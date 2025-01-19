@@ -84,7 +84,9 @@ set_property (TARGET magic_enum PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 #target_include_directories(magic_enum INTERFACE ${CMAKE_SOURCE_DIR}/vendor/magic_enum)
 
 #vendor/other
+if(WIN32)
 set_property (TARGET uninstall PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 #set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
+endif()

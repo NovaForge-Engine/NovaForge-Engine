@@ -1,0 +1,1 @@
+call cmake --preset x64-debug

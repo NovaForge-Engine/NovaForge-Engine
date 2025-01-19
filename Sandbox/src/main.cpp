@@ -1,18 +1,18 @@
 
 #include "Application.h"
+
 #include <NRI.h>
 
 int main(int argc, char** argv) {
-	constexpr auto api = nri::GraphicsAPI::D3D12;
-	Application app;
 
-	bool startup = app.Init(api); 
-	spdlog::info("Application started with startup {}", startup);
-	while (startup) {
+	Application app;
+	app.shouldClose = app.Init(argc, argv);
+
+	spdlog::info("Application started with startup {}", app.shouldClose);
+	while (app.shouldClose)
+	{
 		app.Update();
-		app.Draw();	
-		glfwPollEvents();
+		app.Draw();
 	}
 	return 0;
 }
-

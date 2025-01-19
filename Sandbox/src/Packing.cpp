@@ -11,3 +11,12 @@ uint32_t float2_to_unorm_16_16(const glm::vec2& v)
 
 	return p;
 }
+
+float16_t2 float2_to_float16_t2(const glm::vec2& v)
+{
+	float16_t2 r;
+	r.x = float16_t(v.x);
+	r.y = float16_t(v.y);
+
+	return r;
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PhysicsEngine.h"
+
 #include <NRI.h>
 
 #include <Extensions/NRIDeviceCreation.h>
@@ -17,14 +19,24 @@
 #include "Window.h"
 #include "NRIContext.h"
 
+#include "ApplicationUI.h"
+#include "DockingDetails.h"
+
 #include "Settings.h"
-#include "PhysicsEngine.h"
 
 #include "ScriptingSystem/ScriptEngine.h"
 
 
-inline bool m_DebugAPI = false;
-inline bool m_DebugNRI = false;
+#include "CmdLine.h"
+
+
+#include "ModelLoader.h"
+#include "Scene.hpp"
+
+
+
+
+constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
 
@@ -34,19 +46,37 @@ public:
 	Application();
 	~Application();
 
-	bool Init(nri::GraphicsAPI graphicsAPI);
+	bool Init(int argc, char** argv);
 	void Shutdown();
 	void Update();
 	void Draw();
 
+	void InitCmdLine([[maybe_unused]] cmdline::parser& cmdLine) {}
+
+	void ReadCmdLine([[maybe_unused]] cmdline::parser& cmdLine) {}
+
+	void InitCmdLineDefault(cmdline::parser& cmdLine);
+	void ReadCmdLineDefault(cmdline::parser& cmdLine);
+
+	bool shouldClose = false;
 
 private:
-	Window* window;
+	nova::NovaWindow* window;
 
 	MainRenderPass mainRenderPass;
 	UIRenderPass uiRenderPass;
 
-	Frame& getCurrentFrame(){return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];}
+	nova::ModelLoader loader;
+	nova::Scene scene;
+
+	
+	AppState appState;
+	DockingParams dockingParams;
+
+	nova::Frame& getCurrentFrame()
+	{
+		return window->GetFrames()[frameIndex % BUFFERED_FRAME_MAX_NUM];
+	}
 
 	NRIInterface NRI = {};
 	nri::Device* m_Device = nullptr;
@@ -54,6 +84,9 @@ private:
 	nri::SwapChain* m_SwapChain = nullptr;
 	nri::CommandQueue* m_CommandQueue = nullptr;
 	nri::Fence* m_FrameFence = nullptr;
+
+	bool m_DebugAPI = false;
+	bool m_DebugNRI = false;
 
 	uint32_t frameIndex = 0;
 
@@ -64,15 +97,12 @@ private:
 #pragma region Physics
 
 public:
-
 	PhysicsEngine* GetPhysicsEngine() { return physicsEngine; }
 
 private:
-
 	PhysicsEngine* physicsEngine;
 	ScriptEngine* scriptEngine;
 
 
 #pragma endregion Physics
-
 };

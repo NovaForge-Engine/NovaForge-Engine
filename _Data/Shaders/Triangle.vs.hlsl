@@ -4,28 +4,41 @@
 
 NRI_RESOURCE( cbuffer, CommonConstants, b, 0, 0 )
 {
-    float3 color;
-    float scale;
+    float4x4 gProj;
+    float4x4 gView;
 };
 
-struct outputVS
+struct Input
 {
-    float4 position : SV_Position;
-    float2 texCoord : TEXCOORD0;
+    float3 Position : POSITION;
+    float2 TexCoord : TEXCOORD0;
+    float3 Normal : NORMAL;
+    float4 Tangent : TANGENT;
 };
 
-outputVS main
-(
-    float2 inPos : POSITION0,
-    float2 inTexCoord : TEXCOORD0
-)
+
+struct Attributes
 {
-    outputVS output;
+    float4 Position : SV_Position;
+    float4 Normal : TEXCOORD0; //.w = TexCoord.x
+    float4 View : TEXCOORD1; //.w = TexCoord.y
+    float4 Tangent : TEXCOORD2;
+};
 
-    output.position.xy = inPos * scale;
-    output.position.zw = float2( 0.0, 1.0 );
+Attributes main(in Input input)
+{
+    Attributes output;
 
-    output.texCoord = inTexCoord;
+    float3 N = input.Normal * 2.0 -1.0;
+    float4 T = input.Tangent * 2.0 - 1.0;
+    float3 V = -input.Position;    
+
+    output.Position = mul( gView , float4(input.Position,1));
+    output.Position = mul( gProj , output.Position);
+
+    output.Normal= float4( N, input.TexCoord.x);
+    output.View = float4( V, input.TexCoord.y);
+    output.Tangent = T;
 
     return output;
 }

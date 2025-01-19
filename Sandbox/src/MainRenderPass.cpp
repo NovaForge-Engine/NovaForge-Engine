@@ -1,11 +1,21 @@
 #include "MainRenderPass.h"
 
-constexpr uint32_t BuFFERED_FRAME_MAX_NUM = 2;
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
-bool MainRenderPass::Init(InitParams params)
+constexpr uint32_t BuFFERED_FRAME_MAX_NUM = 2;
+constexpr float CLEAR_DEPTH = 0.0f;
+
+bool MainRenderPass::Init(InitParams& params)
 {
 
-	const nri::DeviceDesc& deviceDesc = params.NRI.GetDeviceDesc(params.m_Device);
+	const nri::DeviceDesc& deviceDesc =
+		params.NRI.GetDeviceDesc(params.m_Device);
+
+	m_Scene = *params.scene;
+	m_DepthFormat =
+		nri::GetSupportedDepthFormat(params.NRI, params.m_Device, 24, true);
+
 	ShaderCodeStorage shaderCodeStorage;
 	{
 		nri::DescriptorRangeDesc descriptorRangeConstant[1];
@@ -35,7 +45,8 @@ bool MainRenderPass::Init(InitParams params)
 			nri::StageBits::VERTEX_SHADER | nri::StageBits::FRAGMENT_SHADER;
 
 		if (params.NRI.CreatePipelineLayout(params.m_Device, pipelineLayoutDesc,
-		                             m_PipelineLayout) != nri::Result::SUCCESS)
+		                                    m_PipelineLayout) !=
+		    nri::Result::SUCCESS)
 		{
 			return false;
 		};
@@ -44,19 +55,27 @@ bool MainRenderPass::Init(InitParams params)
 		vertexStreamDesc.bindingSlot = 0;
 		vertexStreamDesc.stride = sizeof(Vertex);
 
-		nri::VertexAttributeDesc vertexAttributeDesc[2] = {};
+		nri::VertexAttributeDesc vertexAttributeDesc[4] = {};
 		{
-			vertexAttributeDesc[0].format = nri::Format::RG32_SFLOAT;
-			vertexAttributeDesc[0].streamIndex = 0;
+			vertexAttributeDesc[0].format = nri::Format::RGB32_SFLOAT;
 			vertexAttributeDesc[0].offset = GetOffsetOf(&Vertex::position);
 			vertexAttributeDesc[0].d3d = {"POSITION", 0};
-			vertexAttributeDesc[0].vk.location = {0};
+			vertexAttributeDesc[0].vk = {0};
 
-			vertexAttributeDesc[1].format = nri::Format::RG32_SFLOAT;
-			vertexAttributeDesc[1].streamIndex = 0;
+			vertexAttributeDesc[1].format = nri::Format::RG16_SFLOAT;
 			vertexAttributeDesc[1].offset = GetOffsetOf(&Vertex::uv);
 			vertexAttributeDesc[1].d3d = {"TEXCOORD", 0};
-			vertexAttributeDesc[1].vk.location = {1};
+			vertexAttributeDesc[1].vk = {1};
+
+			vertexAttributeDesc[2].format = nri::Format::R10_G10_B10_A2_UNORM;
+			vertexAttributeDesc[2].offset = GetOffsetOf(&Vertex::N);
+			vertexAttributeDesc[2].d3d = {"NORMAL", 0};
+			vertexAttributeDesc[2].vk = {2};
+
+			vertexAttributeDesc[3].format = nri::Format::R10_G10_B10_A2_UNORM;
+			vertexAttributeDesc[3].offset = GetOffsetOf(&Vertex::T);
+			vertexAttributeDesc[3].d3d = {"TANGENT", 0};
+			vertexAttributeDesc[3].vk = {3};
 		}
 
 		nri::VertexInputDesc vertexInputDesc = {};
@@ -69,21 +88,20 @@ bool MainRenderPass::Init(InitParams params)
 		inputAssemblyDesc.topology = nri::Topology::TRIANGLE_LIST;
 
 		nri::RasterizationDesc rasterizationDesc = {};
-		rasterizationDesc.viewportNum = 1;
 		rasterizationDesc.fillMode = nri::FillMode::SOLID;
-		rasterizationDesc.cullMode = nri::CullMode::NONE;
+		rasterizationDesc.cullMode = nri::CullMode::FRONT;
+		rasterizationDesc.frontCounterClockwise = true;
 
 		nri::ColorAttachmentDesc colorAttachmentDesc = {};
 		colorAttachmentDesc.format = params.renderTargetFormat;
 		colorAttachmentDesc.colorWriteMask = nri::ColorWriteBits::RGBA;
-		colorAttachmentDesc.blendEnabled = true;
-		colorAttachmentDesc.colorBlend = {nri::BlendFactor::SRC_ALPHA,
-		                                  nri::BlendFactor::ONE_MINUS_SRC_ALPHA,
-		                                  nri::BlendFunc::ADD};
 
 		nri::OutputMergerDesc outputMergerDesc = {};
 		outputMergerDesc.colors = &colorAttachmentDesc;
 		outputMergerDesc.colorNum = 1;
+		outputMergerDesc.depthStencilFormat = m_DepthFormat;
+		outputMergerDesc.depth.write = true;
+		outputMergerDesc.depth.compareFunc = nri::CompareFunc::LESS;
 
 		nri::ShaderDesc shaderStages[] = {
 			LoadShader(deviceDesc.graphicsAPI, "Triangle.vs",
@@ -102,8 +120,8 @@ bool MainRenderPass::Init(InitParams params)
 		graphicsPipelineDesc.shaderNum = GetCountOf(shaderStages);
 
 		if (params.NRI.CreateGraphicsPipeline(
-				params.m_Device, graphicsPipelineDesc,
-		                               m_Pipeline) != nri::Result::SUCCESS)
+				params.m_Device, graphicsPipelineDesc, m_Pipeline) !=
+		    nri::Result::SUCCESS)
 		{
 			return false;
 		};
@@ -117,116 +135,150 @@ bool MainRenderPass::Init(InitParams params)
 		descriptorPoolDesc.samplerMaxNum = 1;
 
 		if (params.NRI.CreateDescriptorPool(params.m_Device, descriptorPoolDesc,
-		                             m_DescriptorPool) != nri::Result::SUCCESS)
+		                                    m_DescriptorPool) !=
+		    nri::Result::SUCCESS)
 		{
 			return false;
 		};
 	}
-	//Load texture
+	// Load texture
 	Texture texture;
 
 	std::string path = GetFullPath("wood.dds", DataFolder::TEXTURES);
 	if (!LoadTexture(path, texture))
 		return false;
 
-	 //Resources
+	// Resources
 	const uint32_t constantBufferSize =
 		Align((uint32_t)sizeof(ConstantBufferLayout),
 	          deviceDesc.constantBufferOffsetAlignment);
-	const uint64_t indexDataSize = sizeof(g_IndexData);
-	const uint64_t indexDataAlignedSize = Align(indexDataSize, 16);
-	const uint64_t vertexDataSize = sizeof(g_VertexData);
-
+	nri::Texture* depthTexture = nullptr;
 	{
-		 //Texture
-		nri::TextureDesc textureDesc = {};
-		textureDesc.type = nri::TextureType::TEXTURE_2D;
-		textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
-		textureDesc.format = texture.GetFormat();
-		textureDesc.width = texture.GetWidth();
-		textureDesc.height = texture.GetHeight();
-		textureDesc.mipNum = texture.GetMipNum();
-
-		if (params.NRI.CreateTexture(params.m_Device, textureDesc, m_Texture) !=
-		    nri::Result::SUCCESS){
-			return false;
+		{
+			// Texture
+			nri::TextureDesc textureDesc = {};
+			textureDesc.type = nri::TextureType::TEXTURE_2D;
+			textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
+			textureDesc.format = texture.GetFormat();
+			textureDesc.width = texture.GetWidth();
+			textureDesc.height = texture.GetHeight();
+			textureDesc.mipNum = texture.GetMipNum();
+			nri::Texture* texture;
+			if (params.NRI.CreateTexture(params.m_Device, textureDesc,
+			                             texture) != nri::Result::SUCCESS)
+			{
+				return false;
 			};
+			m_Textures.push_back(texture);
+		}
+
+		// FIXME: Hardcoded values
+
+		{
+			nri::TextureDesc textureDesc = {};
+			textureDesc.type = nri::TextureType::TEXTURE_2D;
+			textureDesc.usage = nri::TextureUsageBits::DEPTH_STENCIL_ATTACHMENT;
+			textureDesc.format = m_DepthFormat;
+			textureDesc.width = (uint16_t)1920;
+			textureDesc.height = (uint16_t)1080;
+			textureDesc.mipNum = 1;
+
+			if (params.NRI.CreateTexture(params.m_Device, textureDesc,
+			                             depthTexture) != nri::Result::SUCCESS)
+			{
+				return false;
+			};
+
+			m_Textures.push_back(depthTexture);
+		}
 
 		{ // Constant buffer
 			nri::BufferDesc bufferDesc = {};
 			bufferDesc.size = constantBufferSize * BUFFERED_FRAME_MAX_NUM;
 			bufferDesc.usage = nri::BufferUsageBits::CONSTANT_BUFFER;
-			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc,
-			                            m_ConstantBuffer) !=
+			nri::Buffer* buffer;
+			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc, buffer) !=
 			    nri::Result::SUCCESS)
 			{
 				return false;
 			};
-		}
+			m_Buffers.push_back(buffer);
 
-		{ // Geometry buffer
-			nri::BufferDesc bufferDesc = {};
-			bufferDesc.size = indexDataAlignedSize + vertexDataSize;
-			bufferDesc.usage = nri::BufferUsageBits::VERTEX_BUFFER |
-			                   nri::BufferUsageBits::INDEX_BUFFER;
-			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc,
-			                     m_GeometryBuffer) !=
+			// Index buffer
+			bufferDesc.size = GetByteSizeOf(m_Scene.indices);
+			bufferDesc.usage = nri::BufferUsageBits::INDEX_BUFFER;
+			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc, buffer) !=
 			    nri::Result::SUCCESS)
 			{
 				return false;
 			};
+			m_Buffers.push_back(buffer);
+			// Vertex buffer
+			bufferDesc.size = GetByteSizeOf(m_Scene.vertices);
+			bufferDesc.usage = nri::BufferUsageBits::VERTEX_BUFFER;
+			if (params.NRI.CreateBuffer(params.m_Device, bufferDesc, buffer) !=
+			    nri::Result::SUCCESS)
+			{
+				return false;
+			};
+			m_Buffers.push_back(buffer);
 		}
-		m_GeometryOffset = indexDataAlignedSize;
 	}
 
-	nri::ResourceGroupDesc resourceGroupDesc = {};
-	resourceGroupDesc.memoryLocation = nri::MemoryLocation::HOST_UPLOAD;
-	resourceGroupDesc.bufferNum = 1;
-	resourceGroupDesc.buffers = &m_ConstantBuffer;
-
-	m_MemoryAllocations.resize(1, nullptr);
-	if (params.helperInterface.AllocateAndBindMemory(
-			params.m_Device, resourceGroupDesc,
-	                              m_MemoryAllocations.data()) !=
-	    nri::Result::SUCCESS)
 	{
-		return false;
-	};
+		// From this we should make a arrays of nri::Texture and upload them
+		// So, idk why we can't make Texture?
+		nri::ResourceGroupDesc resourceGroupDesc = {};
 
-	resourceGroupDesc.memoryLocation = nri::MemoryLocation::DEVICE;
-	resourceGroupDesc.bufferNum = 1;
-	resourceGroupDesc.buffers = &m_GeometryBuffer;
-	resourceGroupDesc.textureNum = 1;
-	resourceGroupDesc.textures = &m_Texture;
+		resourceGroupDesc.bufferNum = 1;
+		resourceGroupDesc.buffers = &m_Buffers[0];
+		resourceGroupDesc.memoryLocation = nri::MemoryLocation::HOST_UPLOAD;
 
-	m_MemoryAllocations.resize(
-		1 + params.helperInterface.CalculateAllocationNumber(params.m_Device,
-	                                                         resourceGroupDesc),
-		nullptr);
-	if (params.helperInterface.AllocateAndBindMemory(
-			params.m_Device, resourceGroupDesc,
-	                                          m_MemoryAllocations.data() + 1) !=
-	    nri::Result::SUCCESS)
-	{
-		return false;
-	};
+		size_t baseAllocation = m_MemoryAllocations.size();
+		m_MemoryAllocations.resize(baseAllocation + 1);
 
-
-
-	nri::Descriptor* constantBufferViews[BUFFERED_FRAME_MAX_NUM];
-	{ // Descriptors
-	   //Texture
-		nri::Texture2DViewDesc texture2DViewDesc = {
-			m_Texture, nri::Texture2DViewType::SHADER_RESOURCE_2D,
-			texture.GetFormat()};
-		if (params.NRI.CreateTexture2DView(texture2DViewDesc,
-		                            m_TextureShaderResource) !=
+		if (params.helperInterface.AllocateAndBindMemory(
+				params.m_Device, resourceGroupDesc,
+				m_MemoryAllocations.data() + baseAllocation) !=
 		    nri::Result::SUCCESS)
 		{
 			return false;
 		};
 
-		 //Sampler
+		resourceGroupDesc.bufferNum = 2;
+		resourceGroupDesc.buffers = &m_Buffers[1];
+		resourceGroupDesc.textures = m_Textures.data();
+		resourceGroupDesc.memoryLocation = nri::MemoryLocation::DEVICE;
+		resourceGroupDesc.textureNum = (uint32_t)m_Textures.size();
+
+		baseAllocation = m_MemoryAllocations.size();
+		const size_t allocationNum =
+			params.helperInterface.CalculateAllocationNumber(params.m_Device,
+		                                                     resourceGroupDesc);
+		m_MemoryAllocations.resize(baseAllocation + allocationNum);
+		if (params.helperInterface.AllocateAndBindMemory(
+				params.m_Device, resourceGroupDesc,
+				m_MemoryAllocations.data() + baseAllocation) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+	}
+
+	nri::Descriptor* constantBufferViews[BUFFERED_FRAME_MAX_NUM];
+	{ // Descriptors
+	  // Texture
+		nri::Texture2DViewDesc texture2DViewDesc = {
+			m_Textures[0], nri::Texture2DViewType::SHADER_RESOURCE_2D,
+			texture.GetFormat()};
+		if (params.NRI.CreateTexture2DView(texture2DViewDesc,
+		                                   m_TextureShaderResource) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+
+		// Sampler
 		nri::SamplerDesc samplerDesc = {};
 		samplerDesc.addressModes = {nri::AddressMode::MIRRORED_REPEAT,
 		                            nri::AddressMode::MIRRORED_REPEAT};
@@ -238,11 +290,11 @@ bool MainRenderPass::Init(InitParams params)
 		    nri::Result::SUCCESS)
 			;
 
-		 //Constant buffer
+		// Constant buffer
 		for (uint32_t i = 0; i < BUFFERED_FRAME_MAX_NUM; i++)
 		{
 			nri::BufferViewDesc bufferViewDesc = {};
-			bufferViewDesc.buffer = m_ConstantBuffer;
+			bufferViewDesc.buffer = m_Buffers[CONSTANT_BUFFER];
 			bufferViewDesc.viewType = nri::BufferViewType::CONSTANT;
 			bufferViewDesc.offset = i * constantBufferSize;
 			bufferViewDesc.size = constantBufferSize;
@@ -255,14 +307,28 @@ bool MainRenderPass::Init(InitParams params)
 
 			m_Descriptors.push_back(constantBufferViews[i]);
 		}
+
+		{
+			// Depth buffer
+			nri::Texture2DViewDesc texture2DViewDesc = {
+				depthTexture, nri::Texture2DViewType::DEPTH_STENCIL_ATTACHMENT,
+				m_DepthFormat};
+
+			if (params.NRI.CreateTexture2DView(texture2DViewDesc,
+			                                   m_DepthAttachment) !=
+			    nri::Result::SUCCESS)
+			{
+				return false;
+			};
+			m_Descriptors.push_back(m_DepthAttachment);
+		}
 	}
 
 	{ // Descriptor sets
-		 //Texture
+	  // Texture
 		if (params.NRI.AllocateDescriptorSets(
 				*m_DescriptorPool, *m_PipelineLayout, 1,
-		                               &m_TextureDescriptorSet, 1,
-		                               0) != nri::Result::SUCCESS)
+				&m_TextureDescriptorSet, 1, 0) != nri::Result::SUCCESS)
 		{
 			return false;
 		};
@@ -274,17 +340,15 @@ bool MainRenderPass::Init(InitParams params)
 		descriptorRangeUpdateDescs[1].descriptorNum = 1;
 		descriptorRangeUpdateDescs[1].descriptors = &m_Sampler;
 		params.NRI.UpdateDescriptorRanges(
-			*m_TextureDescriptorSet, 0,
-		                           GetCountOf(descriptorRangeUpdateDescs),
-		                           descriptorRangeUpdateDescs);
+			*m_TextureDescriptorSet, 0, GetCountOf(descriptorRangeUpdateDescs),
+			descriptorRangeUpdateDescs);
 		m_DescriptorSets.resize(BUFFERED_FRAME_MAX_NUM);
-		 //Constant buffer
+		// Constant buffer
 		for (uint32_t i = 0; i < BUFFERED_FRAME_MAX_NUM; i++)
 		{
 			if (params.NRI.AllocateDescriptorSets(
-					*m_DescriptorPool, *m_PipelineLayout,
-			                               0, &m_DescriptorSets[i],
-			                               1, 0) != nri::Result::SUCCESS)
+					*m_DescriptorPool, *m_PipelineLayout, 0,
+					&m_DescriptorSets[i], 1, 0) != nri::Result::SUCCESS)
 			{
 				return false;
 			};
@@ -292,45 +356,54 @@ bool MainRenderPass::Init(InitParams params)
 			nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc = {
 				&constantBufferViews[i], 1};
 			params.NRI.UpdateDescriptorRanges(*m_DescriptorSets[i], 0, 1,
-			                           &descriptorRangeUpdateDesc);
+			                                  &descriptorRangeUpdateDesc);
 		}
 	}
 
 	{ // Upload data
-		std::vector<uint8_t> geometryBufferData(indexDataAlignedSize +
-		                                        vertexDataSize);
-		memcpy(&geometryBufferData[0], g_IndexData, indexDataSize);
-		memcpy(&geometryBufferData[indexDataAlignedSize], g_VertexData,
-		       vertexDataSize);
-
 		std::array<nri::TextureSubresourceUploadDesc, 16> subresources;
+
+		std::vector<nri::TextureUploadDesc> textureData(2);
+
 		for (uint32_t mip = 0; mip < texture.GetMipNum(); mip++)
+		{
+			spdlog::info("mip {} ", mip);
 			texture.GetSubresource(subresources[mip], mip);
+		}
 
-		nri::TextureUploadDesc textureData = {};
-		textureData.subresources = subresources.data();
-		textureData.texture = m_Texture;
-		textureData.after = {nri::AccessBits::SHADER_RESOURCE,
-		                     nri::Layout::SHADER_RESOURCE};
+		textureData[0] = {};
+		textureData[0].subresources = subresources.data();
+		textureData[0].texture = m_Textures[0];
+		textureData[0].after = {nri::AccessBits::SHADER_RESOURCE,
+		                        nri::Layout::SHADER_RESOURCE};
 
-		nri::BufferUploadDesc bufferData = {};
-		bufferData.buffer = m_GeometryBuffer;
-		bufferData.data = &geometryBufferData[0];
-		bufferData.dataSize = geometryBufferData.size();
-		bufferData.after = {nri::AccessBits::INDEX_BUFFER |
-		                    nri::AccessBits::VERTEX_BUFFER};
+		textureData[1] = {};
+		textureData[1].subresources = nullptr;
+		textureData[1].texture = depthTexture;
+		textureData[1].after = {nri::AccessBits::DEPTH_STENCIL_ATTACHMENT_WRITE,
+		                        nri::Layout::DEPTH_STENCIL_ATTACHMENT};
 
-		if (params.helperInterface.UploadData(*params.commandQueue,
-		                                      &textureData, 1,
-		                                      &bufferData,
-		                                      1) != nri::Result::SUCCESS)
+		nri::BufferUploadDesc bufferData[] = {
+			{m_Scene.vertices.data(),
+		     GetByteSizeOf(m_Scene.vertices),
+		     m_Buffers[VERTEX_BUFFER],
+		     0,
+		     {nri::AccessBits::VERTEX_BUFFER}},
+			{m_Scene.indices.data(),
+		     GetByteSizeOf(m_Scene.indices),
+		     m_Buffers[INDEX_BUFFER],
+		     0,
+		     {nri::AccessBits::INDEX_BUFFER}}};
+
+		if (params.helperInterface.UploadData(
+				*params.commandQueue, textureData.data(), textureData.size(),
+				bufferData, GetCountOf(bufferData)) != nri::Result::SUCCESS)
 		{
 			return false;
-			};
+		};
 	}
 
-
-return true;
+	return true;
 }
 
 void MainRenderPass::Init()
@@ -343,51 +416,70 @@ void MainRenderPass::Draw()
 
 void MainRenderPass::Draw(const nri::CoreInterface& NRI,
                           const nri::StreamerInterface& streamerInterface,
-						  const nri::SwapChainInterface& swapChainInterface,
+                          const nri::SwapChainInterface& swapChainInterface,
                           const nri::StreamerInterface& streamer,
-                          nri::CommandBuffer& commandBuffer, const Frame& frame,
-                          const BackBuffer& currentBackBuffer,
-                          const uint32_t currentTextureIndex,const uint32_t m_RenderWindowWidth, const uint32_t m_RenderWindowHeight)
+                          nri::CommandBuffer& commandBuffer,
+                          const nova::Frame& frame,
+                          const nova::BackBuffer& currentBackBuffer,
+                          const uint32_t currentTextureIndex,
+                          const uint32_t m_RenderWindowWidth,
+                          const uint32_t m_RenderWindowHeight)
 {
-	 nri::Dim_t windowWidth = (nri::Dim_t)m_RenderWindowWidth;
-	 nri::Dim_t windowHeight = (nri::Dim_t)m_RenderWindowHeight;
-	 nri::Dim_t halfWidth = windowWidth / 2;
-	 nri::Dim_t halfHeight = windowHeight / 2;
+	nri::Dim_t windowWidth = (nri::Dim_t)m_RenderWindowWidth;
+	nri::Dim_t windowHeight = (nri::Dim_t)m_RenderWindowHeight;
+	nri::Dim_t halfWidth = windowWidth / 2;
+	nri::Dim_t halfHeight = windowHeight / 2;
 
+	ConstantBufferLayout* commonConstants =
+		(ConstantBufferLayout*)NRI.MapBuffer(*m_Buffers[CONSTANT_BUFFER],
+	                                         frame.constantBufferViewOffset,
+	                                         sizeof(ConstantBufferLayout));
+	spdlog::info("Constant buffer offset {}", frame.constantBufferViewOffset);
+	m_ProjectionMatrix = glm::perspective(
+		glm::radians(90.0f), (float)windowWidth / (float)windowHeight, 0.1f,
+		1000.0f);
+	m_ViewMatrix =
+		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
 
-
-	 ConstantBufferLayout* commonConstants =
-		(ConstantBufferLayout*)NRI.MapBuffer(*m_ConstantBuffer,
-	                                          frame.constantBufferViewOffset,
-	                                          sizeof(ConstantBufferLayout));
-	 if (commonConstants)
+	if (commonConstants)
 	{
-		commonConstants->color[0] = 0.8f;
-		commonConstants->color[1] = 0.5f;
-		commonConstants->color[2] = 0.1f;
-		commonConstants->scale = m_Scale;
+		commonConstants->projectionMatrix = m_ProjectionMatrix;
 
-		NRI.UnmapBuffer(*m_ConstantBuffer);
+		commonConstants->viewMatrix = m_ViewMatrix;
+
+		NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);
 	}
 
-	 nri::TextureBarrierDesc textureBarrierDescs = {};
-	 textureBarrierDescs.texture = currentBackBuffer.texture;
-	 textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
-	                              nri::Layout::COLOR_ATTACHMENT};
-	 textureBarrierDescs.layerNum = 1;
-	 textureBarrierDescs.mipNum = 1;
-
-	 //Record
-	 NRI.BeginCommandBuffer(commandBuffer, m_DescriptorPool);
+	// Record
+	NRI.BeginCommandBuffer(commandBuffer, m_DescriptorPool);
 	{
+		{ // Copy upload requests to destinations
+			Annotation annotation(NRI, commandBuffer, "Streamer");
+
+			// TODO: is barrier from "SHADER_RESOURCE" to "COPY_DESTINATION"
+			// needed here for "Buffer::InstanceData"?
+
+			//streamerInterface.CmdUploadStreamerUpdateRequests(
+				//commandBuffer, streamer);
+		}
+
+		nri::TextureBarrierDesc textureBarrierDescs = {};
+		textureBarrierDescs.texture = currentBackBuffer.texture;
+		textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
+		                             nri::Layout::COLOR_ATTACHMENT};
+		textureBarrierDescs.layerNum = 1;
+		textureBarrierDescs.mipNum = 1;
+
 		nri::BarrierGroupDesc barrierGroupDesc = {};
 		barrierGroupDesc.textureNum = 1;
 		barrierGroupDesc.textures = &textureBarrierDescs;
+
 		NRI.CmdBarrier(commandBuffer, barrierGroupDesc);
 
 		nri::AttachmentsDesc attachmentsDesc = {};
 		attachmentsDesc.colorNum = 1;
 		attachmentsDesc.colors = &currentBackBuffer.colorAttachment;
+		attachmentsDesc.depthStencil = m_DepthAttachment;
 
 		constexpr nri::Color32f COLOR_0 = {1.0f, 1.0f, 0.0f, 1.0f};
 
@@ -396,12 +488,14 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 			{
 				Annotation annotation(NRI, commandBuffer, "Clears");
 
-				nri::ClearDesc clearDesc = {};
-				clearDesc.planes = nri::PlaneBits::COLOR;
-				clearDesc.value.color.f = COLOR_0;
+				nri::ClearDesc clearDescs[2] = {};
+				clearDescs[0].planes = nri::PlaneBits::COLOR;
+				clearDescs[0].value.color.f = COLOR_0;
+				clearDescs[1].planes = nri::PlaneBits::DEPTH;
+				clearDescs[1].value.depthStencil.depth = 1;
 
-				NRI.CmdClearAttachments(commandBuffer, &clearDesc, 1, nullptr,
-				                        0);
+				NRI.CmdClearAttachments(commandBuffer, clearDescs,
+				                        GetCountOf(clearDescs), nullptr, 0);
 			}
 
 			{
@@ -415,51 +509,62 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 				NRI.CmdSetPipelineLayout(commandBuffer, *m_PipelineLayout);
 				NRI.CmdSetPipeline(commandBuffer, *m_Pipeline);
 				NRI.CmdSetRootConstants(commandBuffer, 0, &m_Transparency, 4);
-				NRI.CmdSetIndexBuffer(commandBuffer, *m_GeometryBuffer, 0,
-				                      nri::IndexType::UINT16);
-				NRI.CmdSetVertexBuffers(commandBuffer, 0, 1, &m_GeometryBuffer,
-				                        &m_GeometryOffset);
+
 				NRI.CmdSetDescriptorSet(commandBuffer, 0, *m_DescriptorSets[0],
 				                        nullptr);
 				NRI.CmdSetDescriptorSet(commandBuffer, 1,
 				                        *m_TextureDescriptorSet, nullptr);
 
-				nri::Rect scissor = {0, 0, windowWidth, windowHeight};
+				nri::Rect scissor = {(int16_t)halfWidth, (int16_t)halfHeight,
+				                     halfWidth, halfHeight};
 				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
-				NRI.CmdDrawIndexed(commandBuffer, {3, 1, 0, 0, 0});
+				// NRI.CmdDraw(commandBuffer, {3, 1, 0, 0});
+				scissor = {0, 0, windowWidth, windowHeight};
 
-				scissor = {(int16_t)halfWidth, (int16_t)halfHeight, halfWidth,
-				           halfHeight};
 				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
-				NRI.CmdDraw(commandBuffer, {3, 1, 0, 0});
+
+				for (const Mesh& mesh : m_Scene.meshes)
+				{
+					NRI.CmdSetIndexBuffer(
+						commandBuffer, *m_Buffers[INDEX_BUFFER], 0,
+						sizeof(uint32_t) == 2 ? nri::IndexType::UINT16
+											  : nri::IndexType::UINT32);
+					constexpr uint64_t offset = 0;
+					NRI.CmdSetVertexBuffers(commandBuffer, 0, 1,
+					                        &m_Buffers[VERTEX_BUFFER], &offset);
+					NRI.CmdDrawIndexed(commandBuffer,
+					                   {mesh.indexNum, 1, mesh.indexOffset,
+					                    (int32_t)mesh.vertexOffset, 0});
+				}
 			}
 
 			{
 			}
 		}
 		NRI.CmdEndRendering(commandBuffer);
-
-		textureBarrierDescs.before = textureBarrierDescs.after;
-		textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,
-		                             nri::Layout::PRESENT};
-
-		NRI.CmdBarrier(commandBuffer, barrierGroupDesc);
 	}
 }
 
 void MainRenderPass::PrepareFrame()
 {
-
 }
 
-void MainRenderPass::Shutdown(){
-
+void MainRenderPass::Shutdown()
+{
 }
 
-MainRenderPass::MainRenderPass(){
-
+MainRenderPass::MainRenderPass()
+{
 }
 
-MainRenderPass::~MainRenderPass(){
-    
+MainRenderPass::~MainRenderPass()
+{
+}
+
+void MainRenderPass::BeginUI()
+{
+}
+
+void MainRenderPass::EndUI()
+{
 }
