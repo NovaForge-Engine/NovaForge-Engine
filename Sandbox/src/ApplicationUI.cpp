@@ -4,6 +4,33 @@
 
 const std::filesystem::path AppState::rootAssetPath = "Assets";
 
+void DrawSceneItemRecursive(TmpTestSceneItem* sceneItem)
+{
+	if (ImGui::CollapsingHeader(sceneItem->itemName.c_str())) {
+		for (auto childSceneItem : sceneItem->childs) {
+			DrawSceneItemRecursive(childSceneItem);
+		}
+	}
+
+	if (ImGui::BeginDragDropTarget()) {
+		auto payload = ImGui::AcceptDragDropPayload("SceneItemPayload");
+		if (payload && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+			TmpTestSceneItem* draggedSceneItem = (TmpTestSceneItem*)payload->Data;
+			if (draggedSceneItem->parent) {
+				auto parentChilds = &draggedSceneItem->parent->childs;
+				parentChilds->erase(std::remove(parentChilds->begin(), parentChilds->end(), draggedSceneItem), parentChilds->end());
+			}
+			sceneItem->childs.push_back(draggedSceneItem);
+		}
+		ImGui::EndDragDropTarget();
+	}
+
+	if (ImGui::BeginDragDropSource()) {
+		ImGui::SetDragDropPayload("SceneItemPayload", sceneItem, sizeof(TmpTestSceneItem));
+		ImGui::EndDragDropSource();
+	}
+}
+
 void GuiWindowViewport(AppState& appState)
 {
 	ImVec2 windowSize = ImGui::GetWindowSize();
@@ -54,7 +81,42 @@ void GuiWindowAssetBrowser(AppState& appState)
 
 void GuiWindowOutliner(AppState& appState)
 {
-	ImGui::Text("Outliner here");
+	const char* createAssetContextMenuID = "Create Asset";
+	const char* removeAssetContextMenuID = "Remove Asset";
+
+	for (auto sceneItem : appState.dbgSceneItems) {
+		DrawSceneItemRecursive(&sceneItem);
+	}
+
+	if (ImGui::IsWindowHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+		if (!ImGui::IsItemHovered()) {
+			ImGui::OpenPopup(createAssetContextMenuID);
+		}
+		else {
+			ImGui::OpenPopup(createAssetContextMenuID);
+		}
+	}
+
+	if (ImGui::BeginPopup(createAssetContextMenuID)) {
+		if (ImGui::MenuItem("Cube")) {
+			appState.dbgSceneItems.push_back(TmpTestSceneItem("Cube"));
+		}
+		if (ImGui::MenuItem("Sphere")) {
+			appState.dbgSceneItems.push_back(TmpTestSceneItem("Sphere"));
+      }        
+	   if (ImGui::MenuItem("Cylinder")) {
+			appState.dbgSceneItems.push_back(TmpTestSceneItem("Cylinder"));
+      }
+
+     ImGui::EndPopup();
+	}	
+
+	if (ImGui::BeginPopup(removeAssetContextMenuID)) {
+		if (ImGui::MenuItem("Remove")) {
+
+		}
+		ImGui::EndPopup();
+	}
 }
 
 void GuiWindowInspector(AppState& appState)

@@ -211,7 +211,7 @@ namespace ThemesImpl
 		colors[ImGuiCol_Button] = ImVec4(0.30f, 0.30f, 0.30f, 0.54f);
 		colors[ImGuiCol_ButtonHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
 		colors[ImGuiCol_ButtonActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
-		colors[ImGuiCol_Header] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+		colors[ImGuiCol_Header] = ImVec4(0.00f, 0.00f, 0.00f, 0.01f);
 		colors[ImGuiCol_HeaderHovered] = ImVec4(0.00f, 0.00f, 0.00f, 0.36f);
 		colors[ImGuiCol_HeaderActive] = ImVec4(0.20f, 0.22f, 0.23f, 0.33f);
 		colors[ImGuiCol_Separator] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
@@ -255,7 +255,7 @@ namespace ThemesImpl
 		style.WindowBorderSize = 1;
 		style.ChildBorderSize = 1;
 		style.PopupBorderSize = 1;
-		style.FrameBorderSize = 1;
+		style.FrameBorderSize = 0;
 		style.TabBorderSize = 1;
 		style.WindowRounding = 0;
 		style.ChildRounding = 0;
