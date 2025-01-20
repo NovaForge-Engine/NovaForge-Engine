@@ -168,8 +168,8 @@ bool Application::Init(int argc, char** argv)
 	}
 	bool result = true;
 
-	//result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
-	result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	//result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 
 	if (!result)
 	{

@@ -183,10 +183,15 @@ std::vector<Texture> ModelLoader::loadMaterialTextures(aiMaterial* mat,
 			}
 
 			std::string filename = std::string(str.C_Str());
+			for (size_t i = 0; i < filename.length(); i++)
+			{
+				if ((int)filename[i] == 92)
+				{
+					filename[i] = '/';
+				}
+			}
 			filename = this->directory_ + "/" + filename;
-			spdlog::info(
-				"We're trying to understand what's going on with texture {}",
-				filename);
+			spdlog::info("Fullpath of texture is {}" , filename);
 			Texture* texture = new Texture;
 			bool res = LoadTexture(filename, *texture);
 			if (res)
