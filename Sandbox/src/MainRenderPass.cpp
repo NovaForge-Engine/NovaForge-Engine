@@ -3,6 +3,8 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "spdlog/spdlog.h"
+
 constexpr uint32_t BuFFERED_FRAME_MAX_NUM = 2;
 constexpr float CLEAR_DEPTH = 0.0f;
 
@@ -288,11 +290,14 @@ bool MainRenderPass::Init(InitParams& params)
 		{
 			return false;
 		};
+
+		params.NRI.SetDebugName(params.outputTexture, "SceneTexture");
+
 		//Output Texture
 		nri::Descriptor* output;
 		nri::Texture2DViewDesc outputTexture2DViewDesc = {
-			params.outputTexture, nri::Texture2DViewType::SHADER_RESOURCE_2D,
-			params.renderTargetFormat
+			params.outputTexture, nri::Texture2DViewType::COLOR_ATTACHMENT,
+			params.renderTargetFormat,0,1,0,1
 		};
 		if (params.NRI.CreateTexture2DView(outputTexture2DViewDesc,
 		                                   output) !=
@@ -301,6 +306,24 @@ bool MainRenderPass::Init(InitParams& params)
 			return false;
 		};
 		outputDesc = output;
+
+		nri::Descriptor* output2;
+
+		nri::Texture2DViewDesc outputTexture2DViewDesc2 = {
+			params.outputTexture,
+			nri::Texture2DViewType::SHADER_RESOURCE_2D,
+			params.renderTargetFormat,
+			0,
+			1,
+			0,
+			1};
+		if (params.NRI.CreateTexture2DView(outputTexture2DViewDesc2, output2) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+
+		outputDesc2 = output2;
 
 		// Sampler
 		nri::SamplerDesc samplerDesc = {};
@@ -490,8 +513,9 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 		nri::TextureBarrierDesc textureBarrierDescs = {};
 		textureBarrierDescs.texture = outputTexture;
-		textureBarrierDescs.after = {nri::AccessBits::SHADER_RESOURCE,
-		                             nri::Layout::SHADER_RESOURCE};
+
+		textureBarrierDescs.after = {nri::AccessBits::COLOR_ATTACHMENT,
+		                             nri::Layout::COLOR_ATTACHMENT};
 		textureBarrierDescs.layerNum = 1;
 		textureBarrierDescs.mipNum = 1;
 
@@ -567,6 +591,16 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 			}
 		}
 		NRI.CmdEndRendering(commandBuffer);
+
+		textureBarrierDescs.before = textureBarrierDescs.after;
+		textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,
+		                             nri::Layout::PRESENT};
+
+		barrierGroupDesc.textures = &textureBarrierDescs;
+
+		NRI.CmdBarrier(commandBuffer, barrierGroupDesc);
+
+
 	}
 }
 

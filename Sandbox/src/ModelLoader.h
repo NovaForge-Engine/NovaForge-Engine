@@ -16,7 +16,7 @@
 #include "MeshRegistry.hpp"
 
 #include <spdlog/spdlog.h>
-
+#define SPDLOG_FMT_EXTERNAL
 
 namespace nova
 {

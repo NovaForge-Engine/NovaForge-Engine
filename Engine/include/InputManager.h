@@ -8,7 +8,6 @@
 #include "include/InputContext.h"
 #include "include/Singleton.h"
 
-#include "spdlog/spdlog.h"
 
 namespace NovaEngine {
 

@@ -178,15 +178,16 @@ bool Application::Init(int argc, char** argv)
 	}
 
 	
+
 	{
 		nri::TextureDesc textureDesc = {};
 		textureDesc.type = nri::TextureType::TEXTURE_2D;
-		textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
+		textureDesc.usage = nri::TextureUsageBits::COLOR_ATTACHMENT | nri::TextureUsageBits::SHADER_RESOURCE;
 		textureDesc.format = swapChainFormat;
 		textureDesc.width = static_cast<uint16_t>(window->m_RenderOutputWidth);
 		textureDesc.height = static_cast<uint16_t>(window->m_RenderOutputHeight);
 		textureDesc.mipNum = 1;
-		textureDesc.layerNum = 1;
+		textureDesc.layerNum = 0;
 		NRI.CreateTexture(*m_Device, textureDesc, sceneTexture);
 	}
 
@@ -206,8 +207,9 @@ bool Application::Init(int argc, char** argv)
 	
 
 	result = mainRenderPass.Init(passParams);
-
-	appState.outputTexture = mainRenderPass.outputDesc;
+	spdlog::info("{:p} pointer 1 ", fmt::ptr(&mainRenderPass.outputDesc2));
+	appState.outputTexture = mainRenderPass.outputDesc2;
+	spdlog::info("{:p} pointer 2", fmt::ptr(&appState.outputTexture));
 
 	spdlog::info("MainRenderPass initialized: {}", result);
 
@@ -335,16 +337,6 @@ void Application::Draw()
 	}
 
 	{ // UI
-		nri::AttachmentsDesc attachmentsDesc = {};
-		attachmentsDesc.colorNum = 1;
-		attachmentsDesc.colors = &backBuffer.colorAttachment;
-
-		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
-		{
-			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f,
-			                  true);
-		}
-		NRI.CmdEndRendering(*commandBuffer);
 
 		nri::TextureBarrierDesc textureBarrierDescs = {};
 		textureBarrierDescs.texture = backBuffer.texture;
@@ -356,6 +348,21 @@ void Application::Draw()
 		nri::BarrierGroupDesc barrierGroupDesc = {};
 		barrierGroupDesc.textureNum = 1;
 		barrierGroupDesc.textures = &textureBarrierDescs;
+
+		NRI.CmdBarrier(*commandBuffer, barrierGroupDesc);
+
+		nri::AttachmentsDesc attachmentsDesc = {};
+		attachmentsDesc.colorNum = 1;
+		attachmentsDesc.colors = &backBuffer.colorAttachment;
+
+		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
+		{
+			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f,
+			                  true);
+		}
+		NRI.CmdEndRendering(*commandBuffer);
+
+	
 
 		textureBarrierDescs.before = textureBarrierDescs.after;
 		textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,

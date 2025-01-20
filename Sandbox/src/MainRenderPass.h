@@ -17,6 +17,7 @@
 #include "MeshRegistry.hpp"
 
 
+
 struct CustomVertex
 {
 	float position[2];
@@ -76,6 +77,7 @@ public:
 	~MainRenderPass();
 	nri::Descriptor* m_TextureShaderResource = nullptr;
 	nri::Descriptor* outputDesc = nullptr;
+	nri::Descriptor* outputDesc2 = nullptr;
 
 private:
 	float m_Transparency = 1.0f;

@@ -1,6 +1,6 @@
 
 #include "Application.h"
-
+#define SPDLOG_FMT_EXTERNAL
 #include <NRI.h>
 
 
