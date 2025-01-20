@@ -594,7 +594,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 		textureBarrierDescs.before = textureBarrierDescs.after;
 		textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,
-		                             nri::Layout::PRESENT};
+		                             nri::Layout::SHADER_RESOURCE};
 
 		barrierGroupDesc.textures = &textureBarrierDescs;
 
