@@ -6,6 +6,7 @@ namespace GameObjectsBase
     {
         private ObjectId _id;
         private List<Component> _components = new List<Component>();
+        private List<GameObject> _children = new List<GameObject>();
         private bool _isActive;
         private string _name = string.Empty;
 
@@ -37,6 +38,8 @@ namespace GameObjectsBase
             _components.Clear();
         }
 
+        public void AddChild(GameObject child) => _children.Add(child);
+
         public void AddComponent(Component component)
         {
             _components.Add(component);
@@ -58,6 +61,25 @@ namespace GameObjectsBase
             return component != null;
         }
 
+        public T GetComponentInChildren<T>() where T : Component
+        {
+            foreach(var child in _children)
+            {
+                if (child.ContainsComponent<T>())
+                {
+                    return child.GetComponent<T>();
+                }
+            }
+
+            T component = null;
+            foreach(var child in _children)
+            {
+                component = child.GetComponentInChildren<T>();
+            }
+
+            return component;
+        }
+
         public bool ContainsComponent<T>()
         {
             foreach (var component in _components)
@@ -71,6 +93,9 @@ namespace GameObjectsBase
         public void SetActive(bool active)
         {
             _isActive = active;
+
+            foreach(var child in _children) 
+                child.SetActive(active); 
 
             if (active) 
                 OnEnable();
