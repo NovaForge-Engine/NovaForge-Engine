@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace GameObjectsBase
 {
@@ -78,6 +79,12 @@ namespace GameObjectsBase
             }
 
             return component;
+        }
+
+        public bool TryGetComponentInChildren<T>(out T component) where T : Component
+        {
+            component = GetComponentInChildren<T>();
+            return component != null;
         }
 
         public bool ContainsComponent<T>()
