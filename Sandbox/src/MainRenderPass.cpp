@@ -20,19 +20,18 @@ bool MainRenderPass::Init(InitParams& params)
 
 	ShaderCodeStorage shaderCodeStorage;
 	{
-		nri::DescriptorRangeDesc descriptorRangeConstant[1];
-		descriptorRangeConstant[0] = {
-			0, 1, nri::DescriptorType::CONSTANT_BUFFER, nri::StageBits::ALL};
+		nri::DescriptorRangeDesc descriptorRangeConstant[2];
+		descriptorRangeConstant[0] = {0, 1, nri::DescriptorType::CONSTANT_BUFFER, nri::StageBits::ALL};
+		descriptorRangeConstant[1] = {0, 1, nri::DescriptorType::SAMPLER,nri::StageBits::FRAGMENT_SHADER};
 
-		nri::DescriptorRangeDesc descriptorRangeTexture[2];
-		descriptorRangeTexture[0] = {0, 1, nri::DescriptorType::TEXTURE,
-		                             nri::StageBits::FRAGMENT_SHADER};
-		descriptorRangeTexture[1] = {0, 1, nri::DescriptorType::SAMPLER,
-		                             nri::StageBits::FRAGMENT_SHADER};
+		nri::DescriptorRangeDesc materialDescriptorRange[1];
+		materialDescriptorRange[0] = {0, 4, nri::DescriptorType::TEXTURE,
+		                              nri::StageBits::FRAGMENT_SHADER};
+
 
 		nri::DescriptorSetDesc descriptorSetDescs[] = {
 			{0, descriptorRangeConstant, GetCountOf(descriptorRangeConstant)},
-			{1, descriptorRangeTexture, GetCountOf(descriptorRangeTexture)},
+			{1, materialDescriptorRange, GetCountOf(materialDescriptorRange)},
 		};
 
 		nri::RootConstantDesc rootConstant = {1, sizeof(float),
@@ -129,26 +128,17 @@ bool MainRenderPass::Init(InitParams& params)
 		};
 	}
 
-	{ // Descriptor pool
-		nri::DescriptorPoolDesc descriptorPoolDesc = {};
-		descriptorPoolDesc.descriptorSetMaxNum = BUFFERED_FRAME_MAX_NUM + 1;
-		descriptorPoolDesc.constantBufferMaxNum = BUFFERED_FRAME_MAX_NUM;
-		descriptorPoolDesc.textureMaxNum = 1;
-		descriptorPoolDesc.samplerMaxNum = 1;
-
-		if (params.NRI.CreateDescriptorPool(params.m_Device, descriptorPoolDesc,
-		                                    m_DescriptorPool) !=
-		    nri::Result::SUCCESS)
-		{
-			return false;
-		};
-	}
+	
 	// Load texture
 	Texture texture;
 
-	std::string path = GetFullPath("wood.dds", DataFolder::TEXTURES);
+	std::string path = GetFullPath("Cat_diffuse.jpg", DataFolder::TEXTURES);
 	if (!LoadTexture(path, texture))
 		return false;
+
+	int materialNum = params.scene->materials_.size();
+	int textureNum = params.scene->textures.size();
+
 
 	// Resources
 	const uint32_t constantBufferSize =
@@ -156,6 +146,32 @@ bool MainRenderPass::Init(InitParams& params)
 	          deviceDesc.constantBufferOffsetAlignment);
 	nri::Texture* depthTexture = nullptr;
 	{
+
+		{
+			for (const Texture* textureData : params.scene->textures)
+			{
+				nri::TextureDesc textureDesc = {};
+				textureDesc.type = nri::TextureType::TEXTURE_2D;
+				textureDesc.usage = nri::TextureUsageBits::SHADER_RESOURCE;
+				textureDesc.format = textureData->GetFormat();
+				textureDesc.width = textureData->GetWidth();
+				textureDesc.height = textureData->GetHeight();
+				textureDesc.mipNum = textureData->GetMipNum();
+				textureDesc.layerNum = textureData->GetArraySize();
+				nri::Texture* texture;
+
+				if (params.NRI.CreateTexture(params.m_Device, textureDesc,
+				                             texture) == nri::Result::SUCCESS)
+
+				{
+					m_Textures.push_back(texture);
+				}
+				else
+				{
+					std::cout << "cannot make a texture\n";
+				}
+			}
+		}
 		{
 			// Texture
 			nri::TextureDesc textureDesc = {};
@@ -231,13 +247,6 @@ bool MainRenderPass::Init(InitParams& params)
 		}
 	}
 
-		
-
-
-
-
-
-
 	{
 		// From this we should make a arrays of nri::Texture and upload them
 		// So, idk why we can't make Texture?
@@ -293,14 +302,17 @@ bool MainRenderPass::Init(InitParams& params)
 
 		params.NRI.SetDebugName(params.outputTexture, "SceneTexture");
 
-		//Output Texture
+		// Output Texture
 		nri::Descriptor* output;
 		nri::Texture2DViewDesc outputTexture2DViewDesc = {
-			params.outputTexture, nri::Texture2DViewType::COLOR_ATTACHMENT,
-			params.renderTargetFormat,0,1,0,1
-		};
-		if (params.NRI.CreateTexture2DView(outputTexture2DViewDesc,
-		                                   output) !=
+			params.outputTexture,
+			nri::Texture2DViewType::COLOR_ATTACHMENT,
+			params.renderTargetFormat,
+			0,
+			1,
+			0,
+			1};
+		if (params.NRI.CreateTexture2DView(outputTexture2DViewDesc, output) !=
 		    nri::Result::SUCCESS)
 		{
 			return false;
@@ -324,6 +336,25 @@ bool MainRenderPass::Init(InitParams& params)
 		};
 
 		outputDesc2 = output2;
+
+		{
+			m_Descriptors.resize(textureNum);
+			for (int i = 0; i < textureNum; i++)
+			{
+				Texture& texture = *params.scene->textures[i];
+
+				nri::Texture2DViewDesc texture2DViewDesc = {
+					m_Textures[i], nri::Texture2DViewType::SHADER_RESOURCE_2D,
+					texture.GetFormat()};
+				if (params.NRI.CreateTexture2DView(texture2DViewDesc,
+				                                   m_Descriptors[i]) !=
+				    nri::Result::SUCCESS)
+				{
+					spdlog::error("cannot make a texture descriptor");
+					return false;
+				}
+			}
+		}
 
 		// Sampler
 		nri::SamplerDesc samplerDesc = {};
@@ -371,64 +402,125 @@ bool MainRenderPass::Init(InitParams& params)
 		}
 	}
 
+	{ // Descriptor pool
+		nri::DescriptorPoolDesc descriptorPoolDesc = {};
+		descriptorPoolDesc.descriptorSetMaxNum = BUFFERED_FRAME_MAX_NUM + materialNum;
+		descriptorPoolDesc.textureMaxNum = materialNum*4;
+		descriptorPoolDesc.samplerMaxNum = BUFFERED_FRAME_MAX_NUM;
+		descriptorPoolDesc.constantBufferMaxNum = BUFFERED_FRAME_MAX_NUM;
+
+		if (params.NRI.CreateDescriptorPool(params.m_Device, descriptorPoolDesc,
+		                                    m_DescriptorPool) !=
+		    nri::Result::SUCCESS)
+		{
+			return false;
+		};
+	}
+
+
 	{ // Descriptor sets
-	  // Texture
+		//Global
+
+		m_DescriptorSets.resize(BUFFERED_FRAME_MAX_NUM +
+		                        materialNum);
+		// Constant buffer
 		if (params.NRI.AllocateDescriptorSets(
-				*m_DescriptorPool, *m_PipelineLayout, 1,
-				&m_TextureDescriptorSet, 1, 0) != nri::Result::SUCCESS)
+				*m_DescriptorPool, *m_PipelineLayout, 0, &m_DescriptorSets[0],
+				2, 0) != nri::Result::SUCCESS)
 		{
 			return false;
 		};
 
-		nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDescs[2] = {};
-		descriptorRangeUpdateDescs[0].descriptorNum = 1;
-		descriptorRangeUpdateDescs[0].descriptors = &m_TextureShaderResource;
-
-		descriptorRangeUpdateDescs[1].descriptorNum = 1;
-		descriptorRangeUpdateDescs[1].descriptors = &m_Sampler;
-		params.NRI.UpdateDescriptorRanges(
-			*m_TextureDescriptorSet, 0, GetCountOf(descriptorRangeUpdateDescs),
-			descriptorRangeUpdateDescs);
-		m_DescriptorSets.resize(BUFFERED_FRAME_MAX_NUM);
-		// Constant buffer
 		for (uint32_t i = 0; i < BUFFERED_FRAME_MAX_NUM; i++)
 		{
-			if (params.NRI.AllocateDescriptorSets(
-					*m_DescriptorPool, *m_PipelineLayout, 0,
-					&m_DescriptorSets[i], 1, 0) != nri::Result::SUCCESS)
-			{
-				return false;
-			};
 
-			nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc = {
-				&constantBufferViews[i], 1};
-			params.NRI.UpdateDescriptorRanges(*m_DescriptorSets[i], 0, 1,
-			                                  &descriptorRangeUpdateDesc);
+			nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc[2] = {};
+			descriptorRangeUpdateDesc[0].descriptorNum = 1;
+			descriptorRangeUpdateDesc[0].descriptors = &constantBufferViews[i];
+			descriptorRangeUpdateDesc[1].descriptorNum = 1;
+			descriptorRangeUpdateDesc[1].descriptors = &m_Sampler;
+			params.NRI.UpdateDescriptorRanges(
+				*m_DescriptorSets[i], 0, GetCountOf(descriptorRangeUpdateDesc),
+				descriptorRangeUpdateDesc);
+		};
+	}
+	// Material
+	{
+		if (params.NRI.AllocateDescriptorSets(
+				*m_DescriptorPool, *m_PipelineLayout, 1, &m_DescriptorSets[BUFFERED_FRAME_MAX_NUM],
+				materialNum, 0) != nri::Result::SUCCESS)
+		{
+			return false;
+		};
+
+
+		for (uint32_t i = 0; i < materialNum;i++)
+		{
+			const Material& material = params.scene->materials_[i];
+			nri::Descriptor* materialTextures[4] = {
+				m_Descriptors[material.ambientTexIndex],
+				m_Descriptors[material.diffuseTexIndex],
+				m_Descriptors[material.heightTexIndex],
+				m_Descriptors[material.OpacityTexIndex]};
+
+			nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc = {};
+			descriptorRangeUpdateDesc.descriptorNum  = GetCountOf(materialTextures);
+			descriptorRangeUpdateDesc.descriptors = materialTextures;
+			params.NRI.UpdateDescriptorRanges(
+				*m_DescriptorSets[i + BUFFERED_FRAME_MAX_NUM], 0, 1,
+				&descriptorRangeUpdateDesc);
 		}
 	}
 
+
+
+
 	{ // Upload data
-		std::array<nri::TextureSubresourceUploadDesc, 16> subresources;
+		std::vector<nri::TextureUploadDesc> textureData(textureNum + 2);
 
-		std::vector<nri::TextureUploadDesc> textureData(2);
-
-		for (uint32_t mip = 0; mip < texture.GetMipNum(); mip++)
+		uint32_t subresourceNum = 0;
+		for (uint32_t i = 0; i < textureNum; i++)
 		{
-			spdlog::info("mip {} ", mip);
-			texture.GetSubresource(subresources[mip], mip);
+			const Texture& texture = *m_Scene.textures[i];
+			subresourceNum += texture.GetArraySize() * texture.GetMipNum();
 		}
 
-		textureData[0] = {};
-		textureData[0].subresources = subresources.data();
-		textureData[0].texture = m_Textures[0];
-		textureData[0].after = {nri::AccessBits::SHADER_RESOURCE,
-		                        nri::Layout::SHADER_RESOURCE};
+		std::vector<nri::TextureSubresourceUploadDesc> subresources(
+			subresourceNum);
+		nri::TextureSubresourceUploadDesc* subresourceBegin =
+			subresources.data();
 
-		textureData[1] = {};
-		textureData[1].subresources = nullptr;
-		textureData[1].texture = depthTexture;
-		textureData[1].after = {nri::AccessBits::DEPTH_STENCIL_ATTACHMENT_WRITE,
+
+		uint32_t i = 0;
+		for (;i<textureNum;i++)
+		{
+			const Texture& texture = *m_Scene.textures[i];
+			for (uint32_t slice = 0; slice < texture.GetArraySize(); slice++)
+			{
+
+				for (uint32_t mip = 0; mip < texture.GetMipNum(); mip++)
+				{
+					texture.GetSubresource(subresourceBegin[slice * texture.GetMipNum() + mip],
+						mip, slice);
+				}
+
+				textureData[i] = {};
+				textureData[i].subresources = subresourceBegin;
+				textureData[i].texture = m_Textures[i];
+				textureData[i].after = {nri::AccessBits::SHADER_RESOURCE,
+				                        nri::Layout::SHADER_RESOURCE};
+
+				 subresourceBegin += texture.GetArraySize() * texture.GetMipNum();
+
+			}
+		}
+
+		textureData[i] = {};
+		textureData[i].subresources = nullptr;
+		textureData[i].texture = depthTexture;
+		textureData[i].after = {nri::AccessBits::DEPTH_STENCIL_ATTACHMENT_WRITE,
 		                        nri::Layout::DEPTH_STENCIL_ATTACHMENT};
+		i++;
 
 		nri::BufferUploadDesc bufferData[] = {
 			{m_Scene.vertices.data(),
@@ -443,7 +535,7 @@ bool MainRenderPass::Init(InitParams& params)
 		     {nri::AccessBits::INDEX_BUFFER}}};
 
 		if (params.helperInterface.UploadData(
-				*params.commandQueue, textureData.data(), textureData.size(),
+				*params.commandQueue, textureData.data(), i,
 				bufferData, GetCountOf(bufferData)) != nri::Result::SUCCESS)
 		{
 			return false;
@@ -486,8 +578,11 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 	m_ProjectionMatrix = glm::perspective(
 		glm::radians(90.0f), (float)windowWidth / (float)windowHeight, 0.1f,
 		1000.0f);
+
+
 	m_ViewMatrix =
 		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+
 
 	if (commonConstants)
 	{
@@ -561,8 +656,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 				NRI.CmdSetDescriptorSet(commandBuffer, 0, *m_DescriptorSets[0],
 				                        nullptr);
-				NRI.CmdSetDescriptorSet(commandBuffer, 1,
-				                        *m_TextureDescriptorSet, nullptr);
+				
 
 				nri::Rect scissor = {(int16_t)halfWidth, (int16_t)halfHeight,
 				                     halfWidth, halfHeight};
@@ -579,6 +673,14 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 						sizeof(uint32_t) == 2 ? nri::IndexType::UINT16
 											  : nri::IndexType::UINT32);
 					constexpr uint64_t offset = 0;
+
+
+					nri::DescriptorSet* descriptorSet =
+						m_DescriptorSets[BUFFERED_FRAME_MAX_NUM +
+					                     mesh.materialNum];
+					NRI.CmdSetDescriptorSet(commandBuffer, 1, *descriptorSet,
+					                        nullptr);
+
 					NRI.CmdSetVertexBuffers(commandBuffer, 0, 1,
 					                        &m_Buffers[VERTEX_BUFFER], &offset);
 					NRI.CmdDrawIndexed(commandBuffer,

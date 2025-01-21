@@ -17,6 +17,8 @@ namespace nova
 		std::vector<unsigned int> indices;
 		std::vector<Texture*> textures;
 		std::vector<Mesh> meshes;
+
+		std::vector<Material> materials_;
 	};
 
 } // namespace nova

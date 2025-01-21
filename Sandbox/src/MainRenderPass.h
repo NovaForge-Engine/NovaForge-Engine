@@ -112,4 +112,7 @@ private:
 	uint64_t m_GeometryOffset = 0;
 
 	nova::MeshRegistry m_Scene;
+
+	double time = 0;
+
 };
