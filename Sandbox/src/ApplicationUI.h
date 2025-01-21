@@ -2,6 +2,21 @@
 #include <NRIDescs.h>
 #include <filesystem>
 
+static unsigned int uniqueCounterId = 0;
+
+struct TmpTestSceneItem
+{
+	TmpTestSceneItem(std::string itemName) : itemName(itemName + std::to_string(uniqueCounterId)) { uniqueCounterId++; }
+
+	std::string itemName;
+	
+	TmpTestSceneItem* parent = nullptr;
+	std::vector<TmpTestSceneItem*> childs;
+
+private:
+	TmpTestSceneItem();
+};
+
 enum TmpLogLevel
 {
 	Debug = 0,
@@ -12,15 +27,17 @@ enum TmpLogLevel
 
 struct TmpLogInfo 
 {
+	TmpLogInfo(std::string log, TmpLogLevel logLevel) : logBuffer(logBuffer), logLevel(logLevel) {}
+
 	std::string logBuffer;
 	TmpLogLevel logLevel;
-
-	TmpLogInfo(std::string log, TmpLogLevel logLevel) { this->logBuffer = log; this->logLevel = logLevel; }
 };
 
 struct AppState
 {
 	nri::Descriptor* outputTexture = nullptr;
+
+	std::vector<TmpTestSceneItem> dbgSceneItems = { TmpTestSceneItem("Cube"), TmpTestSceneItem("Sphere"), TmpTestSceneItem("Cylinder")};
 
 	float assetPadding = 16.0f;
 	float assetThumbnailSize = 120.0f;
