@@ -255,7 +255,7 @@ void Application::Draw()
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 		ImGui::DockSpaceOverViewport(viewport);
-		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
+		/*SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
 		if (dockingParams.layoutReset) {
 			dockingParams.layoutReset = false;
@@ -293,7 +293,7 @@ void Application::Draw()
 				dockableWindow.GuiFunction();
 			}
 			ImGui::End();
-		}
+		}*/
 	}
 
 	uiRenderPass.EndUI(NRI, *m_Streamer, NRI, NRI, m_CommandQueue);
