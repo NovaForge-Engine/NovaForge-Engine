@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace GameObjectsBase
@@ -29,7 +30,10 @@ namespace GameObjectsBase
         public void OnDisable() => _components.ForEach(x => x.OnDisable());
 
         public void Start() => _components.ForEach(x => x.Start());
-        public void Update() => _components.ForEach(x => x.Update());
+        public void Update() {
+            Console.WriteLine("Update object with id " +  _id.Value);
+            _components.ForEach(x => x.Update()); 
+        }
         public void FixedUpdate() => _components.ForEach(x => x.FixedUpdate());
 
         public void OnDestroy()
