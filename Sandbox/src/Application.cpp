@@ -42,7 +42,10 @@ bool Application::Init(int argc, char** argv)
 	window = new nova::NovaWindow();
 
 	window->Initialize(1280, 720, cmdLine.get<std::string>("api"));
+	windowWidth = window->m_RenderWindowWidth;
+	windowHeight = window->m_RenderWindowHeight;
 
+    glfwSetWindowSizeCallback(window->GetGLFWWindow(),this->framebuffer_size_callback);
 	nri::AdapterDesc bestAdapterDesc = {};
 	uint32_t adapterDecscNum = 1;
 	if (nriEnumerateAdapters(&bestAdapterDesc, adapterDecscNum) !=
@@ -249,6 +252,9 @@ void Application::Update()
 	{
 		shouldClose = false;
 	}
+	if (window->m_RenderWindowWidth != windowWidth ||
+	    window->m_RenderWindowHeight != windowHeight)
+		ResizeSwapChain(windowWidth, windowHeight);
 
 	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else
 	//is updating above
@@ -419,4 +425,59 @@ void Application::ReadCmdLineDefault(cmdline::parser& cmdLine)
 {
 	m_DebugAPI = cmdLine.exist("debugAPI");
 	m_DebugNRI = cmdLine.exist("debugNRI");
+}
+
+bool Application::ResizeSwapChain(int width, int height)
+{
+	NRI.WaitForIdle(*m_CommandQueue);
+
+	for(nova::BackBuffer& backBuffer : window->m_SwapChainBuffers)
+	{
+		NRI.DestroyDescriptor(*backBuffer.colorAttachment);
+	}
+
+	NRI.DestroySwapChain(*m_SwapChain);
+
+	nri::Format swapChainFormat;
+	nri::SwapChainDesc swapChainDesc = {};
+	swapChainDesc.window = window->GetNRIWindow();
+	swapChainDesc.commandQueue = m_CommandQueue;
+	swapChainDesc.format = nri::SwapChainFormat::BT709_G22_8BIT;
+	swapChainDesc.verticalSyncInterval = window->m_VsyncInterval;
+	swapChainDesc.width = static_cast<uint16_t>(width);
+	swapChainDesc.height = static_cast<uint16_t>(height);
+	swapChainDesc.textureNum = SWAP_CHAIN_TEXTURE_NUM;
+	NRI_ABORT_ON_FAILURE(
+		NRI.CreateSwapChain(*m_Device, swapChainDesc, m_SwapChain));
+
+	uint32_t swapChainTextureNum;
+	nri::Texture* const* swapChainTextures =
+		NRI.GetSwapChainTextures(*m_SwapChain, swapChainTextureNum);
+	swapChainFormat = NRI.GetTextureDesc(*swapChainTextures[0]).format;
+
+	for (uint32_t i = 0; i < swapChainTextureNum; i++)
+	{
+		nri::Texture2DViewDesc textureViewDesc = {
+			swapChainTextures[i], nri::Texture2DViewType::COLOR_ATTACHMENT,
+			swapChainFormat};
+
+		nri::Descriptor* colorAttachment;
+		if ((NRI.CreateTexture2DView(textureViewDesc, colorAttachment)) !=
+		    nri::Result::SUCCESS)
+			return false;
+
+		const nova::BackBuffer backBuffer = {colorAttachment,
+		                                     swapChainTextures[i]};
+		window->m_SwapChainBuffers[i] = backBuffer;
+	}
+
+
+}
+
+void Application::framebuffer_size_callback(GLFWwindow* glfwwindow, int width,
+                                            int height)
+{
+	
+	glfwGetFramebufferSize(glfwwindow, &windowWidth, &windowHeight);
+	
 }
