@@ -25,6 +25,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Установка 20-го стандарта
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CPP_RTTI_ENABLED ON)
 
 # Include sub-projects.
 add_subdirectory("vendor")

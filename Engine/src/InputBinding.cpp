@@ -19,7 +19,7 @@ void InputBinding::informSubscribers(InputEvent event) {
         event = InputEvent(event.getSource(), absValue, relValue);
     }
     for (auto &delegate: _subscribers) {
-        delegate(event);
+        delegate(event, _name);
     }
 }
 

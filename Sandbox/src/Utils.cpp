@@ -1,6 +1,7 @@
 #include "Utils.hpp"
 
 #include <cassert>
+#include <cstring>
 #include <cstddef>
 #include <detex.h>
 #include <glm/vec4.hpp>

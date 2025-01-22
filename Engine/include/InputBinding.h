@@ -17,7 +17,7 @@ enum class EventType {
     ENDED
 };
 
-using InputDelegate = entt::delegate<void (InputEvent)>;
+using InputDelegate = entt::delegate<void (InputEvent, std::string)>;
 using InputValueConversionDelegate = entt::delegate<InputValueVariant (InputValueVariant, EventAxes)>;
 
 class  InputBinding {

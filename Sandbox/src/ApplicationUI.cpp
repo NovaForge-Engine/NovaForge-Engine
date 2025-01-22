@@ -1,6 +1,7 @@
 ﻿#include "ApplicationUI.h"
 #include "DockingParams.h"
 #include <filesystem>
+#include <algorithm>
 
 const std::filesystem::path AppState::rootAssetPath = "Assets";
 
