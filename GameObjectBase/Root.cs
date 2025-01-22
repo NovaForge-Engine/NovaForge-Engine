@@ -38,8 +38,13 @@ namespace GameObjectBase
             Console.WriteLine("C# Root Gui Start!");
             Console.WriteLine();
             ImGui.Begin("Hello, World!");
-            ImGui.Text("This is some useful text.");
+            ImGui.Text("Hello imgui from c#.");
             ImGui.End();
+
+            ImGui.Begin("Hello, World!");
+            ImGui.Text("This is some useful text2.");
+            ImGui.End();
+
             Console.WriteLine("C# Root Gui End!");
         }
     }

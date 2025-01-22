@@ -168,7 +168,7 @@ bool Application::Init(int argc, char** argv)
 	}
 	bool result = true;
 
-	result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	//result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 
 	if (!result)
@@ -254,7 +254,7 @@ void Application::Draw()
 		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-		ImGui::DockSpaceOverViewport(mainDockspaceId, viewport);
+		ImGui::DockSpaceOverViewport(viewport);
 		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
 		if (dockingParams.layoutReset) {

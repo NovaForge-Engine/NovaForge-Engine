@@ -20,14 +20,7 @@ target_compile_definitions (detex PRIVATE ${COMPILE_DEFINITIONS})
 set_property (TARGET detex PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(detex INTERFACE ${CMAKE_SOURCE_DIR}/vendor/detex)
 
-# vendor/Imgui
-file (GLOB IMGUI_SOURCE "imgui/*.cpp")
-file (GLOB IMGUI_HEADERS "imgui/*.h")
-source_group ("" FILES ${IMGUI_SOURCE} ${IMGUI_HEADERS})
-add_library (imgui STATIC ${IMGUI_SOURCE} ${IMGUI_HEADERS})
-target_compile_definitions (imgui PRIVATE ${COMPILE_DEFINITIONS})
-set_property (TARGET imgui PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/imgui)
+
 
 # vendor/assimp
 set (ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
@@ -41,12 +34,12 @@ target_include_directories(assimp INTERFACE
 # vendor/spdlog
 add_subdirectory("spdlog")
 set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/spdlog/include)
+target_include_directories(spdlog INTERFACE ${CMAKE_SOURCE_DIR}/vendor/spdlog/include)
 
 # vendor/entt
 add_subdirectory("entt")
 set_property(TARGET EnTT PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/entt/src)
+target_include_directories(spdlog INTERFACE ${CMAKE_SOURCE_DIR}/vendor/entt/src)
 
 # vendor/glm
 add_subdirectory("glm")

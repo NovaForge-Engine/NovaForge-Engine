@@ -52,7 +52,6 @@ target_link_libraries(
     NovaSandbox PUBLIC
     novaengine
     assimp
-    imgui
     NRI
     detex
     spdlog

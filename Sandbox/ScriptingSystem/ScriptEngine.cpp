@@ -10,7 +10,7 @@
 #include <mono/metadata/mono-debug.h>
 #include <mono/metadata/threads.h>
 
-#include <imgui.h>
+#include "../Sandbox/src/imgui.h"
 
 struct ScriptEngineData
 {
