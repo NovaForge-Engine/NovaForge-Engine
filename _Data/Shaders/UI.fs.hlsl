@@ -20,17 +20,17 @@ struct PS_INPUT
 };
 
 NRI_RESOURCE( SamplerState, sampler0, s, 0, 0 );
-NRI_RESOURCE( Texture2D<float>, texture0, t, 0, 0 );
+NRI_RESOURCE( Texture2D, texture0, t, 0, 0 );
 
 float4 main( PS_INPUT input ) : SV_Target
 {
-    float4 color = input.col;
-    color.w *= texture0.Sample( sampler0, input.uv );
+    float4 color = input.col * texture0.Sample( sampler0, input.uv ); 
+    //color.w *= texture0.Sample( sampler0, input.uv );
 
-    if( g_PushConstants.gIsSrgb == 0.0 )
-        color.xyz = Color::FromSrgb( color.xyz );
-
-    color.xyz *= g_PushConstants.gSdrScale;
+    //if( g_PushConstants.gIsSrgb == 0.0 )
+    //    color.xyz = Color::FromSrgb( color.xyz );
+//
+    //color.xyz *= g_PushConstants.gSdrScale;
 
     return color;
 }

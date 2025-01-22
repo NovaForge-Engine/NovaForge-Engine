@@ -364,7 +364,7 @@ void Application::Draw()
 		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
 		{
 			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f,
-			                  true);
+			                  false);
 		}
 		NRI.CmdEndRendering(*commandBuffer);
 
