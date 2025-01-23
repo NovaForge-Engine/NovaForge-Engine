@@ -22,6 +22,9 @@ public:
 	void OnMonoDrawGui();
 	void OnMonoUpdate();
 
+	void ProcessInput(std::string name, int value);
+
+
 private:
 	static ScriptEngine* instance;
 
@@ -31,4 +34,5 @@ private:
 	MonoObject* monoInstance = nullptr;
 	MonoMethod* methodDrawGui = nullptr;
 	MonoMethod* methodUpdate = nullptr;
+	MonoMethod* processUnput = nullptr;
 };

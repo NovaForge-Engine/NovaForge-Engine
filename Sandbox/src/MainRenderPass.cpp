@@ -574,7 +574,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 		(ConstantBufferLayout*)NRI.MapBuffer(*m_Buffers[CONSTANT_BUFFER],
 	                                         frame.constantBufferViewOffset,
 	                                         sizeof(ConstantBufferLayout));
-	spdlog::info("Constant buffer offset {}", frame.constantBufferViewOffset);
+	//spdlog::info("Constant buffer offset {}", frame.constantBufferViewOffset);
 	m_ProjectionMatrix = glm::perspective(
 		glm::radians(90.0f), (float)windowWidth / (float)windowHeight, 0.1f,
 		1000.0f);

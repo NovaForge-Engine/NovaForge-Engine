@@ -27,7 +27,7 @@ namespace GameObjectBase
 
         public static void Update()
         {
-            Console.WriteLine("C# Root Update!");
+            //Console.WriteLine("C# Root Update!");
             _holder.Update();
         }
 
@@ -36,16 +36,21 @@ namespace GameObjectBase
             _holder.FixedUpdate();
         }
 
+        public static void ProcessInput(string name, int button){
+            Console.WriteLine("C# Root Process Input! with " + name + " " + button);
+        }
+
+
         public static void DrawGui()
         {
-            Console.WriteLine("C# Root Gui Start!");
-            Console.WriteLine();
+            //Console.WriteLine("C# Root Gui Start!");
+            //Console.WriteLine();
             ImGui.Begin("Hello, World!");
             ImGui.Text("Hello imgui from c#.");
             ImGui.End();
 
             ImGui.SliderInt("X in c#", ref x, 0, 100);
-            Console.WriteLine("this is x in c#  " +  x);
+            //Console.WriteLine("this is x in c#  " +  x);
 
             ImGui.Begin("Hello, World!");
             ImGui.Text("This is some useful text2.");
@@ -58,7 +63,7 @@ namespace GameObjectBase
 
             ImGui.End();
 
-            Console.WriteLine("C# Root Gui End!");
+            //Console.WriteLine("C# Root Gui End!");
         }
     }
 }

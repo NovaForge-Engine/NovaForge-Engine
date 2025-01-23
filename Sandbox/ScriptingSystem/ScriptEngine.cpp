@@ -139,6 +139,7 @@ void ScriptEngine::InitMono()
 
 	methodUpdate = mono_class_get_method_from_name(monoRoot, "Update", 0);
 	methodDrawGui = mono_class_get_method_from_name(monoRoot, "DrawGui", 0);
+	processUnput = mono_class_get_method_from_name(monoRoot, "ProcessInput", 2);
 }
 
 void ScriptEngine::OnMonoDrawGui()
@@ -149,6 +150,12 @@ void ScriptEngine::OnMonoDrawGui()
 void ScriptEngine::OnMonoUpdate()
 {
 	mono_runtime_invoke(methodUpdate, monoInstance, nullptr, nullptr);
+}
+
+void ScriptEngine::ProcessInput(std::string name, int value)
+{
+	void* params[2] = {mono_string_new(s_Data->AppDomain, name.c_str()),&value};
+	mono_runtime_invoke(processUnput, monoInstance, params, nullptr);
 }
 
 void ScriptEngine::ShutdownMono()

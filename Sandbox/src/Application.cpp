@@ -4,6 +4,36 @@
 
 #include <Extensions/NRIDeviceCreation.h>
 
+
+void helloCallback(NovaEngine::InputEvent event, std::string contextName)
+{
+	NovaEngine::KeyboardSource source = std::get<NovaEngine::KeyboardSource>(event.getSource().getSource());
+	int k = -1;
+	switch (source)
+	{
+		case NovaEngine::KeyboardSource::KEY_W:
+			k = 87;
+			break;
+		case NovaEngine::KeyboardSource::KEY_A:
+			k = 65;
+			break;
+		case NovaEngine::KeyboardSource::KEY_S:
+			k = 83;
+			break;
+		case NovaEngine::KeyboardSource::KEY_D:
+			k = 68;
+			break;
+		default:
+			spdlog::error("Unknown keyboard button which is not mapped inside switch, please fix it");
+			break;
+	}
+	ScriptEngine* scriptEngine = ScriptEngine::Get();
+	scriptEngine->ProcessInput(contextName, k);
+	
+	//spdlog::info("Input event: {} with value {} ", contextName, k);
+}
+
+
 Application::Application()
 	: physicsEngine(PhysicsEngine::Get()), scriptEngine(ScriptEngine::Get())
 {
@@ -211,9 +241,8 @@ bool Application::Init(int argc, char** argv)
 	
 
 	result = mainRenderPass.Init(passParams);
-	spdlog::info("{:p} pointer 1 ", fmt::ptr(&mainRenderPass.outputDesc2));
+
 	appState.outputTexture = mainRenderPass.outputDesc2;
-	spdlog::info("{:p} pointer 2", fmt::ptr(&appState.outputTexture));
 
 	spdlog::info("MainRenderPass initialized: {}", result);
 
@@ -232,6 +261,36 @@ bool Application::Init(int argc, char** argv)
 	physicsEngine->Init();
 
 	scriptEngine->Init();
+
+
+	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON,
+	                              NovaEngine::EventType::STARTED);
+	NovaEngine::InputBinding bind2("helloBind2", NovaEngine::EventAxes::BUTTON,
+	                              NovaEngine::EventType::STARTED);
+	NovaEngine::InputBinding bind3("helloBind3", NovaEngine::EventAxes::BUTTON,
+	                              NovaEngine::EventType::STARTED);
+	NovaEngine::InputBinding bind4("helloBind4", NovaEngine::EventAxes::BUTTON,
+	                              NovaEngine::EventType::STARTED);
+	bind.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});	
+	bind2.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});	
+	bind3.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});	
+	bind4.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
+
+
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind, NovaEngine::KeyboardSource::KEY_A);
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind2, NovaEngine::KeyboardSource::KEY_W);
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind3, NovaEngine::KeyboardSource::KEY_S);
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind4,NovaEngine::KeyboardSource::KEY_D);
+
+
 
 	return true;
 }
@@ -265,7 +324,7 @@ void Application::Update()
 void Application::Draw()
 {
 	const uint32_t bufferedFrameIndex = frameIndex % BUFFERED_FRAME_MAX_NUM;
-	spdlog::info("Drawing frame {}", bufferedFrameIndex);
+	//spdlog::info("Drawing frame {}", bufferedFrameIndex);
 	const nova::Frame& frame = window->GetFrames()[bufferedFrameIndex];
 	nri::CommandBuffer* commandBuffer = frame.commandBuffer;
 
@@ -285,6 +344,16 @@ void Application::Draw()
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 		ImGui::DockSpaceOverViewport(viewport);
+		//FIXME: This is temporary solution to draw a scene
+
+		ImVec2 windowSize = ImGui::GetWindowSize();
+		ImGui::SetWindowPos(ImVec2(0, 0));
+		ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
+		ImGui::Image((ImTextureID)appState.outputTexture,
+		             ImVec2(windowSize.x, windowSize.y), ImVec2(0.0f, 0.0f),
+		             ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
+		             ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
 		/*SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
 		if (dockingParams.layoutReset) {
@@ -335,7 +404,7 @@ void Application::Draw()
 
 	const uint32_t currentTextureIndex =
 		NRI.AcquireNextSwapChainTexture(*m_SwapChain);
-	spdlog::info("Current texture index {}", currentTextureIndex);
+	//spdlog::info("Current texture index {}", currentTextureIndex);
 
 	nova::BackBuffer& backBuffer =
 		window->m_SwapChainBuffers[currentTextureIndex];
