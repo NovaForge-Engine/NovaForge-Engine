@@ -1,6 +1,0 @@
-C:\Engine\NovaForge-Engine\build\Sandbox\Resources\Scripts\ScriptingSandbox.dll
-C:\Engine\NovaForge-Engine\build\Sandbox\Resources\Scripts\ScriptingSandbox.pdb
-C:\Engine\NovaForge-Engine\ScriptingSandbox\obj\Debug\ScriptingSandbox.csproj.AssemblyReference.cache
-C:\Engine\NovaForge-Engine\ScriptingSandbox\obj\Debug\ScriptingSandbox.csproj.CoreCompileInputs.cache
-C:\Engine\NovaForge-Engine\ScriptingSandbox\obj\Debug\ScriptingSandbox.dll
-C:\Engine\NovaForge-Engine\ScriptingSandbox\obj\Debug\ScriptingSandbox.pdb

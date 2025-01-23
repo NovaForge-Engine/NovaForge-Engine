@@ -47,7 +47,8 @@ JPH::uint BroadPhaseLayerInterfaceImpl::GetNumBroadPhaseLayers() const
 JPH::BroadPhaseLayer
 BroadPhaseLayerInterfaceImpl::GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const
 {
-	JPH_ASSERT(inLayer < collisionLayersCount);
+	//TODO: This line except on Release mode
+	/*JPH_ASSERT(inLayer < collisionLayersCount);*/
 	return JPH::BroadPhaseLayer(inLayer);
 }
 
