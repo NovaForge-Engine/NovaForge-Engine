@@ -2,7 +2,11 @@
 
 #include "PhysicsEngine.h"
 
+
+
 #include <NRI.h>
+
+
 
 #include <Extensions/NRIDeviceCreation.h>
 #include <Extensions/NRIHelper.h>
@@ -31,7 +35,7 @@
 
 
 #include "ModelLoader.h"
-#include "Scene.hpp"
+#include "MeshRegistry.hpp"
 
 
 
@@ -39,6 +43,8 @@
 constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
+
+static int windowWidth, windowHeight;
 
 class Application
 {
@@ -60,6 +66,11 @@ public:
 
 	bool shouldClose = false;
 
+
+
+	bool ResizeSwapChain(int width,int height);
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 private:
 	nova::NovaWindow* window;
 
@@ -67,7 +78,13 @@ private:
 	UIRenderPass uiRenderPass;
 
 	nova::ModelLoader loader;
-	nova::Scene scene;
+	nova::MeshRegistry scene;
+
+
+	nri::Descriptor* sceneTextureDesc = nullptr;
+	nri::Texture* sceneTexture = nullptr;
+
+	nri::Descriptor* sceneStorageTexture = nullptr;
 
 	
 	AppState appState;

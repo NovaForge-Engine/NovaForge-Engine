@@ -4,6 +4,7 @@
 
 #include "include/GamepadManager.h"
 #include <iostream>
+#include "spdlog/spdlog.h"
 
 namespace NovaEngine {
 

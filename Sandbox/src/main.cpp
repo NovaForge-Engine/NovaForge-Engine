@@ -1,6 +1,8 @@
 
+
 #include "Application.h"
 
+#define SPDLOG_FMT_EXTERNAL
 #include <NRI.h>
 
 int main(int argc, char** argv) {

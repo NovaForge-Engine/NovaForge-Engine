@@ -82,7 +82,7 @@ bool NovaWindow::Initialize(int width, int height, std::string api)
 	glfwWindowHint(GLFW_POSITION_Y, y);
 
 	char windowName[256];
-	snprintf(windowName, sizeof(windowName), "%s [%s]", "MyBestRender",
+	snprintf(windowName, sizeof(windowName), "%s [%s]", "NovaForge editor",
 	         api.c_str());
 
 	m_Window = glfwCreateWindow(m_RenderWindowWidth, m_RenderWindowHeight,

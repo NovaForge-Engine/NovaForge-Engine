@@ -258,7 +258,7 @@ static void PostProcessTexture(const std::string& name, Texture& texture,
 bool LoadTexture(const std::string& path, Texture& texture,
                  bool computeAvgColorAndAlphaMode)
 {
-	printf("Loading texture '%s'...\n", GetFileName(path));
+	spdlog::info("Loading texture {} ", GetFileName(path));
 
 	detexTexture** dTexture = nullptr;
 	int mipNum = 0;

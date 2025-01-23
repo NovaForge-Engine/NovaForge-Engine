@@ -1,6 +1,6 @@
 #include <utility>
 #include <cstddef>
-
+#include "spdlog/spdlog.h"
 #include "include/InputManager.h"
 #include <iostream>
 

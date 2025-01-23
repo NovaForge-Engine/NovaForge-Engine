@@ -12,6 +12,8 @@
 #include <array>
 #include <Extensions/NRIHelper.h>
 #include <detex.h>
+#include <spdlog/spdlog.h>
+
 struct Texture;
 
 typedef std::vector<std::vector<uint8_t>> ShaderCodeStorage;
@@ -49,6 +51,8 @@ template<typename T, typename U> constexpr uint32_t GetOffsetOf(U T::* member)
 {
 	return (uint32_t)((char*)&((T*)nullptr->*member) - (char*)nullptr);
 }
+
+
 
 template<typename T, uint32_t N> constexpr uint32_t GetCountOf(T const (&)[N])
 {
@@ -233,5 +237,27 @@ struct Mesh
 	uint32_t indexOffset;
 	uint32_t indexNum;
 	uint32_t vertexNum;
+	uint32_t materialNum;
 };
 
+enum EMaterial
+{
+	DIFFUSE,AMBIENT,HEIGHT,OPACITY,UNKNOWN = -1
+};
+
+enum ESTATIC_TEXTURES
+{
+	BLACK,
+	WHITE,
+	FLATNORMAL,
+	INVALID
+};
+
+
+struct Material 
+{
+	uint32_t diffuseTexIndex = -1;
+	uint32_t ambientTexIndex = -1;
+	uint32_t heightTexIndex = -1;
+	uint32_t OpacityTexIndex = -1;
+};

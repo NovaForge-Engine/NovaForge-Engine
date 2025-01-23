@@ -6,17 +6,19 @@
 namespace nova
 {
 
-	class Scene
+	class MeshRegistry
 	{
 	public:
-		Scene();
-		~Scene();
+		MeshRegistry();
+		~MeshRegistry();
 
 	public:
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		std::vector<Texture*> textures;
 		std::vector<Mesh> meshes;
+
+		std::vector<Material> materials_;
 	};
 
 } // namespace nova

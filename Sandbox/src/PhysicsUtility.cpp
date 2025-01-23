@@ -175,6 +175,7 @@ void DebugRenderer::DrawGeometry(JPH::RMat44Arg inModelMatrix,
                                  ECullMode inCullMode, ECastShadow inCastShadow,
                                  EDrawMode inDrawMode)
 {
+
 }
 
 void DebugRenderer::DrawText3D(JPH::RVec3Arg inPosition,

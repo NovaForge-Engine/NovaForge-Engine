@@ -13,10 +13,10 @@
 
 #include "fmath/f16.hpp"
 #include "Packing.h"
-#include "Scene.hpp"
+#include "MeshRegistry.hpp"
 
 #include <spdlog/spdlog.h>
-
+#define SPDLOG_FMT_EXTERNAL
 
 namespace nova
 {
@@ -27,16 +27,18 @@ namespace nova
 		ModelLoader();
 		~ModelLoader();
 
-		bool LoadModel(nova::Scene& scene, std::string filename);
-		void processNode(nova::Scene& scene, aiNode* node,
+		bool LoadModel(nova::MeshRegistry& scene, std::string filename);
+		void processNode(nova::MeshRegistry& scene, aiNode* node,
 		                 const aiScene* assimp_scene);
-		bool processMesh(nova::Scene& scene, aiMesh* mesh,
+		bool processMesh(nova::MeshRegistry& scene, aiMesh* mesh,
 		                 const aiScene* assimp_scene);
 
-		std::vector<Texture> loadMaterialTextures(aiMaterial* mat,
+		bool loadMaterialTextures(aiMaterial* mat,
 		                                          aiTextureType type,
 		                                          std::string typeName,
-		                                          const aiScene* assimp_scene);
+		                                          const aiScene* assimp_scene,unsigned int materialIndex);
+
+		uint32_t materialOffset=0;
 
 		std::vector<Mesh> meshes_;
 		std::vector<std::string> texturePaths;
@@ -44,6 +46,10 @@ namespace nova
 		std::string directory_;
 
 		std::vector<Texture*> textures_loaded_;
+
+		int last_material_index = 0;
+
+		std::vector<Material> materials_;
 	};
 
 } // namespace nova

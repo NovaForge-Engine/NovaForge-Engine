@@ -43,7 +43,10 @@ bool Application::Init(int argc, char** argv)
 	window = new nova::NovaWindow();
 
 	window->Initialize(1280, 720, cmdLine.get<std::string>("api"));
+	windowWidth = window->m_RenderWindowWidth;
+	windowHeight = window->m_RenderWindowHeight;
 
+    glfwSetWindowSizeCallback(window->GetGLFWWindow(),this->framebuffer_size_callback);
 	nri::AdapterDesc bestAdapterDesc = {};
 	uint32_t adapterDecscNum = 1;
 	if (nriEnumerateAdapters(&bestAdapterDesc, adapterDecscNum) !=
@@ -154,6 +157,7 @@ bool Application::Init(int argc, char** argv)
 		}
 	}
 
+
 	for (nova::Frame& frame : window->GetFrames())
 	{
 		if (NRI.CreateCommandAllocator(*m_CommandQueue,
@@ -173,20 +177,43 @@ bool Application::Init(int argc, char** argv)
 
 	if (!result)
 	{
-		spdlog::error("Failed to load Sponza model");
+		spdlog::error("Failed to load any model in pool");
 		return false;
 	}
 
-	MainRenderPass::InitParams passParams = {.NRI = NRI,
-	                                         .helperInterface = NRI,
-	                                         .m_Device = *m_Device,
-	                                         .renderTargetFormat =
-	                                             swapChainFormat,
-	                                         .commandQueue = m_CommandQueue,
-	                                         .scene = &scene};
-	result = mainRenderPass.Init(passParams);
+	
 
-	appState.outputTexture = mainRenderPass.m_TextureShaderResource;
+	{
+		nri::TextureDesc textureDesc = {};
+		textureDesc.type = nri::TextureType::TEXTURE_2D;
+		textureDesc.usage = nri::TextureUsageBits::COLOR_ATTACHMENT | nri::TextureUsageBits::SHADER_RESOURCE;
+		textureDesc.format = swapChainFormat;
+		textureDesc.width = static_cast<uint16_t>(window->m_RenderOutputWidth);
+		textureDesc.height = static_cast<uint16_t>(window->m_RenderOutputHeight);
+		textureDesc.mipNum = 1;
+		textureDesc.layerNum = 0;
+		NRI.CreateTexture(*m_Device, textureDesc, sceneTexture);
+	}
+
+
+
+	MainRenderPass::InitParams passParams = {
+		.NRI = NRI,
+		.helperInterface = NRI,
+		.m_Device = *m_Device,
+		.renderTargetFormat = swapChainFormat,
+		.commandQueue = m_CommandQueue,
+		.scene = &scene,
+		.outputTexture = sceneTexture,
+		.outputTextureDesc = sceneTextureDesc,
+
+	};								
+	
+
+	result = mainRenderPass.Init(passParams);
+	spdlog::info("{:p} pointer 1 ", fmt::ptr(&mainRenderPass.outputDesc2));
+	appState.outputTexture = mainRenderPass.outputDesc2;
+	spdlog::info("{:p} pointer 2", fmt::ptr(&appState.outputTexture));
 
 	spdlog::info("MainRenderPass initialized: {}", result);
 
@@ -224,6 +251,9 @@ void Application::Update()
 	{
 		shouldClose = false;
 	}
+	if (window->m_RenderWindowWidth != windowWidth ||
+	    window->m_RenderWindowHeight != windowHeight)
+		ResizeSwapChain(windowWidth, windowHeight);
 
 	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else
 	//is updating above
@@ -313,20 +343,10 @@ void Application::Draw()
 		mainRenderPass.Draw(NRI, NRI, NRI, NRI, *commandBuffer, frame,
 		                    backBuffer, bufferedFrameIndex,
 		                    window->m_RenderWindowWidth,
-		                    window->m_RenderWindowHeight);
+		                    window->m_RenderWindowHeight,sceneTextureDesc,sceneTexture);
 	}
 
 	{ // UI
-		nri::AttachmentsDesc attachmentsDesc = {};
-		attachmentsDesc.colorNum = 1;
-		attachmentsDesc.colors = &backBuffer.colorAttachment;
-
-		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
-		{
-			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f,
-			                  true);
-		}
-		NRI.CmdEndRendering(*commandBuffer);
 
 		nri::TextureBarrierDesc textureBarrierDescs = {};
 		textureBarrierDescs.texture = backBuffer.texture;
@@ -338,6 +358,21 @@ void Application::Draw()
 		nri::BarrierGroupDesc barrierGroupDesc = {};
 		barrierGroupDesc.textureNum = 1;
 		barrierGroupDesc.textures = &textureBarrierDescs;
+
+		NRI.CmdBarrier(*commandBuffer, barrierGroupDesc);
+
+		nri::AttachmentsDesc attachmentsDesc = {};
+		attachmentsDesc.colorNum = 1;
+		attachmentsDesc.colors = &backBuffer.colorAttachment;
+
+		NRI.CmdBeginRendering(*commandBuffer, attachmentsDesc);
+		{
+			uiRenderPass.Draw(NRI, NRI, *m_Streamer, *commandBuffer, 1.0f,
+			                  false);
+		}
+		NRI.CmdEndRendering(*commandBuffer);
+
+	
 
 		textureBarrierDescs.before = textureBarrierDescs.after;
 		textureBarrierDescs.after = {nri::AccessBits::UNKNOWN,
@@ -394,4 +429,59 @@ void Application::ReadCmdLineDefault(cmdline::parser& cmdLine)
 {
 	m_DebugAPI = cmdLine.exist("debugAPI");
 	m_DebugNRI = cmdLine.exist("debugNRI");
+}
+
+bool Application::ResizeSwapChain(int width, int height)
+{
+	NRI.WaitForIdle(*m_CommandQueue);
+
+	for(nova::BackBuffer& backBuffer : window->m_SwapChainBuffers)
+	{
+		NRI.DestroyDescriptor(*backBuffer.colorAttachment);
+	}
+
+	NRI.DestroySwapChain(*m_SwapChain);
+
+	nri::Format swapChainFormat;
+	nri::SwapChainDesc swapChainDesc = {};
+	swapChainDesc.window = window->GetNRIWindow();
+	swapChainDesc.commandQueue = m_CommandQueue;
+	swapChainDesc.format = nri::SwapChainFormat::BT709_G22_8BIT;
+	swapChainDesc.verticalSyncInterval = window->m_VsyncInterval;
+	swapChainDesc.width = static_cast<uint16_t>(width);
+	swapChainDesc.height = static_cast<uint16_t>(height);
+	swapChainDesc.textureNum = SWAP_CHAIN_TEXTURE_NUM;
+	NRI_ABORT_ON_FAILURE(
+		NRI.CreateSwapChain(*m_Device, swapChainDesc, m_SwapChain));
+
+	uint32_t swapChainTextureNum;
+	nri::Texture* const* swapChainTextures =
+		NRI.GetSwapChainTextures(*m_SwapChain, swapChainTextureNum);
+	swapChainFormat = NRI.GetTextureDesc(*swapChainTextures[0]).format;
+
+	for (uint32_t i = 0; i < swapChainTextureNum; i++)
+	{
+		nri::Texture2DViewDesc textureViewDesc = {
+			swapChainTextures[i], nri::Texture2DViewType::COLOR_ATTACHMENT,
+			swapChainFormat};
+
+		nri::Descriptor* colorAttachment;
+		if ((NRI.CreateTexture2DView(textureViewDesc, colorAttachment)) !=
+		    nri::Result::SUCCESS)
+			return false;
+
+		const nova::BackBuffer backBuffer = {colorAttachment,
+		                                     swapChainTextures[i]};
+		window->m_SwapChainBuffers[i] = backBuffer;
+	}
+
+
+}
+
+void Application::framebuffer_size_callback(GLFWwindow* glfwwindow, int width,
+                                            int height)
+{
+	
+	glfwGetFramebufferSize(glfwwindow, &windowWidth, &windowHeight);
+	
 }

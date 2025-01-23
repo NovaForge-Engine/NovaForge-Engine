@@ -1,6 +1,7 @@
 // © 2021 NVIDIA Corporation
 
 #include "NRICompatibility.hlsli"
+#include "ml.hlsli"
 
 NRI_RESOURCE( cbuffer, CommonConstants, b, 0, 0 )
 {
@@ -15,8 +16,11 @@ struct PushConstants
 
 NRI_ROOT_CONSTANTS( PushConstants, g_PushConstants, 1, 0 );
 
-NRI_RESOURCE( Texture2D, g_DiffuseTexture, t, 0, 1 );
-NRI_RESOURCE( SamplerState, g_Sampler, s, 0, 1 );
+NRI_RESOURCE( Texture2D, DiffuseMap, t, 0, 1 );
+NRI_RESOURCE( Texture2D, SpecularMap, t, 1, 1 );
+NRI_RESOURCE( Texture2D, NormalMap, t, 2, 1 );
+NRI_RESOURCE( Texture2D, EmissiveMap, t, 3, 1 );
+NRI_RESOURCE( SamplerState, AnisotropicSampler, s, 0, 0 );
 
 struct Attributes
 {
@@ -29,11 +33,13 @@ struct Attributes
 [earlydepthstencil]
 float4 main( in Attributes input ) : SV_Target
 {
+    const float exposure = 0.00025;
     float4 output;
     float2 uv = float2( input.Normal.w, input.View.w );
-    output.xyz = g_DiffuseTexture.Sample( g_Sampler, uv).xyz;
-    output.w = g_PushConstants.transparency;
-    //output = input.Normal;
 
-    return output;
+    float4 diffuse =  SpecularMap.Sample( AnisotropicSampler, uv);
+    output = diffuse;
+    //output.xyz = Color::HdrToLinear(output.xyz * exposure);
+
+    return float4(output.xyz,1.0f);
 }
