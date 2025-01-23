@@ -4,7 +4,8 @@
 
 #include <Extensions/NRIDeviceCreation.h>
 
-Application::Application() : physicsEngine(PhysicsEngine::Get())
+Application::Application()
+	: physicsEngine(PhysicsEngine::Get()), scriptEngine(ScriptEngine::Get())
 {
 }
 
@@ -167,7 +168,7 @@ bool Application::Init(int argc, char** argv)
 	}
 	bool result = true;
 
-	result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
+	//result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 
 	if (!result)
@@ -203,9 +204,7 @@ bool Application::Init(int argc, char** argv)
 
 	physicsEngine->Init();
 
-	// loader.LoadModel(GetFullPath("PZ18.ma", DataFolder::SCENES));
-	// loader.LoadModel(GetFullPath("PZ19.ma", DataFolder::SCENES));
-	// loader.LoadModel(GetFullPath("fhead.stl", DataFolder::SCENES));
+	scriptEngine->Init();
 
 	return true;
 }
@@ -229,6 +228,8 @@ void Application::Update()
 	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else
 	//is updating above
 	physicsEngine->Update();
+	
+	scriptEngine->OnMonoUpdate();
 }
 
 void Application::Draw()
@@ -246,13 +247,15 @@ void Application::Draw()
 
 	uiRenderPass.BeginUI();
 	{
+		scriptEngine->OnMonoDrawGui();
+
 		//(@Tenzy21)TODO: Add ImGuiWindowFlags_MenuBar flag into main window
 		static bool pOpen = true;
 		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-		ImGui::DockSpaceOverViewport(mainDockspaceId, viewport);
-		SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
+		ImGui::DockSpaceOverViewport(viewport);
+		/*SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
 		if (dockingParams.layoutReset) {
 			dockingParams.layoutReset = false;
@@ -290,10 +293,11 @@ void Application::Draw()
 				dockableWindow.GuiFunction();
 			}
 			ImGui::End();
-		}
+		}*/
 	}
 
 	uiRenderPass.EndUI(NRI, *m_Streamer, NRI, NRI, m_CommandQueue);
+
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);
 
 	mainRenderPass.PrepareFrame();

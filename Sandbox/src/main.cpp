@@ -3,10 +3,9 @@
 
 #include <NRI.h>
 
-
 int main(int argc, char** argv) {
-	Application app;
 
+	Application app;
 	app.shouldClose = app.Init(argc, argv);
 
 	spdlog::info("Application started with startup {}", app.shouldClose);

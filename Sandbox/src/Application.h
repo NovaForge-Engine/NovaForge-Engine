@@ -24,6 +24,8 @@
 
 #include "Settings.h"
 
+#include "ScriptingSystem/ScriptEngine.h"
+
 
 #include "CmdLine.h"
 
@@ -99,6 +101,8 @@ public:
 
 private:
 	PhysicsEngine* physicsEngine;
+	ScriptEngine* scriptEngine;
+
 
 #pragma endregion Physics
 };

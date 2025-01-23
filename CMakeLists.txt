@@ -4,8 +4,6 @@ project(novaforge)
 
 
 include(CMakePrintHelpers)
-
-set(CMAKE_PREFIX_PATH "$ENV{VCPKG_ROOT}")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if (MSVC)

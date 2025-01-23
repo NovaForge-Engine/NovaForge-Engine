@@ -20,6 +20,9 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "vendor/mono"]
+	path = vendor/mono
+	url = https://gitlab.winehq.org/mono/mono
 [submodule "vendor/joltphysics"]
 	path = vendor/joltphysics
 	url = https://github.com/jrouwe/JoltPhysics

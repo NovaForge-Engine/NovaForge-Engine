@@ -36,7 +36,7 @@ add_library(novaengine SHARED ${SRCFILES})
 target_link_libraries(
 	novaengine 
 	assimp
-	imgui
+	spdlog
 	glfw
 	EnTT
 	glm

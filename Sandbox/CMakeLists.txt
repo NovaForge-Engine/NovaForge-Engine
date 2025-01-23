@@ -9,7 +9,6 @@ STRING(REGEX REPLACE "[/\\]+$" "" CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURC
 include_directories(include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
@@ -20,6 +19,9 @@ file(GLOB_RECURSE SRCFILES
 	./*.cxx;
 	./*.h;
 	./*.hpp;
+    ScriptingSystem/*.cpp
+    ScriptingSystem/*.hpp
+    ScriptingSystem/*.h
 )
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SRCFILES})
@@ -44,19 +46,17 @@ set_target_properties(
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/build/exec/debug"
 )
 
-
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(
     NovaSandbox PUBLIC
     novaengine
     assimp
-    imgui
     NRI
     detex
     spdlog
     glfw
+    monosgen
     glm
     Jolt
     magic_enum

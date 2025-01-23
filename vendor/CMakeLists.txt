@@ -20,14 +20,7 @@ target_compile_definitions (detex PRIVATE ${COMPILE_DEFINITIONS})
 set_property (TARGET detex PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(detex INTERFACE ${CMAKE_SOURCE_DIR}/vendor/detex)
 
-# vendor/Imgui
-file (GLOB IMGUI_SOURCE "imgui/*.cpp")
-file (GLOB IMGUI_HEADERS "imgui/*.h")
-source_group ("" FILES ${IMGUI_SOURCE} ${IMGUI_HEADERS})
-add_library (imgui STATIC ${IMGUI_SOURCE} ${IMGUI_HEADERS})
-target_compile_definitions (imgui PRIVATE ${COMPILE_DEFINITIONS})
-set_property (TARGET imgui PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/imgui)
+
 
 # vendor/assimp
 set (ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
@@ -41,17 +34,36 @@ target_include_directories(assimp INTERFACE
 # vendor/spdlog
 add_subdirectory("spdlog")
 set_property(TARGET spdlog PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/spdlog/include)
+target_include_directories(spdlog INTERFACE ${CMAKE_SOURCE_DIR}/vendor/spdlog/include)
 
 # vendor/entt
 add_subdirectory("entt")
 set_property(TARGET EnTT PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
-target_include_directories(imgui INTERFACE ${CMAKE_SOURCE_DIR}/vendor/entt/src)
+target_include_directories(spdlog INTERFACE ${CMAKE_SOURCE_DIR}/vendor/entt/src)
 
 # vendor/glm
 add_subdirectory("glm")
 set_property (TARGET glm PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 target_include_directories(glm INTERFACE ${CMAKE_SOURCE_DIR}/vendor/glm)
+
+# vendor/mono
+
+# add libs based on what we have after build
+# it is impied that you built mono in mono/build
+# TODO: change this for the actual folder where mono is built on win32 with a VS solution
+if(CMAKE_HOST_LINUX)
+    add_library(monosgen SHARED IMPORTED GLOBAL)
+    set_target_properties(monosgen PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/vendor/mono/build/lib/libmonosgen-2.0.so.1.0.0"
+    )
+    target_include_directories(monosgen INTERFACE "${CMAKE_SOURCE_DIR}/vendor/mono/build/include/mono-2.0")
+elseif(CMAKE_HOST_WIN32)
+    add_library(monosgen SHARED IMPORTED GLOBAL)
+    set_target_properties(monosgen PROPERTIES
+	    IMPORTED_IMPLIB "${CMAKE_SOURCE_DIR}/vendor/mono/build/bin/mono-2.0-sgen.lib"
+    )
+    target_include_directories(monosgen INTERFACE "${CMAKE_SOURCE_DIR}/vendor/mono/build/include/")
+endif()
 
 # vendor/JoltPhysics
 set(BUILD_SHARED_LIBS ON)
@@ -71,5 +83,3 @@ set_property (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "${PROJ
 set_property (TARGET zlibstatic PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 #set_property (TARGET unit PROPERTY FOLDER "${PROJECT_FOLDER}/vendor")
 endif()
-
-
