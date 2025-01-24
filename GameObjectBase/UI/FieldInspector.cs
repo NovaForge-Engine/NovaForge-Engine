@@ -15,37 +15,30 @@ namespace GameObjectBase.UI
 {
     internal class FieldInspector
     {
-
+        private static string _scriptFilter = "";
         public void Render(GameObject selected)
         {
-            if(selected == null) {
+            if(selected == null) 
+            {
                 ImGui.Begin("Property window");
                 ImGui.Text("No object selected");
                 ImGui.End();
                 return;
             }
+
             ImGui.Begin("Property window");
+
             var name = selected.NameRef;
             ImGui.InputText("Name", ref name, 30);
+            selected.SetName(name);
 
             RenderTransform(selected);
 
-            if(ImGui.Button("Add transform"))
+            var assemblies = new List<Assembly>
             {
-                TransformComponent trans = new TransformComponent();
-                selected.AddComponent(trans);
-            }
-
-            var assemblies = new Assembly[]
-           {
                 Assembly.Load("GameObjectBase"),
-                Assembly.LoadFrom("Resources\\Scripts\\GameObjectBase.dll"),
-           };
+            };
 
-            Console.WriteLine(System.AppDomain.CurrentDomain.BaseDirectory);
-            Console.WriteLine(System.Environment.CurrentDirectory);
-            Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
-            Console.WriteLine(Environment.CurrentDirectory);
             var derivedTypes = new List<Type>();
 
             foreach (var assembly in assemblies)
@@ -53,11 +46,10 @@ namespace GameObjectBase.UI
                 try
                 {
                     var types = assembly.GetTypes();
-                    Console.WriteLine(types);
                     derivedTypes.AddRange(types.Where(t =>
-                        t.IsClass &&
-                        !t.IsAbstract &&
-                        t.IsSubclassOf(typeof(Component))));
+                                t.IsClass &&
+                                !t.IsAbstract &&
+                                t.IsSubclassOf(typeof(Component))));
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
@@ -68,10 +60,40 @@ namespace GameObjectBase.UI
                 }
             }
 
+            if (ImGui.Button("Attach Script"))
+                ImGui.OpenPopup("SelectScriptPopup");
+
+            var comps = selected.GetComponents();
+
+            if (ImGui.BeginPopup("SelectScriptPopup"))
+            {
+                ImGui.InputText("Search", ref _scriptFilter, 256);
+
+                ImGui.Separator();
+                foreach (var option in derivedTypes)
+                {
+
+                    if (string.IsNullOrEmpty(_scriptFilter) || option.Name.Contains(_scriptFilter))
+                    {
+                        if (ImGui.Selectable(option.Name))
+                        {
+                            //ConstructorInfo ctor = option.GetConstructor(new typeof(option)[]);
+                            var component = Activator.CreateInstance(option) as Component;
+                            selected.AddComponent(component);
+
+
+                            _scriptFilter = "";
+                            ImGui.CloseCurrentPopup();
+                        }
+                    }
+                }
+
+                ImGui.EndPopup();
+            }
 
 
 
-            ImGui.End();
+                ImGui.End();
         }
 
 
@@ -83,11 +105,18 @@ namespace GameObjectBase.UI
             SharpDX.Vector3 scale = new SharpDX.Vector3(component.Scale.x, component.Scale.y, component.Scale.z);
             SharpDX.Vector4 rot = new SharpDX.Vector4(component.Rotation.x, component.Rotation.y, component.Rotation.z, component.Rotation.w);
 
+        
+
             ImGui.Separator();
-            ImGui.InputFloat3("Position",ref pos);
-            ImGui.InputFloat4("Rotation", ref rot);
+            ImGui.InputFloat3("Position",ref pos); 
+            ImGui.SliderFloat4("Rotation", ref rot,0.0f,1.0f);
             ImGui.InputFloat3("Scale", ref scale);
 
+            SharpDX.Quaternion q = new SharpDX.Quaternion(rot.X, rot.Y, rot.Z, rot.W);
+            q.Normalize();
+            component.SetPosition(MathTypes.toGLM(pos));
+            component.SetRotation(MathTypes.toGLM(q));
+            component.SetScale(MathTypes.toGLM(scale));
         }
 
     }
