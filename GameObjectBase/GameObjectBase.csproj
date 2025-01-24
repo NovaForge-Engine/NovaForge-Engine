@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GlmSharp, Version=0.9.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\GlmSharp.0.9.8\lib\Net45\GlmSharp.dll</HintPath>
+    </Reference>
     <Reference Include="ImGui.NET, Version=1.88.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\Scripts\ImGui.NET.dll</HintPath>
@@ -76,6 +79,7 @@
     <Compile Include="Agents\IAgentContext.cs" />
     <Compile Include="Agents\IPerceptionSensor.cs" />
     <Compile Include="Agents\IUpdatable.cs" />
+    <Compile Include="Attributes.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Director\Aggregators\Aggregator.cs" />
     <Compile Include="Director\Buckets\Bucket.cs" />
@@ -88,6 +92,7 @@
     <Compile Include="Director\Scorers\Consideration.cs" />
     <Compile Include="Director\Scorers\GroupScorer.cs" />
     <Compile Include="Director\UtilityDirector.cs" />
+    <Compile Include="GameComponents\TransformComponent.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="GameObjectsExtensions.cs" />
     <Compile Include="Memory\Blackboard.cs" />
@@ -97,6 +102,8 @@
     <Compile Include="ObjectsHolder.cs" />
     <Compile Include="Root.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="UI\FieldInspector.cs" />
+    <Compile Include="UI\SceneTreeView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

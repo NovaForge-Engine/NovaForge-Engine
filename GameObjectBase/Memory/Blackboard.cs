@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace InteractableGroupsAi.Memory
 {
     public class BlackboardEntry<T>

@@ -26,12 +26,14 @@ namespace GameObjectsBase
             _name = name;
         }
 
+        public ref string NameRef => ref _name ;
+
         public void OnEnable() => _components.ForEach(x => x.OnEnable());
         public void OnDisable() => _components.ForEach(x => x.OnDisable());
 
         public void Start() => _components.ForEach(x => x.Start());
         public void Update() {
-            Console.WriteLine("Update object with id " +  _id.Value);
+            //Console.WriteLine("Update object with id " +  _id.Value);
             _components.ForEach(x => x.Update()); 
         }
         public void FixedUpdate() => _components.ForEach(x => x.FixedUpdate());

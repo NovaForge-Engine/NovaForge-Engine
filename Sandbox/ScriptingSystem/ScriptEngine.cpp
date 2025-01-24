@@ -110,29 +110,22 @@ void ScriptEngine::InitMono()
 
 	MonoDomain* rootDomain = mono_jit_init("NovaJITRuntime");
 	assert(rootDomain != nullptr);
-
 	// Store the root domain pointer
 	s_Data->RootDomain = rootDomain;
 
     s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("NovaScriptRuntime"), nullptr);
 	mono_domain_set(s_Data->AppDomain, true);
-
 	s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/GameObjectBase.dll");
 	PrintAssemblyTypes(s_Data->CoreAssembly);
-
 	MonoImage* assemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 	MonoClass* monoRoot = mono_class_from_name(assemblyImage, "GameObjectBase", "Root");
-
 	monoInstance = mono_object_new(s_Data->AppDomain, monoRoot);
 
 	void* cntx = ImGui::GetCurrentContext();
-
 	ImGuiMemAllocFunc allocFunc = nullptr;
 	ImGuiMemFreeFunc freeFunc = nullptr;
 	void* userData = nullptr;
-
 	ImGui::GetAllocatorFunctions(&allocFunc, &freeFunc, &userData);
-
 	MonoMethod* monoRootInitialize = mono_class_get_method_from_name(monoRoot, "Initialize", 3);
 	void* params[3] = {&cntx, &allocFunc, &freeFunc};
 	mono_runtime_invoke(monoRootInitialize, monoInstance, params, nullptr);
@@ -162,4 +155,6 @@ void ScriptEngine::ShutdownMono()
 {
 	s_Data->AppDomain = nullptr;
 	s_Data->RootDomain = nullptr;
+
+
 }

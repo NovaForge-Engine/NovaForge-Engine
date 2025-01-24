@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Xml.Linq;
 
 namespace GameObjectsBase
@@ -15,6 +16,11 @@ namespace GameObjectsBase
         public Action<GameObject> OnObjectAdd;
         public Action<GameObject> OnObjectRemove;
         public Action<GameObject> OnObjectUpdate;
+
+        public List<GameObject> GetAllGameObjects()
+        {
+            return _objects;
+        }
 
         public void Update()
         {
@@ -88,7 +94,7 @@ namespace GameObjectsBase
         public void AddNewObject()
         {
             _lastObjectId = _lastObjectId.Next();
-            GameObject obj = new GameObject(_lastObjectId, this, NewGameObjectName);
+            GameObject obj = new GameObject(_lastObjectId, this, NewGameObjectName + _lastObjectId.Value);
 
             _objects.Add(obj);
 

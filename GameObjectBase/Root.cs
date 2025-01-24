@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImGuiNET;
 using System.Numerics;
+using GameObjectBase.UI;
 
 namespace GameObjectBase
 {
@@ -14,20 +15,30 @@ namespace GameObjectBase
     public static class Root
     {
         static int x;
+
+        private static SceneTreeView _view;
         private static ObjectsHolder _holder;
+        private static FieldInspector _fieldInspector;
+
 
         public static void Initialize(IntPtr context, IntPtr alloc, IntPtr free)
         {
             Console.WriteLine("C# Root Constructor!");
             _holder = new ObjectsHolder();
+            _view = new SceneTreeView();
+            _fieldInspector = new FieldInspector();
 
             ImGui.SetCurrentContext(context);
             ImGui.SetAllocatorFunctions(alloc, free);
+            Console.WriteLine("C# Root Constructor!");
         }
+
+       
 
         public static void Update()
         {
-            //Console.WriteLine("C# Root Update!");
+
+           // Console.WriteLine("C# Root Update!");
             _holder.Update();
         }
 
@@ -44,13 +55,13 @@ namespace GameObjectBase
         public static void DrawGui()
         {
             //Console.WriteLine("C# Root Gui Start!");
-            //Console.WriteLine();
+           // Console.WriteLine();
             ImGui.Begin("Hello, World!");
             ImGui.Text("Hello imgui from c#.");
             ImGui.End();
 
             ImGui.SliderInt("X in c#", ref x, 0, 100);
-            //Console.WriteLine("this is x in c#  " +  x);
+           //Console.WriteLine("this is x in c#  " + x);
 
             ImGui.Begin("Hello, World!");
             ImGui.Text("This is some useful text2.");
@@ -63,7 +74,20 @@ namespace GameObjectBase
 
             ImGui.End();
 
-            //Console.WriteLine("C# Root Gui End!");
+            _view.Render();
+            _fieldInspector.Render(_view.SelectedObject);
+
+           // Console.WriteLine("C# Root Gui End!");
         }
+
+
+
+        public static List<GameObject> getAllGameObjects() => _holder.GetAllGameObjects();
     }
+
+   
+   
+    
+
+     
 }

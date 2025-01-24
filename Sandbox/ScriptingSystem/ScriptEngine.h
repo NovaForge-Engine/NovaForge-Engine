@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-
+#include <spdlog/spdlog.h>
 extern "C"
 {
 	typedef struct _MonoClass MonoClass;
