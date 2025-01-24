@@ -37,7 +37,7 @@ void helloCallback(NovaEngine::InputEvent event, std::string contextName)
 void mouseRelativeCallback(NovaEngine::InputEvent event, std::string contextName)
 {
 	glm::vec2 pos = std::get<glm::vec2>(event.getRelative());
-	spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
+	//spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
 
 
 
@@ -47,7 +47,7 @@ void mouseAbsoluteCallback(NovaEngine::InputEvent event,
                            std::string contextName)
 {
 	glm::vec2 pos = std::get<glm::vec2>(event.getAbsolute());
-	spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
+	//spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
 }
 
 void mouseButtonCallback(NovaEngine::InputEvent event,
@@ -70,7 +70,7 @@ void mouseButtonCallback(NovaEngine::InputEvent event,
 			spdlog::error("Unknown mouse button which is not mapped inside switch, please fix it");
 			break;
 	}
-	spdlog::info("Mouse event: {} with value {} ", contextName, k);
+	//spdlog::info("Mouse event: {} with value {} ", contextName, k);
 }
 
 Application::Application()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace GameObjectsBase
 {
@@ -8,7 +9,10 @@ namespace GameObjectsBase
     {
         private ObjectId _id;
         private List<Component> _components = new List<Component>();
+
+        private GameObject _parent = null;
         private List<GameObject> _children = new List<GameObject>();
+
         private bool _isActive;
         private string _name = string.Empty;
 
@@ -18,6 +22,7 @@ namespace GameObjectsBase
         public bool IsActive => _isActive;
         public string Name => _name;
         public ObjectId Id => _id;
+        public GameObject Parent => _parent;
 
         public GameObject(ObjectId id, ObjectsHolder root, string name)
         {
@@ -28,11 +33,28 @@ namespace GameObjectsBase
 
         public ref string NameRef => ref _name ;
 
-        public void OnEnable() => _components.ForEach(x => x.OnEnable());
-        public void OnDisable() => _components.ForEach(x => x.OnDisable());
+        public void SetName(string name) => _name = name;
 
-        public void Start() => _components.ForEach(x => x.Start());
-        public void Update() {
+        public void OnEnable() 
+        {
+            _components.ForEach(x => x.OnEnable());
+            _children.ForEach(x => x.OnEnable());
+        } 
+        public void OnDisable() 
+        {
+            _components.ForEach(x => x.OnDisable());
+            _children.ForEach(x => x.OnDisable());
+        } 
+
+        public void Start()
+        {
+            _components.ForEach(x => x.Start());
+            _children.ForEach(x => x.Start());
+        } 
+
+        
+        public void Update() 
+        {
             //Console.WriteLine("Update object with id " +  _id.Value);
             _components.ForEach(x => x.Update()); 
         }
@@ -45,10 +67,26 @@ namespace GameObjectsBase
             _components.Clear();
         }
 
-        public void AddChild(GameObject child) => _children.Add(child);
+        public List<Component> GetComponents() => _components;
+
+        public void AddChild(GameObject child) 
+        {
+            child.SetParent(this);
+            _children.Add(child);
+        } 
+
+        public void SetParent(GameObject parent) => _parent = parent;
 
         public void AddComponent(Component component)
-        {
+        { 
+            //var component = Activator.CreateInstance(type) as Component;
+
+            if (_components.Any(x => x == component))
+            {
+                Console.WriteLine($"Cant add same component as {component}");
+                return;
+            }
+            Console.WriteLine($"We can add same component as {component}");
             _components.Add(component);
         }
 
@@ -126,6 +164,22 @@ namespace GameObjectsBase
         {
             _isActive = true;
             OnEnable();
+        }
+
+        private Type GetBaseType(Type type)
+        {
+            var derived = type;
+            do
+            {
+                if (derived.BaseType == null)
+                {
+                    return derived;
+                }
+                derived = derived.BaseType;
+            }
+            while (derived != null);
+
+            return derived;
         }
     }
 }

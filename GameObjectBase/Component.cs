@@ -9,4 +9,9 @@
         public abstract void OnDisable();
         public abstract void OnDestroy();
     }
+
+    public interface IAddOnceComponent
+    {
+        
+    }
 }

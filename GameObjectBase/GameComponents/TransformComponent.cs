@@ -8,15 +8,20 @@ using GlmSharp;
 
 namespace GameObjectBase.GameComponents
 {
-    public class TransformComponent : Component
+    public class TransformComponent : Component, IAddOnceComponent
     {
         [SerializableField] private vec3 position;
         [SerializableField] private quat rotation;
         [SerializableField] private vec3 scale;
 
+        private mat4 worldMatrix;
+        private mat4 InvWorldMartix;
+
         public vec3 Position { get => position; set => position = value; }
         public quat Rotation { get => rotation; set => rotation = value; }
         public vec3 Scale { get => scale; set => scale = value; }
+
+        public bool isDirty = false;
 
         public TransformComponent()
         {
@@ -25,42 +30,57 @@ namespace GameObjectBase.GameComponents
             scale = new vec3(1, 1, 1);
         }
 
+        public TransformComponent(vec3 position, quat rotation, vec3 scale)
+        {
+            this.position = position;
+            this.rotation = rotation;
+            this.scale = scale;
+        }
+
+        public void SetPosition(vec3 position)
+        {
+            this.position = position;
+            isDirty = true;
+        }
+        public void SetRotation(quat rotation)
+        {
+            this.rotation = rotation;
+            isDirty = true;
+        }
+        public void SetScale(vec3 scale)
+        {
+            this.scale = scale;
+            isDirty = true;
+        }
+
+        public mat4 GetWorldMatrix()
+        {
+            return mat4.Translate(position) * rotation.ToMat4 * mat4.Scale(scale);
+        }
+
         public override void FixedUpdate()
         {
-            throw new NotImplementedException();
         }
 
         public override void OnDestroy()
         {
-            return;
-            throw new NotImplementedException();
         }
 
         public override void OnDisable()
         {
-            return;
-            throw new NotImplementedException();
         }
 
         public override void OnEnable()
         {
-            return;
-            throw new NotImplementedException();
         }
 
         public override void Start()
         {
-            return;
-            throw new NotImplementedException();
         }
 
         public override void Update()
         {
-            return;
 
-
-
-            throw new NotImplementedException();
         }
     }
 }
