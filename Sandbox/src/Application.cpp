@@ -34,6 +34,45 @@ void helloCallback(NovaEngine::InputEvent event, std::string contextName)
 }
 
 
+void mouseRelativeCallback(NovaEngine::InputEvent event, std::string contextName)
+{
+	glm::vec2 pos = std::get<glm::vec2>(event.getRelative());
+	spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
+
+
+
+}
+
+void mouseAbsoluteCallback(NovaEngine::InputEvent event,
+                           std::string contextName)
+{
+	glm::vec2 pos = std::get<glm::vec2>(event.getAbsolute());
+	spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
+}
+
+void mouseButtonCallback(NovaEngine::InputEvent event,
+                           std::string contextName)
+{
+	NovaEngine::MouseSource button = std::get<NovaEngine::MouseSource>(event.getSource().getSource());
+	int k = -1;
+	switch (button)
+	{
+		case NovaEngine::MouseSource::BUTTON_1:
+			k = 0;
+			break;
+		case NovaEngine::MouseSource::BUTTON_2:
+			k = 1;
+			break;
+		case NovaEngine::MouseSource::BUTTON_3:
+			k = 2;
+			break;
+		default:
+			spdlog::error("Unknown mouse button which is not mapped inside switch, please fix it");
+			break;
+	}
+	spdlog::info("Mouse event: {} with value {} ", contextName, k);
+}
+
 Application::Application()
 	: physicsEngine(PhysicsEngine::Get()), scriptEngine(ScriptEngine::Get())
 {
@@ -261,6 +300,31 @@ bool Application::Init(int argc, char** argv)
 	physicsEngine->Init();
 
 	scriptEngine->Init();
+
+	NovaEngine::InputBinding bind5("relativeMousePos", NovaEngine::EventAxes::DOUBLE,
+	                              NovaEngine::EventType::CHANGED);
+	bind5.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&mouseRelativeCallback>});	
+
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind5, NovaEngine::MouseSource::MOVEMENT);
+
+
+	NovaEngine::InputBinding bind6("absoluteMousePos", NovaEngine::EventAxes::DOUBLE,
+	                               NovaEngine::EventType::CHANGED);
+	bind6.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&mouseAbsoluteCallback>});
+
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind6, NovaEngine::MouseSource::MOVEMENT);
+
+	NovaEngine::InputBinding bind7("mouseButton", NovaEngine::EventAxes::BUTTON,
+	                               NovaEngine::EventType::ENDED);
+	bind7.addSubscriber(
+		NovaEngine::InputDelegate{entt::connect_arg<&mouseButtonCallback>});
+
+	NovaEngine::InputManager::instance().getContext("Default").addBinding(
+		bind7, NovaEngine::MouseSource::BUTTON_1);
 
 
 	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON,

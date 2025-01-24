@@ -95,6 +95,7 @@
     <Compile Include="GameComponents\TransformComponent.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="GameObjectsExtensions.cs" />
+    <Compile Include="InputManager.cs" />
     <Compile Include="Memory\Blackboard.cs" />
     <Compile Include="ObjectId.cs" />
     <Compile Include="Other\Item.cs" />
