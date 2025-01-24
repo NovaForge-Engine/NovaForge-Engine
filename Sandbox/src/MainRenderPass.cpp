@@ -111,6 +111,9 @@ bool MainRenderPass::Init(InitParams& params)
 		               shaderCodeStorage),
 		};
 
+
+
+
 		nri::GraphicsPipelineDesc graphicsPipelineDesc = {};
 		graphicsPipelineDesc.pipelineLayout = m_PipelineLayout;
 		graphicsPipelineDesc.vertexInput = &vertexInputDesc;

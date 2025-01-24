@@ -84,6 +84,7 @@ private:
 	float m_Scale = 1.0f;
 
 	nri::PipelineLayout* m_PipelineLayout = nullptr;
+
 	nri::Pipeline* m_Pipeline = nullptr;
 	nri::DescriptorSet* m_TextureDescriptorSet = nullptr;
 

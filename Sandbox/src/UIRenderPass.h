@@ -54,14 +54,17 @@ public:
 
 private:
 	std::vector<uint8_t> m_UiData;
+
 	nri::DescriptorPool* m_DescriptorPool = nullptr;
 	nri::DescriptorSet* m_DescriptorSet = nullptr;
 	nri::DescriptorSet* otherDescriptorSet = nullptr;
 	nri::Descriptor* m_FontShaderResource = nullptr;
 	nri::Descriptor* m_Sampler = nullptr;
 	nri::Pipeline* m_Pipeline = nullptr;
-	nri::PipelineLayout* m_PipelineLayout = nullptr;
 
+
+	nri::PipelineLayout* m_PipelineLayout = nullptr;
+	nri::Pipeline* m_SecondPipeline = nullptr;
 	nri::Descriptor* test = nullptr;
 
 	nri::Texture* m_FontTexture = nullptr;

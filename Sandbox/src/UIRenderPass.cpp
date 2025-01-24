@@ -110,6 +110,12 @@ bool UIRenderPass::Init(InitParams params)
 			LoadShader(deviceDesc.graphicsAPI, "UI.fs", shaderCodeStorage),
 		};
 
+		ShaderCodeStorage shaderCodeStorage2;
+		nri::ShaderDesc shaders2[] = {
+			LoadShader(deviceDesc.graphicsAPI, "StaticUI.vs", shaderCodeStorage2),
+			LoadShader(deviceDesc.graphicsAPI, "StaticUI.fs", shaderCodeStorage2),
+		};
+
 		nri::VertexStreamDesc vertexStreamDesc = {};
 		vertexStreamDesc.bindingSlot = 0;
 		vertexStreamDesc.stride = sizeof(ImDrawVertOpt);
@@ -176,6 +182,15 @@ bool UIRenderPass::Init(InitParams params)
 				params.device, graphicsPipelineDesc, m_Pipeline) !=
 		    nri::Result::SUCCESS)
 			return false;
+
+		graphicsPipelineDesc.shaders = shaders2;
+		graphicsPipelineDesc.shaderNum = GetCountOf(shaders2);
+
+		if (params.NRI.CreateGraphicsPipeline(
+				params.device, graphicsPipelineDesc, m_SecondPipeline) !=
+		    nri::Result::SUCCESS)
+			return false;
+
 	}
 
 	ImFontConfig fontConfig = {};
@@ -358,13 +373,15 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 						//descriptorSet = (nri::DescriptorSet*)drawCmd.GetTexID();
 						//NRI.CmdSetDescriptorSet(commandBuffer, 0,
 						//                        *descriptorSet, nullptr);
-
+							NRI.CmdSetPipeline(commandBuffer, *m_Pipeline);
 							NRI.CmdSetDescriptorSet(commandBuffer, 0,
 						                        *otherDescriptorSet, nullptr);
+							
 
 					}
 					else
 					{
+						NRI.CmdSetPipeline(commandBuffer, *m_SecondPipeline);
 						NRI.CmdSetDescriptorSet(commandBuffer, 0,
 						                        *m_DescriptorSet, nullptr);
 					}
