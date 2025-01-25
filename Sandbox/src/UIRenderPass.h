@@ -52,6 +52,8 @@ public:
 	UIRenderPass();
 	~UIRenderPass();
 
+	void addValueToMap(uint32_t key, nri::Descriptor* value);
+
 private:
 	std::vector<uint8_t> m_UiData;
 
@@ -73,4 +75,7 @@ private:
 	double m_TimePrev = 0.0;
 	uint64_t m_IbOffset = 0;
 	uint64_t m_VbOffset = 0;
+
+	std::map<uint32_t, nri::Descriptor*> dutyMap;
+
 };

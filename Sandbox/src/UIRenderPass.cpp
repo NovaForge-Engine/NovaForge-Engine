@@ -308,7 +308,6 @@ bool UIRenderPass::Init(InitParams params)
 
 
 
-
 	return true;
 }
 
@@ -444,8 +443,19 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
 			if (drawCmd.GetTexID() != 0)
 			{
 				helperInterface.WaitForIdle(*commandBuffer);
-				nri::Descriptor* test =
-					(nri::Descriptor*)drawCmd.GetTexID();
+				uint32_t desc = (uint32_t)drawCmd.GetTexID();
+				nri::Descriptor* test;
+				if (dutyMap.contains(desc))
+				{
+					test = (nri::Descriptor*)dutyMap[desc];
+				
+				}
+				else
+				{
+					test =
+						(nri::Descriptor*)drawCmd.GetTexID();
+				}
+
 				nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc[] = {
 					{&test, 1}, {&m_Sampler, 1}};
 
@@ -490,6 +500,11 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
 
 UIRenderPass::~UIRenderPass()
 {
+}
+
+void UIRenderPass::addValueToMap(uint32_t key, nri::Descriptor* value)
+{
+	dutyMap[key] = value;
 }
 
 UIRenderPass::UIRenderPass()

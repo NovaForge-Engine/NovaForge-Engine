@@ -293,6 +293,9 @@ bool Application::Init(int argc, char** argv)
 	                                         .window = window};
 
 	result = uiRenderPass.Init(uiPassParams);
+
+	uiRenderPass.addValueToMap(1000, mainRenderPass.outputDesc2);
+
 	spdlog::info("UIRenderPass initialized: {}", result);
 
 	dockingParams.layoutReset = true;
