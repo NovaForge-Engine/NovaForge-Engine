@@ -67,10 +67,12 @@ namespace GameObjectBase
             ImGui.Text("This is some useful text2.");
 
 
+
             if (ImGui.Button("button"))
             {
                 _holder.AddNewObject();
             }
+            ImGui.Image((IntPtr)1000, new SharpDX.Vector2(100, 100));
 
             ImGui.End();
 
