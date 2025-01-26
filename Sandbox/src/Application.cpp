@@ -403,65 +403,12 @@ void Application::Draw()
 
 	uiRenderPass.BeginUI();
 	{
-		scriptEngine->OnMonoDrawGui();
-
-		//(@Tenzy21)TODO: Add ImGuiWindowFlags_MenuBar flag into main window
-		static bool pOpen = true;
-		ImGuiID mainDockspaceId = ImGui::GetID("MainDockSpace");
-		ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-		ImGui::DockSpaceOverViewport(viewport);
-		//FIXME: This is temporary solution to draw a scene
-
-		ImVec2 windowSize = ImGui::GetWindowSize();
-		ImGui::SetWindowPos(ImVec2(0, 0));
-		ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
-		ImGui::Image((ImTextureID)appState.outputTexture,
-		             ImVec2(windowSize.x, windowSize.y), ImVec2(0.0f, 0.0f),
-		             ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
-		             ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-		/*SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
-
-		if (dockingParams.layoutReset) {
-			dockingParams.layoutReset = false;
-			ImGui::SetWindowPos(ImVec2(0, 0));
-			ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
-			
-			auto layout = CreateDefaultLayout(appState);
-			dockingParams = layout[0];
-
-			ImGui::DockBuilderRemoveNodeChildNodes(mainDockspaceId);
-			for (const auto& dockingSplit : dockingParams.dockingSplits) {
-				DockingDetails::DoSplit(dockingSplit);
-			}
-			for (const auto& dockableWindow : dockingParams.dockableWindows) {
-				ImGui::DockBuilderDockWindow(dockableWindow.label.c_str(), SplitIdsHelper::GetSplitId(dockableWindow.dockSpaceName));
-			}
-			ImGui::DockBuilderFinish(mainDockspaceId);
+		if (!dockingParams.layoutReset) {
+			dockingParams.layoutReset = true;
 			ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
 		}
-
-		for (auto& dockableWindow : dockingParams.dockableWindows) {
-			if (dockableWindow.windowSize.x > 0.f)
-				ImGui::SetNextWindowSize(dockableWindow.windowSize, dockableWindow.windowSizeCondition);
-			if (dockableWindow.windowPosition.x > 0.f)
-				ImGui::SetNextWindowPos(dockableWindow.windowPosition, dockableWindow.windowPositionCondition);
-
-			bool not_collapsed = true;
-			if (dockableWindow.canBeClosed) {
-				not_collapsed = ImGui::Begin(dockableWindow.label.c_str(), &dockableWindow.isVisible, dockableWindow.imGuiWindowFlags);
-			}
-			else {
-				not_collapsed = ImGui::Begin(dockableWindow.label.c_str(), nullptr, dockableWindow.imGuiWindowFlags);
-			}
-			if (not_collapsed && dockableWindow.GuiFunction) {
-				dockableWindow.GuiFunction();
-			}
-			ImGui::End();
-		}*/
+		scriptEngine->OnMonoDrawGui();
 	}
-
 	uiRenderPass.EndUI(NRI, *m_Streamer, NRI, NRI, m_CommandQueue);
 
 	NRI.CopyStreamerUpdateRequests(*m_Streamer);

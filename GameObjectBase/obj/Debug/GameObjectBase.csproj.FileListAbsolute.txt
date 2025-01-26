@@ -31,3 +31,11 @@ C:\Programming\NovaForge-Engine\Resources\Scripts\GameObjectBase.pdb
 C:\Programming\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.csproj.AssemblyReference.cache
 C:\Programming\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.csproj.CoreCompileInputs.cache
 C:\Programming\NovaForge-Engine\GameObjectBase\obj\Debug\GameObje.D516459B.Up2Date
+C:\Dev\NovaForge-Engine\Resources\Scripts\GameObjectBase.dll.config
+C:\Dev\NovaForge-Engine\Resources\Scripts\GameObjectBase.dll
+C:\Dev\NovaForge-Engine\Resources\Scripts\GameObjectBase.pdb
+C:\Dev\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.csproj.AssemblyReference.cache
+C:\Dev\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.csproj.CoreCompileInputs.cache
+C:\Dev\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.csproj.CopyComplete
+C:\Dev\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.dll
+C:\Dev\NovaForge-Engine\GameObjectBase\obj\Debug\GameObjectBase.pdb

@@ -18,10 +18,10 @@ namespace GameObjectBase.UI
 
         public void Render()
         {
-            SharpDX.Vector2 vec = new SharpDX.Vector2(200, 600);
-            SharpDX.Vector2 pos = new SharpDX.Vector2(720, 200);
-            ImGui.SetNextWindowSize(vec);
-            ImGui.SetNextWindowPos(pos);
+            //SharpDX.Vector2 vec = new SharpDX.Vector2(200, 600);
+            //SharpDX.Vector2 pos = new SharpDX.Vector2(720, 200);
+            //ImGui.SetNextWindowSize(vec);
+            //ImGui.SetNextWindowPos(pos);
             ImGui.Begin("Scene Tree");
             List<GameObject> list = Root.getAllGameObjects();
             foreach (var item in list)

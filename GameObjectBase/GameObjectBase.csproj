@@ -82,6 +82,8 @@
     <Compile Include="Root.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="UI\FieldInspector.cs" />
+    <Compile Include="UI\NovaEditorView.cs" />
+    <Compile Include="UI\NovaRenderer.cs" />
     <Compile Include="UI\SceneTreeView.cs" />
     <Compile Include="AI\Agents\Actions\ActionsFactory.cs" />
     <Compile Include="AI\Agents\Actions\AgentAction.cs" />
@@ -108,6 +110,9 @@
     <Compile Include="AI\Director\UtilityDirector.cs" />
     <Compile Include="AI\Memory\Blackboard.cs" />
     <Compile Include="AI\Other\Item.cs" />
+    <Compile Include="UI\Utility\DockingUtility.cs" />
+    <Compile Include="UI\Utility\ImGuiThemesHelper.cs" />
+    <Compile Include="UI\Utility\ImGuiUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

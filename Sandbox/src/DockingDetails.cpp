@@ -31,7 +31,7 @@ namespace DockingDetails
        );
        
    
-      SplitIdsHelper::SetSplitId(dockingSplit.initialDock, initialDock_imguiId);
+       SplitIdsHelper::SetSplitId(dockingSplit.initialDock, initialDock_imguiId);
        SplitIdsHelper::SetSplitId(dockingSplit.newDock, newDock_imguiId);
        // apply flags
        ImGuiDockNode* newDockNode = ImGui::DockBuilderGetNode(newDock_imguiId);

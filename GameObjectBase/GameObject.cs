@@ -69,6 +69,8 @@ namespace GameObjectsBase
 
         public List<Component> GetComponents() => _components;
 
+        public List<GameObject> GetChildren() => _children;
+
         public void AddChild(GameObject child) 
         {
             child.SetParent(this);
