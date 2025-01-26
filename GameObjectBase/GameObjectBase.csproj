@@ -81,10 +81,8 @@
     <Compile Include="ObjectsHolder.cs" />
     <Compile Include="Root.cs" />
     <Compile Include="Test.cs" />
-    <Compile Include="UI\FieldInspector.cs" />
     <Compile Include="UI\NovaEditorView.cs" />
     <Compile Include="UI\NovaRenderer.cs" />
-    <Compile Include="UI\SceneTreeView.cs" />
     <Compile Include="AI\Agents\Actions\ActionsFactory.cs" />
     <Compile Include="AI\Agents\Actions\AgentAction.cs" />
     <Compile Include="AI\Agents\AiController.cs" />

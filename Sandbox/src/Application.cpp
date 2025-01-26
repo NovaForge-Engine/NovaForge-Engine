@@ -403,10 +403,7 @@ void Application::Draw()
 
 	uiRenderPass.BeginUI();
 	{
-		if (!dockingParams.layoutReset) {
-			dockingParams.layoutReset = true;
-			ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
-		}
+		ApplyTheme(ImGuiTheme::ImGuiTheme_SoDark_AccentRed);
 		scriptEngine->OnMonoDrawGui();
 	}
 	uiRenderPass.EndUI(NRI, *m_Streamer, NRI, NRI, m_CommandQueue);
