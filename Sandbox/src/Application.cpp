@@ -5,7 +5,7 @@
 #include <Extensions/NRIDeviceCreation.h>
 
 
-void helloCallback(NovaEngine::InputEvent event, std::string contextName)
+void keyboardButtonPressed(NovaEngine::InputEvent event, std::string contextName)
 {
 	NovaEngine::KeyboardSource source = std::get<NovaEngine::KeyboardSource>(event.getSource().getSource());
 	int k = -1;
@@ -28,25 +28,59 @@ void helloCallback(NovaEngine::InputEvent event, std::string contextName)
 			break;
 	}
 	ScriptEngine* scriptEngine = ScriptEngine::Get();
-	scriptEngine->ProcessInput(contextName, k);
+	scriptEngine->processPressKey(contextName, k);
 	
 	//spdlog::info("Input event: {} with value {} ", contextName, k);
 }
+
+void keyboardButtonReleased(NovaEngine::InputEvent event,
+                           std::string contextName)
+{
+	NovaEngine::KeyboardSource source =
+		std::get<NovaEngine::KeyboardSource>(event.getSource().getSource());
+	int k = -1;
+	switch (source)
+	{
+		case NovaEngine::KeyboardSource::KEY_W:
+			k = 87;
+			break;
+		case NovaEngine::KeyboardSource::KEY_A:
+			k = 65;
+			break;
+		case NovaEngine::KeyboardSource::KEY_S:
+			k = 83;
+			break;
+		case NovaEngine::KeyboardSource::KEY_D:
+			k = 68;
+			break;
+		default:
+			spdlog::error("Unknown keyboard button which is not mapped inside "
+			              "switch, please fix it");
+			break;
+	}
+	ScriptEngine* scriptEngine = ScriptEngine::Get();
+	scriptEngine->processReleaseKey(contextName, k);
+
+	// spdlog::info("Input event: {} with value {} ", contextName, k);
+}
+
+
+
+
 
 
 void mouseRelativeCallback(NovaEngine::InputEvent event, std::string contextName)
 {
 	glm::vec2 pos = std::get<glm::vec2>(event.getRelative());
 	//spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
-
-
-
 }
 
 void mouseAbsoluteCallback(NovaEngine::InputEvent event,
                            std::string contextName)
 {
 	glm::vec2 pos = std::get<glm::vec2>(event.getAbsolute());
+	ScriptEngine* scriptEngine = ScriptEngine::Get();
+	scriptEngine->processMousePos(pos);
 	//spdlog::info("Mouse event: {} with value {} {}", contextName, pos.x, pos.y);
 }
 
@@ -70,7 +104,9 @@ void mouseButtonCallback(NovaEngine::InputEvent event,
 			spdlog::error("Unknown mouse button which is not mapped inside switch, please fix it");
 			break;
 	}
-	//spdlog::info("Mouse event: {} with value {} ", contextName, k);
+	spdlog::info("Mouse event: {} with value {} ", contextName, k);
+	ScriptEngine* scriptEngine = ScriptEngine::Get();
+	scriptEngine->processMouseKey(contextName, k);
 }
 
 Application::Application()
@@ -329,33 +365,73 @@ bool Application::Init(int argc, char** argv)
 	NovaEngine::InputManager::instance().getContext("Default").addBinding(
 		bind7, NovaEngine::MouseSource::BUTTON_1);
 
+	//Press keyboardButtons
+	{
+		NovaEngine::InputBinding bind("helloBind",
+		                              NovaEngine::EventAxes::BUTTON,
+		                              NovaEngine::EventType::STARTED);
+		NovaEngine::InputBinding bind2("helloBind2",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::STARTED);
+		NovaEngine::InputBinding bind3("helloBind3",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::STARTED);
+		NovaEngine::InputBinding bind4("helloBind4",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::STARTED);
+		bind.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
+		bind2.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
+		bind3.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
+		bind4.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
 
-	NovaEngine::InputBinding bind("helloBind", NovaEngine::EventAxes::BUTTON,
-	                              NovaEngine::EventType::STARTED);
-	NovaEngine::InputBinding bind2("helloBind2", NovaEngine::EventAxes::BUTTON,
-	                              NovaEngine::EventType::STARTED);
-	NovaEngine::InputBinding bind3("helloBind3", NovaEngine::EventAxes::BUTTON,
-	                              NovaEngine::EventType::STARTED);
-	NovaEngine::InputBinding bind4("helloBind4", NovaEngine::EventAxes::BUTTON,
-	                              NovaEngine::EventType::STARTED);
-	bind.addSubscriber(
-		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});	
-	bind2.addSubscriber(
-		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});	
-	bind3.addSubscriber(
-		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});	
-	bind4.addSubscriber(
-		NovaEngine::InputDelegate{entt::connect_arg<&helloCallback>});
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind, NovaEngine::KeyboardSource::KEY_A);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind2, NovaEngine::KeyboardSource::KEY_W);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind3, NovaEngine::KeyboardSource::KEY_S);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind4, NovaEngine::KeyboardSource::KEY_D);
+	}
+
+		// Press keyboardButtons
+	{
+		NovaEngine::InputBinding bind("helloBind5",
+		                              NovaEngine::EventAxes::BUTTON,
+		                              NovaEngine::EventType::ENDED);
+		NovaEngine::InputBinding bind2("helloBind6",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::ENDED);
+		NovaEngine::InputBinding bind3("helloBind7",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::ENDED);
+		NovaEngine::InputBinding bind4("helloBind8",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::ENDED);
+		bind.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+		bind2.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+		bind3.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+		bind4.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind, NovaEngine::KeyboardSource::KEY_A);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind2, NovaEngine::KeyboardSource::KEY_W);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind3, NovaEngine::KeyboardSource::KEY_S);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind4, NovaEngine::KeyboardSource::KEY_D);
+	}
 
 
-	NovaEngine::InputManager::instance().getContext("Default").addBinding(
-		bind, NovaEngine::KeyboardSource::KEY_A);
-	NovaEngine::InputManager::instance().getContext("Default").addBinding(
-		bind2, NovaEngine::KeyboardSource::KEY_W);
-	NovaEngine::InputManager::instance().getContext("Default").addBinding(
-		bind3, NovaEngine::KeyboardSource::KEY_S);
-	NovaEngine::InputManager::instance().getContext("Default").addBinding(
-		bind4,NovaEngine::KeyboardSource::KEY_D);
 
 
 

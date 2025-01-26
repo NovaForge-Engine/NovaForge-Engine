@@ -28,6 +28,8 @@ namespace GameObjectBase
             _view = new SceneTreeView();
             _fieldInspector = new FieldInspector();
 
+            InputManager.Init();
+
             ImGui.SetCurrentContext(context);
             ImGui.SetAllocatorFunctions(alloc, free);
             Console.WriteLine("C# Root Constructor!");

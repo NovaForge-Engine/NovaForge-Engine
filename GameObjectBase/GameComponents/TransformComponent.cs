@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using GameObjectsBase;
@@ -80,7 +81,9 @@ namespace GameObjectBase.GameComponents
 
         public override void Update()
         {
-
+            if (InputManager.IsKeyDown((int)KeyboardSource.KEY_W)){
+                Console.WriteLine("W pressed insude transform component");
+            }
         }
     }
 }

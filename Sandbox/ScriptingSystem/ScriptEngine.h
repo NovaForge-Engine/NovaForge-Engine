@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
 extern "C"
 {
 	typedef struct _MonoClass MonoClass;
@@ -22,7 +23,10 @@ public:
 	void OnMonoDrawGui();
 	void OnMonoUpdate();
 
-	void ProcessInput(std::string name, int value);
+	void processPressKey(std::string name, int value);
+	void processReleaseKey(std::string name, int value);
+	void processMouseKey(std::string name, int value);
+	void processMousePos(glm::vec2 pos);
 
 
 private:
@@ -34,5 +38,12 @@ private:
 	MonoObject* monoInstance = nullptr;
 	MonoMethod* methodDrawGui = nullptr;
 	MonoMethod* methodUpdate = nullptr;
-	MonoMethod* processUnput = nullptr;
+
+	MonoMethod* pressKeyboardKey = nullptr;
+	MonoMethod* releaseKeyBoardKey = nullptr;
+	MonoMethod* pressMouseKey = nullptr;
+
+    MonoMethod* resetInput = nullptr;
+
+	MonoMethod* mousePos = nullptr;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/InputBinding.h"
+#include <spdlog/spdlog.h>
 
 namespace NovaEngine {
 

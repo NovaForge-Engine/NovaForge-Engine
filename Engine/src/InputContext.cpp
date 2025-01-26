@@ -30,6 +30,7 @@ ContainerAdditionResult InputContext::addBinding(InputBinding action, const Inpu
     if (hasBinding(action.getName())) return ContainerAdditionResult::ALREADY_EXISTS;
     const InputSource sourceToAdd(source);
     _bindings.emplace_back(action, sourceToAdd);
+    spdlog::info("Added binding \"{}\" to context \"{}\"", action.getName(), _name);
     return ContainerAdditionResult::SUCCESS;
 }
 

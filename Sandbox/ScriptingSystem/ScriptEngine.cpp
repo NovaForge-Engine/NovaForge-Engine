@@ -132,7 +132,17 @@ void ScriptEngine::InitMono()
 
 	methodUpdate = mono_class_get_method_from_name(monoRoot, "Update", 0);
 	methodDrawGui = mono_class_get_method_from_name(monoRoot, "DrawGui", 0);
-	processUnput = mono_class_get_method_from_name(monoRoot, "ProcessInput", 2);
+
+
+	MonoClass* monoRoot2 = mono_class_from_name(assemblyImage, "GameObjectBase", "InputManager");
+
+	pressKeyboardKey =
+		mono_class_get_method_from_name(monoRoot2, "PressKey", 2);
+	pressMouseKey =
+		mono_class_get_method_from_name(monoRoot2, "PressMouseKey", 2);
+	mousePos =
+		mono_class_get_method_from_name(monoRoot2, "MousePos", 1);
+	releaseKeyBoardKey = mono_class_get_method_from_name(monoRoot2, "ReleaseKey", 2);
 }
 
 void ScriptEngine::OnMonoDrawGui()
@@ -145,10 +155,29 @@ void ScriptEngine::OnMonoUpdate()
 	mono_runtime_invoke(methodUpdate, monoInstance, nullptr, nullptr);
 }
 
-void ScriptEngine::ProcessInput(std::string name, int value)
+void ScriptEngine::processPressKey(std::string name, int value)
 {
 	void* params[2] = {mono_string_new(s_Data->AppDomain, name.c_str()),&value};
-	mono_runtime_invoke(processUnput, monoInstance, params, nullptr);
+	mono_runtime_invoke(pressKeyboardKey, monoInstance, params, nullptr);
+}
+
+void ScriptEngine::processReleaseKey(std::string name, int value)
+{
+	void* params[2] = {mono_string_new(s_Data->AppDomain, name.c_str()),
+	                   &value};
+	mono_runtime_invoke(releaseKeyBoardKey, monoInstance, params, nullptr);
+}
+
+void ScriptEngine::processMouseKey(std::string name, int value)
+{
+	void* params[2] = {mono_string_new(s_Data->AppDomain, name.c_str()), &value};
+	mono_runtime_invoke(pressMouseKey, monoInstance, params, nullptr);
+}
+
+void ScriptEngine::processMousePos(glm::vec2 pos)
+{
+	void* params[1] = {&pos};
+	mono_runtime_invoke(mousePos, monoInstance, params, nullptr);
 }
 
 void ScriptEngine::ShutdownMono()
