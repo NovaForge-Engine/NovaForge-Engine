@@ -13,6 +13,10 @@ extern "C"
 	typedef struct _MonoClassField MonoClassField;
 }
 
+
+
+static void GameObject_SetPosition(int id, glm::vec3 pos);
+
 class ScriptEngine
 {
 public:
@@ -27,6 +31,7 @@ public:
 	void processReleaseKey(std::string name, int value);
 	void processMouseKey(std::string name, int value);
 	void processMousePos(glm::vec2 pos);
+
 
 
 private:

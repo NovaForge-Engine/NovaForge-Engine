@@ -143,11 +143,19 @@ void ScriptEngine::InitMono()
 	mousePos =
 		mono_class_get_method_from_name(monoRoot2, "MousePos", 1);
 	releaseKeyBoardKey = mono_class_get_method_from_name(monoRoot2, "ReleaseKey", 2);
+
+
+	mono_add_internal_call(
+		"GameObjectBase.InternalCalls::GameObject_SetPosition",GameObject_SetPosition);
+
 }
+
+
 
 void ScriptEngine::OnMonoDrawGui()
 {
 	mono_runtime_invoke(methodDrawGui, monoInstance, nullptr, nullptr);
+
 }
 
 void ScriptEngine::OnMonoUpdate()
@@ -180,10 +188,18 @@ void ScriptEngine::processMousePos(glm::vec2 pos)
 	mono_runtime_invoke(mousePos, monoInstance, params, nullptr);
 }
 
+
+
 void ScriptEngine::ShutdownMono()
 {
 	s_Data->AppDomain = nullptr;
 	s_Data->RootDomain = nullptr;
 
 
+}
+
+void GameObject_SetPosition(int id, glm::vec3 pos)
+{
+	spdlog::info("we have call from c# with {} and {} {} {}", id, pos.x, pos.y,
+	             pos.z);
 }
