@@ -17,6 +17,7 @@
 #include "MeshRegistry.hpp"
 
 
+#include "GameScene.h"
 
 struct CustomVertex
 {
@@ -29,6 +30,7 @@ struct ConstantBufferLayout
 {
 	glm::mat4x4 projectionMatrix;
 	glm::mat4x4 viewMatrix;
+	glm::mat4x4 modelMatrix;
 };
 
 static const CustomVertex g_VertexData[] = {{-0.71f, -0.50f, 0.0f, 0.0f},
@@ -114,6 +116,10 @@ private:
 
 	nova::MeshRegistry m_Scene;
 
+	std::vector<GameObjects> m_GameObjects;
+
 	double time = 0;
+
+	float camx=0.0f, camy=0.0f, camz=0.0f;
 
 };

@@ -545,6 +545,24 @@ bool MainRenderPass::Init(InitParams& params)
 		};
 	}
 
+	{
+		GameObjects gameobject;
+		for (int i = 0; i < 6; i++)
+		{
+
+			gameobject.id = i;
+			gameobject.mesh_id = i;
+			gameobject.material_id = i+4;
+			gameobject.world_matrix = glm::translate(
+				glm::mat4(1.0f), glm::vec3(i*0.5, 0.0f, 0.0f));
+			m_GameObjects.push_back(gameobject);
+		}
+
+	}
+
+
+
+
 	return true;
 }
 
@@ -581,10 +599,10 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 	m_ProjectionMatrix = glm::perspective(
 		glm::radians(90.0f), (float)windowWidth / (float)windowHeight, 0.1f,
 		1000.0f);
-
+	
 
 	m_ViewMatrix =
-		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+		glm::translate(glm::mat4(1.0f), glm::vec3(camx, camy, camz));
 
 
 	if (commonConstants)
@@ -668,9 +686,11 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 				scissor = {0, 0, windowWidth, windowHeight};
 
 				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
-
-				for (const Mesh& mesh : m_Scene.meshes)
+				for (const GameObjects& go : m_GameObjects)
 				{
+					Mesh& mesh = m_Scene.meshes[go.mesh_id];
+
+
 					NRI.CmdSetIndexBuffer(
 						commandBuffer, *m_Buffers[INDEX_BUFFER], 0,
 						sizeof(uint32_t) == 2 ? nri::IndexType::UINT16
@@ -678,9 +698,26 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 					constexpr uint64_t offset = 0;
 
 
+					{
+						ConstantBufferLayout* commonConstants =
+							(ConstantBufferLayout*)NRI.MapBuffer(
+								*m_Buffers[CONSTANT_BUFFER],
+								frame.constantBufferViewOffset,
+								sizeof(ConstantBufferLayout));
+						if (commonConstants)
+						{
+							spdlog::info("we're here for object {}" , go.id);
+							commonConstants->modelMatrix = go.world_matrix;	
+						
+						}
+
+
+					}
+
+
 					nri::DescriptorSet* descriptorSet =
 						m_DescriptorSets[BUFFERED_FRAME_MAX_NUM +
-					                     mesh.materialNum];
+					                     (mesh.materialNum == go.material_id? go.material_id:mesh.materialNum)];
 					NRI.CmdSetDescriptorSet(commandBuffer, 1, *descriptorSet,
 					                        nullptr);
 
@@ -689,6 +726,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 					NRI.CmdDrawIndexed(commandBuffer,
 					                   {mesh.indexNum, 1, mesh.indexOffset,
 					                    (int32_t)mesh.vertexOffset, 0});
+					NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);
 				}
 			}
 
@@ -727,6 +765,9 @@ MainRenderPass::~MainRenderPass()
 
 void MainRenderPass::BeginUI()
 {
+	ImGui::DragFloat("Camx", &camx, 0.05f, -1000.0f, 1000.0f);
+	ImGui::DragFloat("Camy", &camy, 0.05f, -1000.0f, 1000.0f);
+	ImGui::DragFloat("Camz", &camz, 0.05f, -1000.0f, 1000.0f);
 }
 
 void MainRenderPass::EndUI()

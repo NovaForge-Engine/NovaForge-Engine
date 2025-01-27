@@ -278,7 +278,15 @@ bool Application::Init(int argc, char** argv)
 	bool result = true;
 
 	//result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
-	result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
+	//result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-idle-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-idle-2.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-attack-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-attack-2.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-dead.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-rest.obj", DataFolder::SCENES));
+
+
 
 	if (!result)
 	{
@@ -479,6 +487,7 @@ void Application::Draw()
 
 	uiRenderPass.BeginUI();
 	{
+		mainRenderPass.BeginUI();
 		scriptEngine->OnMonoDrawGui();
 
 		//(@Tenzy21)TODO: Add ImGuiWindowFlags_MenuBar flag into main window
