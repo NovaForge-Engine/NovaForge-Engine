@@ -48,13 +48,13 @@ namespace GameObjectBase.GameComponents
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_W))
                 {
                     vec3 pos = comp.Position;
-                    pos += new vec3(0, 0, 0.005f);
+                    pos -= new vec3(0, 0, 0.005f);
                     comp.SetPosition(pos);
                 }
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_S))
                 {
                     vec3 pos = comp.Position;
-                    pos -= new vec3(0, 0, 0.005f);
+                    pos += new vec3(0, 0, 0.005f);
                     comp.SetPosition(pos);
                 }
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_A))
