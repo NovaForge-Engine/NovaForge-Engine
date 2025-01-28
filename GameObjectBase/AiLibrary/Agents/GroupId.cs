@@ -16,8 +16,9 @@ namespace InteractableGroupsAi.Agents
 
         public GroupId Next()
         {
-            Id = Id++;
-            return new GroupId(Id);
+            var newId = new GroupId(Id);
+            Id = ++Id;
+            return newId;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using InteractableGroupsAi.Agents.Conditions;
+﻿using AiLibrary.Other;
+using InteractableGroupsAi.Agents.Conditions;
 using InteractableGroupsAi.Director.Goals;
 
 namespace InteractableGroupsAi.Agents
@@ -28,6 +29,7 @@ namespace InteractableGroupsAi.Agents
     {
         private AiController<IAgentState> _controller;
         protected Goal CurrentGoal = new NullGoal(new CompositeGroupCondition());
+        protected IAgentState AgentState => _controller.State;
 
         public Brain(AiController<IAgentState> controller)
         {
@@ -36,10 +38,14 @@ namespace InteractableGroupsAi.Agents
 
         public void SetGoal(Goal goal)
         {
-            CurrentGoal = goal;
+            AiLogger.Log($"#Brain {_controller.State.AgentId} Set new goal from {CurrentGoal} to {goal}");
 
             if (goal == CurrentGoal)
+            {
+                AiLogger.Log($"Same action no reset");
                 return;
+            }
+            CurrentGoal = goal;
 
             Reset();
         }

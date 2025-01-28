@@ -1,4 +1,6 @@
-﻿using InteractableGroupsAi.Director.Goals;
+﻿using AiLibrary.Other;
+using InteractableGroupsAi.Director.Goals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +25,7 @@ namespace InteractableGroupsAi.Agents
 
         public override void Reset()
         {
+            AiLogger.Log($"Brain reset");
             _plannedActions.Clear();
             ChooseNewAction();
         }
@@ -43,14 +46,14 @@ namespace InteractableGroupsAi.Agents
 
         private void ChooseNewAction()
         {
-            var highestScore = 0f;
+            var highestDelta = 0f;
             AgentAction choosenAction = _availableActions.FirstOrDefault();
             foreach (var action in _availableActions)
             {
                 _deepCounter = 0;
-                var score = action.GetGoalChange(CurrentGoal);
-
-                if (score <= highestScore)
+                var delta = action.GetGoalChange(CurrentGoal);
+                AiLogger.Log($"#GobBrain: {action} has {delta} but {choosenAction} has {highestDelta} for {CurrentGoal}");
+                if (delta <= highestDelta)
                 {
                     continue;
                 }
@@ -60,18 +63,20 @@ namespace InteractableGroupsAi.Agents
                 if (action.CanExecute(out var failedCondition) == false)
                 {
                     var resolvingAction = FindActionToSatisfyCondition(action, failedCondition);
-                    if (resolvingAction == null)
+                    if (resolvingAction == false)
                     {
+                        AiLogger.Warning($"#Satisfaction cant find action for {action} and {failedCondition} from try satisfy");
                         continue;
                     }
                 }
                 
-                highestScore = score;
+                highestDelta = delta;
                 choosenAction = action;
-
                 _tempQueue.Enqueue(choosenAction);
+                _plannedActions.Clear();
                 foreach (var item in _tempQueue)
                 {
+                    AiLogger.Log($"#QUEUE From temp to actual {item}");
                     _plannedActions.Enqueue(item);
                 }
             }
@@ -79,42 +84,57 @@ namespace InteractableGroupsAi.Agents
             MoveToNextAction();
         }
 
-        private AgentAction FindActionToSatisfyCondition(AgentAction actionToExecute, AgentCondition requiredCondition)
+        private bool FindActionToSatisfyCondition(AgentAction actionToExecute, List<AgentCondition> requiredConditions)
         {
             _deepCounter++;
-            foreach (var action in _availableActions)
+            foreach(var requiredCondition in requiredConditions)
             {
-                if (action == actionToExecute) continue;
-
-                if (requiredCondition.TrySatisfyCondition(action) == false)
-                    continue;
-                    
-                if (action.CanExecute(out var condition) == false)
+                AiLogger.Warning($"#Satisfaction {requiredCondition}");
+                foreach (var action in _availableActions)
                 {
-                    if (_deepCounter == DeepBorder)
-                    {
-                        return null;
-                    }
+                    if (action == actionToExecute) continue;
 
-                    var satisfyingAction = FindActionToSatisfyCondition(action, condition);
-
-                    if (satisfyingAction == null)
+                    if (requiredCondition.TrySatisfyCondition(action) == false)
                     {
                         continue;
                     }
-                }
 
-                _deepCounter--;
-                _tempQueue.Enqueue(action);
-                return action;
+                    if (action.CanExecute(out var condition) == false)
+                    {
+                        if (_deepCounter == DeepBorder)
+                        {
+                            AiLogger.Warning($"#Satisfaction cant find action for {actionToExecute} and {requiredCondition} - too deep");
+                            return false;
+                        }
+
+                        var satisfyingAction = FindActionToSatisfyCondition(action, condition);
+
+                        if (satisfyingAction == false)
+                        {
+                            AiLogger.Warning($"#Satisfaction cant find action for {action} and {condition}");
+                            continue;
+                        }
+                    }
+
+                    AiLogger.Log($"#Satisfaction find action for {actionToExecute} and {requiredCondition}: {action}");
+                    _deepCounter--;
+                    _tempQueue.Enqueue(action);
+
+                    if (_tempQueue.Count == requiredConditions.Count)
+                    {
+                        return true;
+                    }
+                }
             }
 
             _deepCounter--;
-            return null;
+            AiLogger.Warning($"#Satisfaction cant find action for {actionToExecute} ran out of options");
+            return false;
         }
 
         private void SetAction(AgentAction action)
         {
+            AiLogger.Log($"#GobBrainSet {AgentState.AgentId} set {action}");
             if (_currentAction.OnFailed != null) _currentAction.OnFailed -= ChooseNewAction;
             if (_currentAction.OnCompleted != null) _currentAction.OnCompleted -= MoveToNextAction;
 
@@ -128,7 +148,6 @@ namespace InteractableGroupsAi.Agents
         private void MoveToNextAction()
         {
             _currentAction?.OnEnd();
-            
             if (_plannedActions.Count <= 0)
             {
                 ChooseNewAction();

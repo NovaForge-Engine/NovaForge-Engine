@@ -11,5 +11,11 @@ namespace InteractableGroupsAi.Other
 
         public string Name => _name;
         public int Id => _id;
+
+        public Item(int id, string name)
+        {
+            _id = id;
+            _name = name;
+        }
     }
 }

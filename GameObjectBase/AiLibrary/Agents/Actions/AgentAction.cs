@@ -2,6 +2,7 @@
 using InteractableGroupsAi.Agents.Conditions;
 using InteractableGroupsAi.Director.Goals;
 using System;
+using System.Collections.Generic;
 
 namespace InteractableGroupsAi
 {
@@ -17,7 +18,7 @@ namespace InteractableGroupsAi
             _condition = condition;
         }
 
-        public bool CanExecute(out AgentCondition condition)
+        public bool CanExecute(out List<AgentCondition> condition)
         {
             return _condition.IsSatisfied(out condition);
         }

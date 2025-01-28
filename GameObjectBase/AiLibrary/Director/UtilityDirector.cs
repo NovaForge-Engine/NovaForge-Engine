@@ -1,4 +1,5 @@
-﻿using InteractableGroupsAi.Agents;
+﻿using AiLibrary.Other;
+using InteractableGroupsAi.Agents;
 using InteractableGroupsAi.Director.Buckets;
 using InteractableGroupsAi.Director.Goals;
 using InteractableGroupsAi.Director.Groups;
@@ -7,10 +8,10 @@ using System.Linq;
 
 namespace InteractableGroupsAi.Director
 {
-
     public class UtilityDirector : Director
     {
-        private List<Bucket> _buckets = new List<Bucket>();
+        public IEnumerable<Group> Groups => _activeGroups.Concat(_offlineGroups);
+
         private List<Group> _activeGroups = new List<Group>();
         private List<Group> _offlineGroups = new List<Group>();
 
@@ -22,14 +23,8 @@ namespace InteractableGroupsAi.Director
             UpdateOffline();
         }
 
-        public void AddBucket(Bucket bucket)
-        {
-            _buckets.Add(bucket);
-        }
-
         public void RegisterGroup(Group group)
         {
-            group.GoalReached += () => GenerateNewGoal(group);
             _activeGroups.Add(group);
         }
 
@@ -71,9 +66,9 @@ namespace InteractableGroupsAi.Director
 
         private void GenerateNewGoal(Group group)
         {
-            Bucket bestBucket = _buckets.FirstOrDefault();
+            Bucket bestBucket = group.Buckets.FirstOrDefault();
             float floor = _minimunScore;
-            foreach (var bucket in _buckets)
+            foreach (var bucket in group.Buckets)
             {
                 var score = bucket.EvaluateBucket(group);
 
@@ -84,11 +79,13 @@ namespace InteractableGroupsAi.Director
                 }
             }
 
-            SetGroupGoal(bestBucket.EvaluateGoals(group).Goal, group);
+            var bestGoal = bestBucket.EvaluateGoals(group).Goal;
+            SetGroupGoal(bestGoal, group);
         }
 
         private void SetGroupGoal(Goal goal, Group group)
         {
+            AiLogger.Log($"Set {goal} to {group.GroupId.Id}");  
             if (goal == group.CurrentGoal) return;
             
             group.SetGroupGoal(goal);

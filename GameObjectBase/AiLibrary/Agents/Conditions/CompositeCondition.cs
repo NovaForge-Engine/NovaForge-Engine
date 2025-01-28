@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace InteractableGroupsAi.Agents.Conditions
 {
@@ -18,17 +19,19 @@ namespace InteractableGroupsAi.Agents.Conditions
             Conditions.Add(condition);
         }
 
-        public bool IsSatisfied(out T failedCondition)
+        public bool IsSatisfied(out List<T> failedCondition)
         {
+            failedCondition = new List<T>();
             foreach (var condition in Conditions)
             {
                 if (condition.Check() == false)
                 {
-                    failedCondition = condition;
-                    return false;
+                    failedCondition.Add(condition);
                 }
             }
-            failedCondition = null;
+            if (failedCondition.Any()) return false;
+
+            failedCondition.Clear();
             return true;
         }
     }

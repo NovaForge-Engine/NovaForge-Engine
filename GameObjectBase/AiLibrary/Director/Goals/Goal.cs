@@ -5,7 +5,7 @@ namespace InteractableGroupsAi.Director.Goals
 {
     public abstract class Goal
     {
-        public IGroupContext Group { get; }
+        public IGroupContext Group { get; private set; }
 
         private CompositeGroupCondition _desiredCondition;
 
@@ -13,6 +13,8 @@ namespace InteractableGroupsAi.Director.Goals
         {
             _desiredCondition = condition;
         }
+
+        protected void SetGroupContext(IGroupContext group) => Group = group;
 
         public abstract void Accept();
 

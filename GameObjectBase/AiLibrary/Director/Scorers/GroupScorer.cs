@@ -1,5 +1,8 @@
-﻿using InteractableGroupsAi.Director.Groups;
+﻿using AiLibrary.Other;
+using InteractableGroupsAi.Director.Goals;
+using InteractableGroupsAi.Director.Groups;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Contexts;
 
 namespace InteractableGroupsAi.Director
 {
@@ -32,6 +35,7 @@ namespace InteractableGroupsAi.Director
             {
                 float score = consideration.GetScore(_state);
 
+                AiLogger.Log($"Scorer: {consideration}: {score} for {_state.GroupId.Id}");
                 result *= score;
             }
 

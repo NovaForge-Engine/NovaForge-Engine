@@ -18,17 +18,20 @@ namespace InteractableGroupsAi.Director.Groups
 
     public interface IGroupState
     {
+        GroupId GroupId { get; }
         float CurrentHealth { get; }
         float MaxHealth { get; }
 
         float CurrentRest { get; }
         float MaxRest { get; }
 
-        IGroupContext CurrentTarget { get; }
+        IGroupState CurrentTarget { get; }
 
         Vector3 CurrentPosition { get; }
+        Vector3 TargetPosition { get; }
 
-        void SetTarget(IGroupContext target);
+        void SetTarget(IGroupState target);
+        void SetTargetPosition(Vector3 target);
     }
 
     public class DesiredGroupState : IGroupState
@@ -41,18 +44,20 @@ namespace InteractableGroupsAi.Director.Groups
 
         public float MaxRest { get; set; }
 
-        public IGroupContext CurrentTarget { get; set; }
+        public IGroupState CurrentTarget { get; set; }
 
         public Vector3 CurrentPosition { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
-        public void SetTarget(IGroupContext target)
-        {
-            CurrentTarget = target;
-        }
+        public GroupId GroupId { get; set; }
+
+        public void SetTarget(IGroupState target) => CurrentTarget = target;
+        public void SetTargetPosition(Vector3 target) => TargetPosition = target;
     }
 
     public class GroupState : IGroupState
     {
+        public GroupId GroupId { get; set; }
         public float CurrentHealth 
         { 
             get
@@ -69,7 +74,23 @@ namespace InteractableGroupsAi.Director.Groups
                 CurrentHealth = value;
             }
         }
-        public float MaxHealth { get; private set; }
+        public float MaxHealth
+        {
+            get
+            {
+                var health = 0f;
+                foreach (var agent in _agents)
+                {
+                    health += agent.MaxHealth;
+                }
+                return health;
+            }
+
+            set
+            {
+                MaxHealth = value;
+            }
+        }
 
         public float CurrentRest 
         {
@@ -89,9 +110,25 @@ namespace InteractableGroupsAi.Director.Groups
             }
         }
 
-        public float MaxRest { get; private set; }
+        public float MaxRest
+        {
+            get
+            {
+                var rest = 0f;
+                foreach (var agent in _agents)
+                {
+                    rest += agent.MaxRest;
+                }
+                return rest;
+            }
 
-        public IGroupContext CurrentTarget { get; private set; }
+            set
+            {
+                MaxRest = value;
+            }
+        }
+
+        public IGroupState CurrentTarget { get; private set; }
 
         public Vector3 CurrentPosition
         {
@@ -115,18 +152,14 @@ namespace InteractableGroupsAi.Director.Groups
                 CurrentPosition = value;
             }
         }
+        public Vector3 TargetPosition { get; set; }
 
         public IEnumerable<IAgentState> Agents => _agents;
-        private List<IAgentState> _agents;
+        private List<IAgentState> _agents = new List<IAgentState>();
 
-        public GroupState(List<IAgentState> agents)
-        {
-            _agents = agents;
-        }
+        public void AddAgent(IAgentState agent) => _agents.Add(agent);
 
-        public void SetTarget(IGroupContext target)
-        {
-            CurrentTarget = target;
-        }
+        public void SetTarget(IGroupState target) => CurrentTarget = target;
+        public void SetTargetPosition(Vector3 target) => TargetPosition = target;
     }
 }

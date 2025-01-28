@@ -19,7 +19,7 @@ namespace InteractableGroupsAi.Agents
         Vector3 TargetPosition { get; }
 
         IAgentState CurrentTarget { get; }
-        Item CurrentHand { get; }
+        Item CurrentHand { get; set; }
         List<Item> Items { get; }
 
         void SetGroupId(GroupId id);

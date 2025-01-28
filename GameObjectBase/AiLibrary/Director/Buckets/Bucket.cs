@@ -1,4 +1,5 @@
-﻿using InteractableGroupsAi.Agents.Conditions;
+﻿using AiLibrary.Other;
+using InteractableGroupsAi.Agents.Conditions;
 using InteractableGroupsAi.Director.Goals;
 using InteractableGroupsAi.Director.Groups;
 using System.Collections.Generic;
@@ -9,11 +10,11 @@ namespace InteractableGroupsAi.Director.Buckets
     public class Bucket
     {
         private float _weight;
-        private List<CondideredGoal> _availableGoals = new List<CondideredGoal>();
+        private List<ConsideredGoal> _availableGoals = new List<ConsideredGoal>();
         private GroupScorer _scorer;
         private float _minimunScore = 0f;
 
-        public IEnumerable<CondideredGoal> Goals => _availableGoals;
+        public IEnumerable<ConsideredGoal> Goals => _availableGoals;
         public float Weight => _weight;
 
         public Bucket(float weight, GroupScorer scorer)
@@ -27,19 +28,20 @@ namespace InteractableGroupsAi.Director.Buckets
             return _scorer.GetScore() * _weight;
         }
 
-        public void AddGoal(CondideredGoal goal)
+        public void AddGoal(ConsideredGoal goal)
         {
             _availableGoals.Add(goal);
         }
 
-        public CondideredGoal EvaluateGoals(IGroupContext context)
+        public ConsideredGoal EvaluateGoals(IGroupContext context)
         {
-            CondideredGoal bestGoal = _availableGoals.FirstOrDefault();
+            ConsideredGoal bestGoal = _availableGoals.FirstOrDefault();
             float floor = _minimunScore;
             foreach (var goal in _availableGoals)
             {
                 var score = goal.EvaluateGoal();
 
+                AiLogger.Log($"Bucket: {goal.Goal}: {score} for {context.GetState().GroupId.Id}");
                 if (score > floor)
                 {
                     bestGoal = goal;

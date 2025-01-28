@@ -1,5 +1,6 @@
 ﻿using InteractableGroupsAi.Director.Goals;
 using InteractableGroupsAi.Memory;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -15,6 +16,9 @@ namespace InteractableGroupsAi.Agents
 
         public T State => _character;
         public Blackboard Memory => _blackboard;
+
+        public Action<IAgentState> AgentDetected;
+        public Action<IAgentState> AgentLost;
 
         public AiController(T character)
         {
@@ -43,12 +47,14 @@ namespace InteractableGroupsAi.Agents
         {
             _blackboard.AddValue(new BlackboardKey($"{agentContext.AgentId}_position"), agentContext.CurrentPosition);
             _blackboard.AddValue(new BlackboardKey(agentContext.AgentId.ToString()), agentContext);
+            AgentDetected?.Invoke(agentContext);
         }
 
         public void OnAgentLost(IAgentState agentContext)
         {
             _blackboard.AddValue(new BlackboardKey($"{agentContext.AgentId}_position"), agentContext.CurrentPosition);
             _blackboard.Remove(new BlackboardKey($"{agentContext.AgentId}"));
+            AgentLost?.Invoke(agentContext);
         }
 
         public void OnTargetMoved(IAgentState agentContext) 

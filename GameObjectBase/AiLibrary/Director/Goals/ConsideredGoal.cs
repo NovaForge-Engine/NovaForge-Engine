@@ -1,13 +1,13 @@
 ﻿namespace InteractableGroupsAi.Director.Goals
 {
-    public class CondideredGoal
+    public class ConsideredGoal
     {
         private Goal _goal;
         private GroupScorer _scorer;
 
         public Goal Goal => _goal;
 
-        public CondideredGoal(Goal goal, GroupScorer scorer)
+        public ConsideredGoal(Goal goal, GroupScorer scorer)
         {
             _goal = goal;
             _scorer = scorer;
