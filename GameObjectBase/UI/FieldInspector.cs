@@ -20,12 +20,12 @@ namespace GameObjectBase.UI
         {
             if(selected == null) 
             {
+                
                 ImGui.Begin("Property window");
                 ImGui.Text("No object selected");
                 ImGui.End();
                 return;
             }
-
             ImGui.Begin("Property window");
 
             var name = selected.NameRef;
@@ -81,7 +81,6 @@ namespace GameObjectBase.UI
                             var component = Activator.CreateInstance(option) as Component;
                             selected.AddComponent(component);
 
-
                             _scriptFilter = "";
                             ImGui.CloseCurrentPopup();
                         }
@@ -117,6 +116,9 @@ namespace GameObjectBase.UI
             component.SetPosition(MathTypes.toGLM(pos));
             component.SetRotation(MathTypes.toGLM(q));
             component.SetScale(MathTypes.toGLM(scale));
+
+            InternalCalls.GameObject_SetWorldMatrix((ulong)selected.Id.Value, component.GetWorldMatrix());
+
         }
 
     }

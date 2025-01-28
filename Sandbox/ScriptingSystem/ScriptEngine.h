@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
+#include <src/GameScene.h>
 extern "C"
 {
 	typedef struct _MonoClass MonoClass;
@@ -16,6 +17,11 @@ extern "C"
 
 
 static void GameObject_SetPosition(int id, glm::vec3 pos);
+static void GameObject_SetWorldMatrix(int id, glm::mat4 mat);
+static void GameObject_SetMaterialID(int id, int mat_id);
+static void GameObject_SetMeshID(int id, int mesh_id);
+static void GameObject_AddGameObject();
+static void GameObject_RemoveGameObject(int target_id);
 
 class ScriptEngine
 {
@@ -32,7 +38,7 @@ public:
 	void processMouseKey(std::string name, int value);
 	void processMousePos(glm::vec2 pos);
 
-
+	GameScene* scene;
 
 private:
 	static ScriptEngine* instance;

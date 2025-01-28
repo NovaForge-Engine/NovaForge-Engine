@@ -2,6 +2,10 @@
 {
     public abstract class Component
     {
+        public GameObject parent { get; private set; }
+
+       public void Init(GameObject parent) => this.parent = parent;
+
         public abstract void OnEnable();
         public abstract void Start();
         public abstract void Update();

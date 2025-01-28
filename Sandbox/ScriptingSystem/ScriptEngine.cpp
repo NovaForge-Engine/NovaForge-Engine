@@ -33,6 +33,7 @@ ScriptEngine* ScriptEngine::Get()
 void ScriptEngine::Init()
 {
 	s_Data = new ScriptEngineData();
+	scene = GameScene::Get();
 	InitMono();
 }
 
@@ -147,6 +148,20 @@ void ScriptEngine::InitMono()
 
 	mono_add_internal_call(
 		"GameObjectBase.InternalCalls::GameObject_SetPosition",GameObject_SetPosition);
+	mono_add_internal_call(
+		"GameObjectBase.InternalCalls::GameObject_SetWorldMatrix",
+		GameObject_SetWorldMatrix);
+	mono_add_internal_call(
+		"GameObjectBase.InternalCalls::GameObject_SetMaterialID",
+		GameObject_SetMaterialID);
+	mono_add_internal_call("GameObjectBase.InternalCalls::GameObject_SetMeshID",
+	                       GameObject_SetMeshID);
+	mono_add_internal_call(
+		"GameObjectBase.InternalCalls::GameObject_AddGameObject",
+		GameObject_AddGameObject);
+	mono_add_internal_call(
+		"GameObjectBase.InternalCalls::GameObject_RemoveGameObject",
+		GameObject_RemoveGameObject);
 
 }
 
@@ -200,6 +215,36 @@ void ScriptEngine::ShutdownMono()
 
 void GameObject_SetPosition(int id, glm::vec3 pos)
 {
-	spdlog::info("we have call from c# with {} and {} {} {}", id, pos.x, pos.y,
-	             pos.z);
+	GameScene* scene = GameScene::Get();
+	scene->SetPosition(id, pos);
+}
+
+void GameObject_SetWorldMatrix(int id, glm::mat4 mat)
+{
+	GameScene* scene = GameScene::Get();
+	scene->SetWorldMatrix(id, mat);
+}
+
+void GameObject_SetMaterialID(int id, int mat_id)
+{
+	GameScene* scene = GameScene::Get();
+	scene->SetMaterial(id, mat_id);
+}
+
+void GameObject_SetMeshID(int id, int mesh_id)
+{
+	GameScene* scene = GameScene::Get();
+	scene->SetMesh(id, mesh_id);
+}
+
+void GameObject_AddGameObject()
+{
+	GameScene* scene = GameScene::Get();
+	scene->AddObject();
+}
+
+void GameObject_RemoveGameObject(int target_id)
+{
+	GameScene* scene = GameScene::Get();
+	scene->RemoveObject(target_id);
 }

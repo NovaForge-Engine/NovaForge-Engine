@@ -10,7 +10,7 @@ constexpr float CLEAR_DEPTH = 0.0f;
 
 bool MainRenderPass::Init(InitParams& params)
 {
-
+	m_GameWorld = GameScene::Get();
 	const nri::DeviceDesc& deviceDesc =
 		params.NRI.GetDeviceDesc(params.m_Device);
 
@@ -21,7 +21,7 @@ bool MainRenderPass::Init(InitParams& params)
 	ShaderCodeStorage shaderCodeStorage;
 	{
 		nri::DescriptorRangeDesc descriptorRangeConstant[2];
-		descriptorRangeConstant[0] = {0, 1, nri::DescriptorType::CONSTANT_BUFFER, nri::StageBits::ALL};
+		descriptorRangeConstant[0] = {1, 1, nri::DescriptorType::CONSTANT_BUFFER, nri::StageBits::ALL};
 		descriptorRangeConstant[1] = {0, 1, nri::DescriptorType::SAMPLER,nri::StageBits::FRAGMENT_SHADER};
 
 		nri::DescriptorRangeDesc materialDescriptorRange[1];
@@ -34,8 +34,9 @@ bool MainRenderPass::Init(InitParams& params)
 			{1, materialDescriptorRange, GetCountOf(materialDescriptorRange)},
 		};
 
-		nri::RootConstantDesc rootConstant = {1, sizeof(float),
-		                                      nri::StageBits::FRAGMENT_SHADER};
+		nri::RootConstantDesc rootConstant = {
+			0, sizeof(glm::mat4), nri::StageBits::ALL
+		};
 
 		nri::PipelineLayoutDesc pipelineLayoutDesc = {};
 		pipelineLayoutDesc.descriptorSetNum = GetCountOf(descriptorSetDescs);
@@ -90,7 +91,7 @@ bool MainRenderPass::Init(InitParams& params)
 
 		nri::RasterizationDesc rasterizationDesc = {};
 		rasterizationDesc.fillMode = nri::FillMode::SOLID;
-		rasterizationDesc.cullMode = nri::CullMode::FRONT;
+		rasterizationDesc.cullMode = nri::CullMode::BACK;
 		rasterizationDesc.frontCounterClockwise = true;
 
 		nri::ColorAttachmentDesc colorAttachmentDesc = {};
@@ -552,9 +553,10 @@ bool MainRenderPass::Init(InitParams& params)
 
 			gameobject.id = i;
 			gameobject.mesh_id = i;
-			gameobject.material_id = i+4;
+			gameobject.material_id = 2+i*2;
 			gameobject.world_matrix = glm::translate(
-				glm::mat4(1.0f), glm::vec3(i*0.5, 0.0f, 0.0f));
+				glm::mat4(1.0f), glm::vec3(i*2, 0.0f, 0.0f)) * glm::rotate(
+				glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			m_GameObjects.push_back(gameobject);
 		}
 
@@ -574,22 +576,22 @@ void MainRenderPass::Draw()
 {
 }
 
-void MainRenderPass::Draw(const nri::CoreInterface& NRI,
-                          const nri::StreamerInterface& streamerInterface,
-                          const nri::SwapChainInterface& swapChainInterface,
-                          const nri::StreamerInterface& streamer,
-                          nri::CommandBuffer& commandBuffer,
-                          const nova::Frame& frame,
-                          const nova::BackBuffer& currentBackBuffer,
-                          const uint32_t currentTextureIndex,
-                          const uint32_t m_RenderWindowWidth,
+void MainRenderPass::Draw(
+	const nri::CoreInterface& NRI,
+	const nri::StreamerInterface& streamerInterface,
+	const nri::SwapChainInterface& swapChainInterface,
+	const nri::StreamerInterface& streamer, nri::CommandBuffer& commandBuffer,
+	const nova::Frame& frame, const nova::BackBuffer& currentBackBuffer,
+	const uint32_t currentTextureIndex, const uint32_t m_RenderWindowWidth,
 	const uint32_t m_RenderWindowHeight, nri::Descriptor* outputTextureDesc,
-	nri::Texture* outputTexture)
+	nri::Texture* outputTexture, nri::Streamer& str)
 {
 	nri::Dim_t windowWidth = (nri::Dim_t)m_RenderWindowWidth;
 	nri::Dim_t windowHeight = (nri::Dim_t)m_RenderWindowHeight;
 	nri::Dim_t halfWidth = windowWidth / 2;
 	nri::Dim_t halfHeight = windowHeight / 2;
+
+	ConstantBufferLayout commonConstantsLayout{};
 
 	ConstantBufferLayout* commonConstants =
 		(ConstantBufferLayout*)NRI.MapBuffer(*m_Buffers[CONSTANT_BUFFER],
@@ -604,12 +606,16 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 	m_ViewMatrix =
 		glm::translate(glm::mat4(1.0f), glm::vec3(camx, camy, camz));
 
+	commonConstantsLayout.projectionMatrix = m_ProjectionMatrix;
+	commonConstantsLayout.viewMatrix = m_ViewMatrix;
 
 	if (commonConstants)
 	{
 		commonConstants->projectionMatrix = m_ProjectionMatrix;
 
 		commonConstants->viewMatrix = m_ViewMatrix;
+
+		commonConstants->modelMatrix = m_GameObjects[0].world_matrix;
 
 		NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);
 	}
@@ -623,8 +629,8 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 			// TODO: is barrier from "SHADER_RESOURCE" to "COPY_DESTINATION"
 			// needed here for "Buffer::InstanceData"?
 
-			//streamerInterface.CmdUploadStreamerUpdateRequests(
-				//commandBuffer, streamer);
+			streamerInterface.CmdUploadStreamerUpdateRequests(
+				commandBuffer, str);
 		}
 
 		nri::TextureBarrierDesc textureBarrierDescs = {};
@@ -673,7 +679,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 				NRI.CmdSetPipelineLayout(commandBuffer, *m_PipelineLayout);
 				NRI.CmdSetPipeline(commandBuffer, *m_Pipeline);
-				NRI.CmdSetRootConstants(commandBuffer, 0, &m_Transparency, 4);
+			
 
 				NRI.CmdSetDescriptorSet(commandBuffer, 0, *m_DescriptorSets[0],
 				                        nullptr);
@@ -681,14 +687,17 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 				nri::Rect scissor = {(int16_t)halfWidth, (int16_t)halfHeight,
 				                     halfWidth, halfHeight};
-				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
+				NRI.CmdSetScissors(commandBuffer, &scissor, 1); 
 				// NRI.CmdDraw(commandBuffer, {3, 1, 0, 0});
 				scissor = {0, 0, windowWidth, windowHeight};
 
 				NRI.CmdSetScissors(commandBuffer, &scissor, 1);
-				for (const GameObjects& go : m_GameObjects)
+				for (const GameObjects* go : m_GameWorld->objects)
 				{
-					Mesh& mesh = m_Scene.meshes[go.mesh_id];
+					if (go->mesh_id == -1)
+						continue;
+					
+					Mesh& mesh = m_Scene.meshes[go->mesh_id];
 
 
 					NRI.CmdSetIndexBuffer(
@@ -699,7 +708,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 
 
 					{
-						ConstantBufferLayout* commonConstants =
+						/*ConstantBufferLayout* commonConstants =
 							(ConstantBufferLayout*)NRI.MapBuffer(
 								*m_Buffers[CONSTANT_BUFFER],
 								frame.constantBufferViewOffset,
@@ -709,15 +718,20 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 							spdlog::info("we're here for object {}" , go.id);
 							commonConstants->modelMatrix = go.world_matrix;	
 						
-						}
-
-
+						}*/
+						NRI.CmdSetRootConstants(commandBuffer, 0,
+						                        &go->world_matrix,
+						                        sizeof(go->world_matrix));
 					}
+
+					//NRI.CmdCopyBuffer(
+					//	commandBuffer, *m_Buffers[CONSTANT_BUFFER], 0, &commonConstants, frame.constantBufferViewOffset,
+					//	sizeof(ConstantBufferLayout));
 
 
 					nri::DescriptorSet* descriptorSet =
 						m_DescriptorSets[BUFFERED_FRAME_MAX_NUM +
-					                     (mesh.materialNum == go.material_id? go.material_id:mesh.materialNum)];
+					                     (go->material_id)];
 					NRI.CmdSetDescriptorSet(commandBuffer, 1, *descriptorSet,
 					                        nullptr);
 
@@ -726,7 +740,7 @@ void MainRenderPass::Draw(const nri::CoreInterface& NRI,
 					NRI.CmdDrawIndexed(commandBuffer,
 					                   {mesh.indexNum, 1, mesh.indexOffset,
 					                    (int32_t)mesh.vertexOffset, 0});
-					NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);
+					/*NRI.UnmapBuffer(*m_Buffers[CONSTANT_BUFFER]);*/
 				}
 			}
 

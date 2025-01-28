@@ -33,6 +33,11 @@ struct ConstantBufferLayout
 	glm::mat4x4 modelMatrix;
 };
 
+struct ModelData
+{
+	glm::mat4x4 modelMatrix;
+};
+
 static const CustomVertex g_VertexData[] = {{-0.71f, -0.50f, 0.0f, 0.0f},
                                             {0.00f, 0.71f, 1.0f, 1.0f},
                                             {0.71f, -0.50f, 0.0f, 1.0f}};
@@ -71,7 +76,7 @@ public:
 	          const nova::BackBuffer& currentBackBuffer,
 	          const uint32_t currentTextureIndex,
 	          const uint32_t m_RenderWindowWidth,
-	          const uint32_t m_RenderWindowHeight,nri::Descriptor* outputTextureDesc,nri::Texture* outputTexture );
+	          const uint32_t m_RenderWindowHeight,nri::Descriptor* outputTextureDesc,nri::Texture* outputTexture,nri::Streamer& str);
 
 	void BeginUI();
 	void EndUI();
@@ -117,6 +122,9 @@ private:
 	nova::MeshRegistry m_Scene;
 
 	std::vector<GameObjects> m_GameObjects;
+
+	GameScene *m_GameWorld;
+
 
 	double time = 0;
 

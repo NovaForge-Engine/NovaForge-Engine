@@ -18,6 +18,8 @@ namespace GameObjectsBase
 
         private ObjectsHolder _root;
 
+
+
         public ObjectsHolder Root => _root;
         public bool IsActive => _isActive;
         public string Name => _name;
@@ -37,7 +39,7 @@ namespace GameObjectsBase
 
         public void OnEnable() 
         {
-            _components.ForEach(x => x.OnEnable());
+            _components.ForEach(x => x.Init(this));
             _children.ForEach(x => x.OnEnable());
         } 
         public void OnDisable() 
@@ -87,7 +89,9 @@ namespace GameObjectsBase
                 return;
             }
             Console.WriteLine($"We can add same component as {component}");
+            component.Init(this);
             _components.Add(component);
+
         }
 
         public void RemoveComponent(Component component)

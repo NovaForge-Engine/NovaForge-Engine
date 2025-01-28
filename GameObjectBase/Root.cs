@@ -73,6 +73,7 @@ namespace GameObjectBase
             if (ImGui.Button("button"))
             {
                 _holder.AddNewObject();
+                InternalCalls.GameObject_AddGameObject();
             }
             ImGui.Image((IntPtr)1000, new SharpDX.Vector2(100, 100));
 

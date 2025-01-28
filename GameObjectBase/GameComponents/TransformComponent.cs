@@ -81,7 +81,11 @@ namespace GameObjectBase.GameComponents
 
         public override void Update()
         {
-            InternalCalls.GameObject_SetPosition(3, position);
+            if (isDirty){
+                worldMatrix = GetWorldMatrix();
+                InternalCalls.GameObject_SetWorldMatrix((ulong)parent.Id.Value, worldMatrix);
+                isDirty = false;
+            }
         }
     }
 }

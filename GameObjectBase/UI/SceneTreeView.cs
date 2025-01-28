@@ -33,6 +33,7 @@ namespace GameObjectBase.UI
                         if (ImGui.IsMouseClicked(0))
                         {
                             SelectedObject = item;
+                            InternalCalls.GameObject_SetMaterialID((ulong)SelectedObject.Id.Value, 0);
                         }
                     }
                 }

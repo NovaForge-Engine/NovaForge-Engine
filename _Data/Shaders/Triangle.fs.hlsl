@@ -3,18 +3,25 @@
 #include "NRICompatibility.hlsli"
 #include "ml.hlsli"
 
-NRI_RESOURCE( cbuffer, CommonConstants, b, 0, 0 )
+struct ModelPushConstants
+{
+    float4x4 proj;
+    float4x4 view;
+    float4x4 world;
+};
+
+NRI_ROOT_CONSTANTS( ModelPushConstants, g_ModelPushConstants, 0, 0 );
+
+
+NRI_RESOURCE(
+cbuffer , CommonConstants, b, 1, 0 )
 {
     float4x4 gProj;
     float4x4 gView;
+    float4x4 gWorld;
 };
 
-struct PushConstants
-{
-    float transparency;
-};
 
-NRI_ROOT_CONSTANTS( PushConstants, g_PushConstants, 1, 0 );
 
 NRI_RESOURCE( Texture2D, DiffuseMap, t, 0, 1 );
 NRI_RESOURCE( Texture2D, SpecularMap, t, 1, 1 );

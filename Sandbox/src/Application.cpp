@@ -564,7 +564,7 @@ void Application::Draw()
 		mainRenderPass.Draw(NRI, NRI, NRI, NRI, *commandBuffer, frame,
 		                    backBuffer, bufferedFrameIndex,
 		                    window->m_RenderWindowWidth,
-		                    window->m_RenderWindowHeight,sceneTextureDesc,sceneTexture);
+		                    window->m_RenderWindowHeight,sceneTextureDesc,sceneTexture,*m_Streamer);
 	}
 
 	{ // UI
