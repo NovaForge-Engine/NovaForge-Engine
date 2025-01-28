@@ -77,7 +77,7 @@ bool NovaWindow::Initialize(int width, int height, std::string api)
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_DECORATED, decorated ? 1 : 0);
-	glfwWindowHint(GLFW_RESIZABLE, 1);
+	glfwWindowHint(GLFW_RESIZABLE, 0);
 	glfwWindowHint(GLFW_POSITION_X, x);
 	glfwWindowHint(GLFW_POSITION_Y, y);
 

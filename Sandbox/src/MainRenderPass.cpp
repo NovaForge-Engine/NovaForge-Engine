@@ -603,8 +603,10 @@ void MainRenderPass::Draw(
 		1000.0f);
 	
 
-	m_ViewMatrix =
-		glm::translate(glm::mat4(1.0f), glm::vec3(camx, camy, camz));
+	m_ViewMatrix = glm::lookAt(glm::vec3(camx, camy, camz),
+	                           glm::vec3(camx, camy, camz-5),
+	                           glm::vec3(0, 1, 0));
+
 
 	commonConstantsLayout.projectionMatrix = m_ProjectionMatrix;
 	commonConstantsLayout.viewMatrix = m_ViewMatrix;

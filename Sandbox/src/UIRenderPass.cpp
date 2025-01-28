@@ -214,24 +214,76 @@ bool UIRenderPass::Init(InitParams params)
 	if (params.NRI.CreateTexture(params.device, textureDesc, m_FontTexture) !=
 	    nri::Result::SUCCESS)
 		return false;
+	m_Textures.push_back(m_FontTexture);
+
+	
+		Texture UIttexture;
+
+		std::string path = GetFullPath("interface.png", DataFolder::TEXTURES);
+		if (!LoadTexture(path, UIttexture))
+			return false;
+
+		nri::TextureDesc textureDesc2 = {};
+		textureDesc2.type = nri::TextureType::TEXTURE_2D;
+		textureDesc2.usage = nri::TextureUsageBits::SHADER_RESOURCE;
+		textureDesc2.format = UIttexture.GetFormat();
+		textureDesc2.width = UIttexture.GetWidth();
+		textureDesc2.height = UIttexture.GetHeight();
+		textureDesc2.mipNum = UIttexture.GetMipNum();
+		textureDesc2.layerNum = UIttexture.GetArraySize();
+		nri::Texture* nri_texture;
+
+		if (params.NRI.CreateTexture(params.device, textureDesc2,
+	                                 nri_texture) ==
+		    nri::Result::SUCCESS)
+
+		{
+		}
+		else
+		{
+			std::cout << "cannot make a texture\n";
+		}
+
+		
+		m_Textures.push_back(nri_texture);
+
+	
+
 
 	nri::ResourceGroupDesc resourceGroupDesc = {};
 	resourceGroupDesc.memoryLocation = nri::MemoryLocation::DEVICE;
-	resourceGroupDesc.textureNum = 1;
-	resourceGroupDesc.textures = &m_FontTexture;
+	resourceGroupDesc.textureNum = (uint32_t)m_Textures.size();
+	resourceGroupDesc.textures = m_Textures.data();
+
+	size_t baseAllocation = m_MemoryAllocations.size();
+	const size_t allocationNum =
+		params.helperInterface.CalculateAllocationNumber(params.device,
+	                                                     resourceGroupDesc);
+	m_MemoryAllocations.resize(baseAllocation + allocationNum);
 
 	nri::Result result = params.helperInterface.AllocateAndBindMemory(
-		params.device, resourceGroupDesc, &m_FontTextureMemory);
+		params.device, resourceGroupDesc,
+		m_MemoryAllocations.data() + baseAllocation);
 	if (result != nri::Result::SUCCESS)
 		return false;
 
 	// Descriptor - texture
-	nri::Texture2DViewDesc texture2DViewDesc = {
+	nri::Texture2DViewDesc texture2DViewDesc2 = {
 		m_FontTexture, nri::Texture2DViewType::SHADER_RESOURCE_2D, format};
 
 	if (params.NRI.CreateTexture2DView(
-			texture2DViewDesc, m_FontShaderResource) != nri::Result::SUCCESS)
+			texture2DViewDesc2, m_FontShaderResource) != nri::Result::SUCCESS)
 		return false;
+
+	nri::Texture2DViewDesc texture2DViewDesc = {
+		nri_texture, nri::Texture2DViewType::SHADER_RESOURCE_2D,
+		UIttexture.GetFormat()};
+
+	if (params.NRI.CreateTexture2DView(texture2DViewDesc, interfaceUI) !=
+	    nri::Result::SUCCESS)
+		return false;
+
+	addValueToMap(2000, interfaceUI);
 
 	Texture texture;
 	LoadTextureFromMemory(format, fontWidth, fontHeight, fontPixels, texture);
@@ -253,30 +305,81 @@ bool UIRenderPass::Init(InitParams params)
 		return false;
 
 	nri::CommandQueue* commandQueue = nullptr;
+
+	
+
+
 	params.NRI.GetCommandQueue(params.device, nri::CommandQueueType::GRAPHICS,
 	                           commandQueue);
 	{
-		nri::TextureSubresourceUploadDesc subresource = {};
-		texture.GetSubresource(subresource, 0);
 
-		nri::TextureUploadDesc textureData = {};
-		textureData.subresources = &subresource;
-		textureData.texture = m_FontTexture;
-		textureData.after = {nri::AccessBits::SHADER_RESOURCE,
-		                     nri::Layout::SHADER_RESOURCE};
+		std::vector<nri::TextureUploadDesc> textureData(2);
 
-		if (params.helperInterface.UploadData(*commandQueue, &textureData, 1,
+		uint32_t subresourceNum = 0;
+		subresourceNum += texture.GetArraySize() * texture.GetMipNum();
+		subresourceNum += UIttexture.GetArraySize() * UIttexture.GetMipNum();
+
+		std::vector<nri::TextureSubresourceUploadDesc> subresources(
+			subresourceNum);
+		nri::TextureSubresourceUploadDesc* subresourceBegin =
+			subresources.data();
+
+		for (uint32_t slice = 0; slice < texture.GetArraySize(); slice++)
+		{
+
+			for (uint32_t mip = 0; mip < texture.GetMipNum(); mip++)
+			{
+				texture.GetSubresource(
+					subresourceBegin[slice * texture.GetMipNum() + mip], mip,
+					slice);
+			}
+
+			textureData[0] = {};
+			textureData[0].subresources = subresourceBegin;
+			textureData[0].texture = m_Textures[0];
+			textureData[0].after = {nri::AccessBits::SHADER_RESOURCE,
+			                        nri::Layout::SHADER_RESOURCE};
+
+			subresourceBegin += texture.GetArraySize() * texture.GetMipNum();
+		}
+
+			for (uint32_t slice = 0; slice < UIttexture.GetArraySize(); slice++)
+		{
+
+			for (uint32_t mip = 0; mip < UIttexture.GetMipNum(); mip++)
+			{
+				UIttexture.GetSubresource(
+					subresourceBegin[slice * UIttexture.GetMipNum() + mip], mip,
+					slice);
+			}
+
+			textureData[1] = {};
+			textureData[1].subresources = subresourceBegin;
+			textureData[1].texture = m_Textures[1];
+			textureData[1].after = {nri::AccessBits::SHADER_RESOURCE,
+			                        nri::Layout::SHADER_RESOURCE};
+
+			subresourceBegin += texture.GetArraySize() * texture.GetMipNum();
+		}
+
+
+
+		if (params.helperInterface.UploadData(*commandQueue, textureData.data(), 
+			textureData.size(),
 		                                      nullptr,
 		                                      0) != nri::Result::SUCCESS)
 			return false;
 	}
 
+	
+
+
 	// Descriptor pool
 	{
 		nri::DescriptorPoolDesc descriptorPoolDesc = {};
-		descriptorPoolDesc.descriptorSetMaxNum = 2;
-		descriptorPoolDesc.textureMaxNum = 2;
-		descriptorPoolDesc.samplerMaxNum = 2;
+		descriptorPoolDesc.descriptorSetMaxNum = 3;
+		descriptorPoolDesc.textureMaxNum = 3;
+		descriptorPoolDesc.samplerMaxNum = 3;
 
 		if (params.NRI.CreateDescriptorPool(params.device, descriptorPoolDesc,
 		                                    m_DescriptorPool) !=
@@ -303,8 +406,22 @@ bool UIRenderPass::Init(InitParams params)
 				0) != nri::Result::SUCCESS)
 			return false;
 
+				if (params.NRI.AllocateDescriptorSets(
+				*m_DescriptorPool, *m_PipelineLayout, 0, &thirdDescriptorSet, 1,
+				0) != nri::Result::SUCCESS)
+			return false;
+
+			nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc2[] = {
+					{&interfaceUI, 1}, {&m_Sampler, 1}};
+
+			params.NRI.UpdateDescriptorRanges(
+				*thirdDescriptorSet, 0, GetCountOf(descriptorRangeUpdateDesc2),
+				descriptorRangeUpdateDesc2);
+
 
 	}
+
+	
 
 
 
@@ -372,9 +489,24 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 						//descriptorSet = (nri::DescriptorSet*)drawCmd.GetTexID();
 						//NRI.CmdSetDescriptorSet(commandBuffer, 0,
 						//                        *descriptorSet, nullptr);
+						NRI.CmdSetDescriptorSet(
+								commandBuffer, 0, *otherDescriptorSet, nullptr);
+						uint32_t desc = (uint32_t)drawCmd.GetTexID();
+						nri::Descriptor* test = nullptr;
+						if (dutyMap.contains(desc))
+						{
+							test = (nri::Descriptor*)dutyMap[desc];
+						}
+						if (test == interfaceUI)
+						{
+							spdlog::info("we're trying to draw texture");
+							NRI.CmdSetDescriptorSet(
+								commandBuffer, 0, *thirdDescriptorSet, nullptr);
+						}
+
+
 							NRI.CmdSetPipeline(commandBuffer, *m_Pipeline);
-							NRI.CmdSetDescriptorSet(commandBuffer, 0,
-						                        *otherDescriptorSet, nullptr);
+				
 							
 
 					}
@@ -452,17 +584,31 @@ void UIRenderPass::EndUI(const nri::StreamerInterface& streamerInterface,
 				}
 				else
 				{
-					test =
-						(nri::Descriptor*)drawCmd.GetTexID();
+					test = (nri::Descriptor*)drawCmd.GetTexID();
 				}
 
 				nri::DescriptorRangeUpdateDesc descriptorRangeUpdateDesc[] = {
 					{&test, 1}, {&m_Sampler, 1}};
+				//spdlog::info("desc {} ui desc {}",desc,(uint32_t)interfaceUI);
+				if ((uint32_t)test == (uint32_t)interfaceUI)
+				{
+					//spdlog::info("Updated descriptor set 2000");
+		/*			NRI.UpdateDescriptorRanges(
+						*thirdDescriptorSet, 0,
+						GetCountOf(descriptorRangeUpdateDesc),
+						descriptorRangeUpdateDesc);*/
+				
+				}
+				else
+				{
+					NRI.UpdateDescriptorRanges(
+						*otherDescriptorSet, 0,
+						GetCountOf(descriptorRangeUpdateDesc),
+						descriptorRangeUpdateDesc);
+				}
+					
 
-				NRI.UpdateDescriptorRanges(
-					*otherDescriptorSet, 0,
-					GetCountOf(descriptorRangeUpdateDesc),
-					descriptorRangeUpdateDesc);
+				
 
 			}
 		}

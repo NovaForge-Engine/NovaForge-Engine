@@ -60,10 +60,14 @@ private:
 	nri::DescriptorPool* m_DescriptorPool = nullptr;
 	nri::DescriptorSet* m_DescriptorSet = nullptr;
 	nri::DescriptorSet* otherDescriptorSet = nullptr;
+	nri::DescriptorSet* thirdDescriptorSet = nullptr;
 	nri::Descriptor* m_FontShaderResource = nullptr;
+	nri::Descriptor* interfaceUI = nullptr;
 	nri::Descriptor* m_Sampler = nullptr;
 	nri::Pipeline* m_Pipeline = nullptr;
 
+	std::vector<nri::Texture*> m_Textures;
+	std::vector<nri::Memory*> m_MemoryAllocations;
 
 	nri::PipelineLayout* m_PipelineLayout = nullptr;
 	nri::Pipeline* m_SecondPipeline = nullptr;

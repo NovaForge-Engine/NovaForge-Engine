@@ -77,6 +77,8 @@ namespace GameObjectBase
             }
             ImGui.Image((IntPtr)1000, new SharpDX.Vector2(100, 100));
 
+            ImGui.Image((IntPtr)2000, new SharpDX.Vector2(100, 100));
+
             ImGui.End();
 
             _view.Render();
