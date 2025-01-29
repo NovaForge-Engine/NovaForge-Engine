@@ -8,7 +8,7 @@ namespace GameObjectBase.GameComponents
 {
     public class AgentsList
     {
-        public List<AgentController> Characters = new();
+       // public List<AgentController> Characters = new();
     }
 
 

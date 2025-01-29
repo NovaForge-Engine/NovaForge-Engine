@@ -108,7 +108,7 @@ namespace GameObjectBase.UI
 
             ImGui.Separator();
             ImGui.InputFloat3("Position",ref pos); 
-            ImGui.SliderFloat4("Rotation", ref rot,0.0f,1.0f);
+            ImGui.SliderFloat4("Rotation", ref rot,-1.0f,1.0f);
             ImGui.InputFloat3("Scale", ref scale);
 
             SharpDX.Quaternion q = new SharpDX.Quaternion(rot.X, rot.Y, rot.Z, rot.W);

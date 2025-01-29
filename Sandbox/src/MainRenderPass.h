@@ -128,10 +128,10 @@ private:
 
 	double time = 0;
 
-	float camx=-1.25f, camy=1.2f, camz=-16.85f;
-
-	float angle = -90.0f;
-	
-	float viewcamx =-1.0f, viewcamy = 1.0f, viewcamz = 0.550f;
+	glm::vec3 cameraPosition = glm::vec3(-6.9f,10.7f,-0.9f);
+	glm::vec3 cameraEulerAngles = glm::vec3(75.0f,57.0f,0.0f);
+	glm::quat cameraRotation = glm::vec3(0.0f);
+	glm::mat4 rotationMatrix = glm::mat4(1.0f);
+	glm::mat4 translationMatrix = glm::mat4(1.0f);
 
 };

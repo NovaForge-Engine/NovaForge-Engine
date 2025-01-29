@@ -10,26 +10,26 @@ using System.Threading.Tasks;
 
 namespace GameObjectBase.GameComponents
 {
-    internal class AgentController : Component
+    internal class AgentController
     {
-        private float _speed = 5f;
+        //private float _speed = 5f;
         
 
-        private AiController<IAgentState> _aiController;
-        private CharacterState _initialState;
+        //private AiController<IAgentState> _aiController;
+        //private CharacterState _initialState;
 
-        private TransformComponent _transformComponent;
-        private CharacterState _currentState;
+        //private TransformComponent _transformComponent;
+        //private CharacterState _currentState;
 
-        private Vector3 _targetPosition;
-        private Vector3 _currentPosition;
-        private Vector3 _direction;
-        private bool _canMove = false;
+        //private Vector3 _targetPosition;
+        //private Vector3 _currentPosition;
+        //private Vector3 _direction;
+        //private bool _canMove = false;
 
-        public float Speed => _speed;
-        public AiController<IAgentState> Controller => _aiController;
+        //public float Speed => _speed;
+        //public AiController<IAgentState> Controller => _aiController;
 
-        public CharacterState initialState => _currentState;
+        //public CharacterState initialState => _currentState;
 
 
 

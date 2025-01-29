@@ -603,10 +603,22 @@ void MainRenderPass::Draw(
 		1000.0f);
 	
 
-	m_ViewMatrix =
-		glm::translate(glm::mat4(1.0f), glm::vec3(camx, camy, camz)) *
-		glm::rotate(glm::mat4(1.0f), glm::radians(angle),
-	                glm::vec3(viewcamx, viewcamy, viewcamz));
+	  cameraRotation = glm::quat(glm::radians(glm::vec3(
+		cameraEulerAngles.y, cameraEulerAngles.x, cameraEulerAngles.z)));
+	cameraRotation = glm::normalize(cameraRotation);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	translationMatrix = glm::translate(model, cameraPosition);
+
+	rotationMatrix = glm::mat4_cast(cameraRotation);
+	glm::vec3 camTarget = rotationMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+	camTarget += cameraPosition;
+
+	glm::vec3 upDir = rotationMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
+	m_ViewMatrix = glm::lookAt(cameraPosition, camTarget, upDir);
+	// m_ViewMatrix = glm::inverse(m_ViewMatrix);
+
 
 
 	commonConstantsLayout.projectionMatrix = m_ProjectionMatrix;
@@ -655,7 +667,7 @@ void MainRenderPass::Draw(
 		attachmentsDesc.colors = &outputDesc;
 		attachmentsDesc.depthStencil = m_DepthAttachment;
 
-		constexpr nri::Color32f COLOR_0 = {1.0f, 1.0f, 0.0f, 1.0f};
+		constexpr nri::Color32f COLOR_0 = {0.88f, 0.88f, 0.88f, 1.0f};
 
 		NRI.CmdBeginRendering(commandBuffer, attachmentsDesc);
 		{
@@ -782,16 +794,25 @@ MainRenderPass::~MainRenderPass()
 
 void MainRenderPass::BeginUI()
 {
-	//ImGui::DragFloat("Camx", &camx, 0.05f, -1000.0f, 1000.0f);
-	//ImGui::DragFloat("Camy", &camy, 0.05f, -1000.0f, 1000.0f);
-	//ImGui::DragFloat("Camz", &camz, 0.05f, -1000.0f, 1000.0f);
+	float positionValues[3] = {cameraPosition.x, cameraPosition.y,
+	                           cameraPosition.z};
+	ImGui::DragFloat3("Position", positionValues, 0.1f);
+	if (ImGui::IsItemActive())
+	{
+		cameraPosition =
+			glm::vec3(positionValues[0], positionValues[1], positionValues[2]);
+	}
 
-	//ImGui::DragFloat("view Camx", &viewcamx, 0.05f, -1.0f, 1.0f);
-	//ImGui::DragFloat("view Camy", &viewcamy, 0.05f, -1.0f, 1.0f);
-	//ImGui::DragFloat("view Camz", &viewcamz, 0.05f, -1.0f, 1.0f);
-
-	//ImGui::DragFloat("angle", &angle, 0.05f, -720.0f, 720.0f);
+	float rotationValues[3] = {cameraEulerAngles.x, cameraEulerAngles.y,
+	                           cameraEulerAngles.z};
+	ImGui::DragFloat3("Rotation", rotationValues, 0.1f);
+	if (ImGui::IsItemActive())
+	{
+		cameraEulerAngles =
+			glm::vec3(rotationValues[0], rotationValues[1], rotationValues[2]);
+	}
 }
+
 
 void MainRenderPass::EndUI()
 {

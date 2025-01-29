@@ -3,7 +3,7 @@ using namespace nova;
 
 ModelLoader::ModelLoader()
 {
-	materials_.resize(3);
+	materials_.resize(7);
 
 	Texture* texture = new Texture;
 	bool res = LoadTexture(GetFullPath("black.png", DataFolder::TEXTURES), *texture);
@@ -70,6 +70,54 @@ ModelLoader::ModelLoader()
 		textures_loaded_.push_back(texture);
 	}
 
+	texture = new Texture;
+	res = LoadTexture(GetFullPath("gg_text_selected.png", DataFolder::TEXTURES),
+	                  *texture);
+	if (!res)
+	{
+		spdlog::error("can't load a texture inside model loader");
+	}
+	else
+	{
+		textures_loaded_.push_back(texture);
+	}
+
+	texture = new Texture;
+	res = LoadTexture(GetFullPath("gg_text.png", DataFolder::TEXTURES),
+	                  *texture);
+	if (!res)
+	{
+		spdlog::error("can't load a texture inside model loader");
+	}
+	else
+	{
+		textures_loaded_.push_back(texture);
+	}
+
+	texture = new Texture;
+	res =
+		LoadTexture(GetFullPath("gg_text_damaged.png", DataFolder::TEXTURES), *texture);
+	if (!res)
+	{
+		spdlog::error("can't load a texture inside model loader");
+	}
+	else
+	{
+		textures_loaded_.push_back(texture);
+	}
+	texture = new Texture;
+	res = LoadTexture(GetFullPath("gg_text_healed.png", DataFolder::TEXTURES),
+	                  *texture);
+	if (!res)
+	{
+		spdlog::error("can't load a texture inside model loader");
+	}
+	else
+	{
+		textures_loaded_.push_back(texture);
+	}
+
+
 
 	Material material = { 0, 1, 2, 3
 	};
@@ -82,6 +130,24 @@ ModelLoader::ModelLoader()
 	material = {5, 1, 2, 3};
 
 	materials_[2] = material;
+
+	material = {6, 1, 2, 3};
+
+	materials_[3] = material;
+
+		material = {7, 1, 2, 3};
+
+	materials_[4] = material;
+
+			material = {8, 1, 2, 3};
+
+	materials_[5] = material;
+
+	
+	material = {9, 1, 2, 3};
+
+	materials_[6] = material;
+
 
 }
 

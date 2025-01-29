@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImGuiNET;
 using System.Numerics;
 using GameObjectBase.UI;
+using GameObjectBase.GameComponents;
 
 namespace GameObjectBase
 {
@@ -33,6 +34,13 @@ namespace GameObjectBase
             ImGui.SetCurrentContext(context);
             ImGui.SetAllocatorFunctions(alloc, free);
             Console.WriteLine("C# Root Constructor!");
+
+
+    
+
+
+
+
         }
 
        
@@ -72,8 +80,90 @@ namespace GameObjectBase
 
             if (ImGui.Button("button"))
             {
+            int objid = 1;
+                //0
+                Console.WriteLine(objid);
+            _holder.AddNewObject();
+            InternalCalls.GameObject_AddGameObject();
+
+            InternalCalls.GameObject_SetMeshID((ulong)objid, 7);
+            InternalCalls.GameObject_SetMaterialID((ulong)objid, 2);
+
+            objid++;
+                Console.WriteLine(objid);
+                //1
                 _holder.AddNewObject();
                 InternalCalls.GameObject_AddGameObject();
+
+                InternalCalls.GameObject_SetMeshID((ulong)objid, 7);
+                InternalCalls.GameObject_SetMaterialID((ulong)objid, 2);
+
+                GameObject obj = _holder.FindObjectById(objid);
+                obj.AddComponent(new TransformComponent());
+                TransformComponent comp = obj.GetComponent<TransformComponent>();
+                comp.SetPosition(new GlmSharp.vec3(0, 0, -25));
+
+                objid++;
+                Console.WriteLine(objid);
+                //2
+                _holder.AddNewObject();
+            InternalCalls.GameObject_AddGameObject();
+
+            InternalCalls.GameObject_SetMeshID((ulong)objid, 7);
+            InternalCalls.GameObject_SetMaterialID((ulong)objid, 2);
+
+            obj = _holder.FindObjectById(objid);
+            obj.AddComponent(new TransformComponent());
+            comp = obj.GetComponent<TransformComponent>();
+            comp.SetPosition(new GlmSharp.vec3(0, 0, 25));
+
+            objid++;
+                Console.WriteLine(objid);
+                //3
+
+                _holder.AddNewObject();
+            InternalCalls.GameObject_AddGameObject();
+
+            InternalCalls.GameObject_SetMeshID((ulong)objid, 1);
+            InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.GGIdle);
+
+            obj = _holder.FindObjectById(objid);
+            obj.AddComponent(new TransformComponent());
+            comp = obj.GetComponent<TransformComponent>();
+            comp.SetPosition(new GlmSharp.vec3(0, 0, -5));
+
+                objid++;
+                Console.WriteLine(objid);
+                //4
+                _holder.AddNewObject();
+            InternalCalls.GameObject_AddGameObject();
+
+            InternalCalls.GameObject_SetMeshID((ulong)objid, 1);
+            InternalCalls.GameObject_SetMaterialID((ulong)objid,(int)MaterialMap.MaterialName.GGDamaged);
+
+                obj = _holder.FindObjectById(objid);
+                obj.AddComponent(new TransformComponent());
+                comp = obj.GetComponent<TransformComponent>();
+                comp.SetPosition(new GlmSharp.vec3(0, 0, 5));
+
+                objid++;
+                Console.WriteLine(objid);
+                //5
+                _holder.AddNewObject();
+            InternalCalls.GameObject_AddGameObject();
+
+            InternalCalls.GameObject_SetMeshID((ulong)objid, 1);
+            InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.GGHealed);
+
+
+                obj = _holder.FindObjectById(objid);
+                obj.AddComponent(new TransformComponent());
+                comp = obj.GetComponent<TransformComponent>();
+                comp.SetPosition(new GlmSharp.vec3(-5, 0, 0));
+
+                objid++;
+                Console.WriteLine(objid);
+
             }
             ImGui.Image((IntPtr)1000, new SharpDX.Vector2(100, 100));
 

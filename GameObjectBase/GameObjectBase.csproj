@@ -67,8 +67,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\Director\Goals\ConsideredGoal.cs" />
+    <Compile Include="AI\Other\AiLogger.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="Component.cs" />
+    <Compile Include="GameComponents\AgentController.cs" />
     <Compile Include="GameComponents\AIComponent.cs" />
     <Compile Include="GameComponents\CameraComponent.cs" />
     <Compile Include="GameComponents\MeshComponent.cs" />
@@ -79,6 +82,7 @@
     <Compile Include="InputManager.cs" />
     <Compile Include="InternalCalls.cs" />
     <Compile Include="KeyCode.cs" />
+    <Compile Include="MaterialMap.cs" />
     <Compile Include="MathTypes.cs" />
     <Compile Include="ObjectId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,7 +105,6 @@
     <Compile Include="AI\Agents\Effects\Effect.cs" />
     <Compile Include="AI\Director\Aggregators\Aggregator.cs" />
     <Compile Include="AI\Director\Buckets\Bucket.cs" />
-    <Compile Include="AI\Director\Goals\CondideredGoal.cs" />
     <Compile Include="AI\Director\Goals\Goal.cs" />
     <Compile Include="AI\Director\Goals\NullGoal.cs" />
     <Compile Include="AI\Director\Groups\Group.cs" />

@@ -33,7 +33,7 @@ namespace InteractableGroupsAi.Director.Groups
 
         public Group(GroupId groupId)
         {
-            AiLogger.Log($"Create new group with id = {groupId.Id}");
+           // AiLogger.Log($"Create new group with id = {groupId.Id}");
             _blackboard = new Blackboard();
             _state = new GroupState();
             _state.GroupId = groupId;
@@ -43,7 +43,7 @@ namespace InteractableGroupsAi.Director.Groups
 
         public void SetGroupGoal(Goal newGoal)
         {
-            AiLogger.Log($"{GroupId.Id} got new goal");
+           // AiLogger.Log($"{GroupId.Id} got new goal");
             _currentGoal = newGoal;
             _currentGoal.Accept();
             _agents.ForEach(x => x.SetCurrentGoal(_currentGoal));
