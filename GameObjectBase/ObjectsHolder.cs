@@ -38,6 +38,14 @@ namespace GameObjectsBase
             }
         }
 
+        public void Start()
+        {
+            foreach (var item in _objects.Where(x => x.IsActive))
+            {
+                item.Start();
+            }
+        }
+
         public GameObject FindObjectById(ObjectId tag) => FindObjectById(tag.Value);
 
         public GameObject FindObjectById(int tag)

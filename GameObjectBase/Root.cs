@@ -78,7 +78,7 @@ namespace GameObjectBase
 
             if (ImGui.Button("button"))
             {
-            int objid = 1;
+                int objid = 1;
                 //0
                 Console.WriteLine(objid);
             _holder.AddNewObject();
@@ -246,7 +246,8 @@ namespace GameObjectBase
             _view.Render();
             _fieldInspector.Render(_view.SelectedObject);
 
-           // Console.WriteLine("C# Root Gui End!");
+            // Console.WriteLine("C# Root Gui End!");
+            _holder.Start();
         }
 
 
