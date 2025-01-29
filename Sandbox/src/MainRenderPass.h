@@ -128,6 +128,10 @@ private:
 
 	double time = 0;
 
-	float camx=0.0f, camy=0.0f, camz=0.0f;
+	float camx=-1.25f, camy=1.2f, camz=-16.85f;
+
+	float angle = -90.0f;
+	
+	float viewcamx =-1.0f, viewcamy = 1.0f, viewcamz = 0.550f;
 
 };

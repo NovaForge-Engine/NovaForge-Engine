@@ -285,10 +285,13 @@ bool Application::Init(int argc, char** argv)
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-attack-2.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-dead.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-rest.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/scene-1.obj", DataFolder::SCENES));
 
 
 
-	if (!result)
+
+    if (!result)
 	{
 		spdlog::error("Failed to load any model in pool");
 		return false;

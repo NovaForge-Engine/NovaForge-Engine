@@ -3,7 +3,7 @@ using namespace nova;
 
 ModelLoader::ModelLoader()
 {
-	materials_.resize(1);
+	materials_.resize(3);
 
 	Texture* texture = new Texture;
 	bool res = LoadTexture(GetFullPath("black.png", DataFolder::TEXTURES), *texture);
@@ -46,9 +46,43 @@ ModelLoader::ModelLoader()
 		textures_loaded_.push_back(texture);
 	}
 
+	texture = new Texture;
+	res = LoadTexture(GetFullPath("bush-text.png", DataFolder::TEXTURES),
+	                  *texture);
+	if (!res)
+	{
+		spdlog::error("can't load a texture inside model loader");
+	}
+	else
+	{
+		textures_loaded_.push_back(texture);
+	}
+
+	texture = new Texture;
+	res = LoadTexture(GetFullPath("land-text.png", DataFolder::TEXTURES),
+	                  *texture);
+	if (!res)
+	{
+		spdlog::error("can't load a texture inside model loader");
+	}
+	else
+	{
+		textures_loaded_.push_back(texture);
+	}
+
+
 	Material material = { 0, 1, 2, 3
 	};
 	materials_[0] = material;
+
+	material = {4, 1, 2, 3};
+
+	materials_[1] = material;
+
+	material = {5, 1, 2, 3};
+
+	materials_[2] = material;
+
 }
 
 ModelLoader::~ModelLoader()

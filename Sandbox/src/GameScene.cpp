@@ -12,7 +12,7 @@ void GameScene::AddObject()
 {
 	GameObjects * obj = new GameObjects(); //create new obj
 	obj->id = last_id++;
-	obj->mesh_id = 0;
+	obj->mesh_id = 7;
 	obj->material_id = 2;
 	obj->world_matrix = glm::mat4(1.0f);
 	obj->position = glm::vec3(0.0f);

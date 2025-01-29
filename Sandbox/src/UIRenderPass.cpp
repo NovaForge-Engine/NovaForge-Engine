@@ -499,7 +499,6 @@ void UIRenderPass::Draw(const nri::CoreInterface& NRI,
 						}
 						if (test == interfaceUI)
 						{
-							spdlog::info("we're trying to draw texture");
 							NRI.CmdSetDescriptorSet(
 								commandBuffer, 0, *thirdDescriptorSet, nullptr);
 						}

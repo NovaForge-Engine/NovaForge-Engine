@@ -603,9 +603,10 @@ void MainRenderPass::Draw(
 		1000.0f);
 	
 
-	m_ViewMatrix = glm::lookAt(glm::vec3(camx, camy, camz),
-	                           glm::vec3(camx, camy, camz-5),
-	                           glm::vec3(0, 1, 0));
+	m_ViewMatrix =
+		glm::translate(glm::mat4(1.0f), glm::vec3(camx, camy, camz)) *
+		glm::rotate(glm::mat4(1.0f), glm::radians(angle),
+	                glm::vec3(viewcamx, viewcamy, viewcamz));
 
 
 	commonConstantsLayout.projectionMatrix = m_ProjectionMatrix;
@@ -781,9 +782,15 @@ MainRenderPass::~MainRenderPass()
 
 void MainRenderPass::BeginUI()
 {
-	ImGui::DragFloat("Camx", &camx, 0.05f, -1000.0f, 1000.0f);
-	ImGui::DragFloat("Camy", &camy, 0.05f, -1000.0f, 1000.0f);
-	ImGui::DragFloat("Camz", &camz, 0.05f, -1000.0f, 1000.0f);
+	//ImGui::DragFloat("Camx", &camx, 0.05f, -1000.0f, 1000.0f);
+	//ImGui::DragFloat("Camy", &camy, 0.05f, -1000.0f, 1000.0f);
+	//ImGui::DragFloat("Camz", &camz, 0.05f, -1000.0f, 1000.0f);
+
+	//ImGui::DragFloat("view Camx", &viewcamx, 0.05f, -1.0f, 1.0f);
+	//ImGui::DragFloat("view Camy", &viewcamy, 0.05f, -1.0f, 1.0f);
+	//ImGui::DragFloat("view Camz", &viewcamz, 0.05f, -1.0f, 1.0f);
+
+	//ImGui::DragFloat("angle", &angle, 0.05f, -720.0f, 720.0f);
 }
 
 void MainRenderPass::EndUI()
