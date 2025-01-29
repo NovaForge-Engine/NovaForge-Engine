@@ -12,7 +12,7 @@ namespace GameObjectBase
 {
     internal class MathTypes
     {
-        public static SharpDX.Vector3 toDX (vec3 vector){
+        public static SharpDX.Vector3 toDX(vec3 vector) {
             return new SharpDX.Vector3(vector.x, vector.y, vector.z);
         }
         public static vec3 toGLM(SharpDX.Vector3 vector)
@@ -42,5 +42,14 @@ namespace GameObjectBase
             return rotation;
         }
 
+        public static System.Numerics.Vector3 ToCSharp(vec3 vector)
+        {
+            return new System.Numerics.Vector3(vector.x, vector.y, vector.z);
+        }
+
+        public static System.Numerics.Quaternion ToCSharp(quat quaternion)
+        {
+            return new System.Numerics.Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+        }
     }
 }

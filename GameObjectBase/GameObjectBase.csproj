@@ -70,10 +70,12 @@
     <Compile Include="AI\Director\Goals\ConsideredGoal.cs" />
     <Compile Include="AI\Other\AiLogger.cs" />
     <Compile Include="Attributes.cs" />
+    <Compile Include="CollisionManager.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="GameComponents\AgentController.cs" />
     <Compile Include="GameComponents\AIComponent.cs" />
     <Compile Include="GameComponents\CameraComponent.cs" />
+    <Compile Include="GameComponents\ColliderComponent.cs" />
     <Compile Include="GameComponents\MeshComponent.cs" />
     <Compile Include="GameComponents\MovementController.cs" />
     <Compile Include="GameComponents\PhysicsComponent.cs" />

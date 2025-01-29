@@ -13,13 +13,16 @@ namespace GameObjectBase
 {
 
    
-    public static class Root
+    static class Root
     {
         static int x;
 
         private static SceneTreeView _view;
         private static ObjectsHolder _holder;
         private static FieldInspector _fieldInspector;
+        private static CollisionManager _collisionManager;
+
+        public static CollisionManager CollisionManager => _collisionManager;
 
 
         public static void Initialize(IntPtr context, IntPtr alloc, IntPtr free)
@@ -35,12 +38,7 @@ namespace GameObjectBase
             ImGui.SetAllocatorFunctions(alloc, free);
             Console.WriteLine("C# Root Constructor!");
 
-
-    
-
-
-
-
+            _collisionManager = new CollisionManager();
         }
 
        
@@ -55,6 +53,7 @@ namespace GameObjectBase
         public static void FixedUpdate()
         {
             _holder.FixedUpdate();
+            _collisionManager.Update();
         }
 
         public static void ProcessInput(string name, int button){
