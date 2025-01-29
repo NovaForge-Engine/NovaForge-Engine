@@ -24,7 +24,7 @@ namespace GameObjectBase.GameComponents
 
         public override void FixedUpdate()
         {
-            UpdateBounds();
+            
         }
 
         public override void OnDestroy()
@@ -40,6 +40,7 @@ namespace GameObjectBase.GameComponents
         public override void OnEnable()
         {
             Root.CollisionManager.RegisterCollider(this);
+            UpdateBounds();
         }
 
         public override void Start()
@@ -50,7 +51,7 @@ namespace GameObjectBase.GameComponents
 
         public override void Update()
         {
-            
+            UpdateBounds();
         }
 
         private void UpdateBounds()

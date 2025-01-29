@@ -11,10 +11,15 @@ namespace GameObjectBase
     {
         private List<ColliderComponent> colliders = new List<ColliderComponent>();
 
+        public CollisionManager() {
+            Console.WriteLine("CollisionManager constructor");
+        }
+
         public void RegisterCollider(ColliderComponent collider)
         {
             if (!colliders.Contains(collider))
             {
+                Console.WriteLine("Register collider");
                 colliders.Add(collider);
             }
         }

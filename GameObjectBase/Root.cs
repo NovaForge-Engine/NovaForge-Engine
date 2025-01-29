@@ -31,14 +31,13 @@ namespace GameObjectBase
             _holder = new ObjectsHolder();
             _view = new SceneTreeView();
             _fieldInspector = new FieldInspector();
+            _collisionManager = new CollisionManager();
 
             InputManager.Init();
 
             ImGui.SetCurrentContext(context);
             ImGui.SetAllocatorFunctions(alloc, free);
             Console.WriteLine("C# Root Constructor!");
-
-            _collisionManager = new CollisionManager();
         }
 
        
@@ -48,12 +47,12 @@ namespace GameObjectBase
 
            // Console.WriteLine("C# Root Update!");
             _holder.Update();
+            _collisionManager.Update();
         }
 
         public static void FixedUpdate()
         {
             _holder.FixedUpdate();
-            _collisionManager.Update();
         }
 
         public static void ProcessInput(string name, int button){
@@ -127,10 +126,11 @@ namespace GameObjectBase
             InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.GGIdle);
 
             obj = _holder.FindObjectById(objid);
-            obj.AddComponent(new TransformComponent());
+                obj.AddComponent(new TransformComponent());
                 obj.AddComponent(new PhysicsComponent());
+                obj.AddComponent(new ColliderComponent(new Vector3(1f)));
                 obj.SetName("player");
-                comp = obj.GetComponent<TransformComponent>();
+            comp = obj.GetComponent<TransformComponent>();
             comp.SetPosition(new GlmSharp.vec3(0, 0, -5));
 
                 objid++;
@@ -211,6 +211,8 @@ namespace GameObjectBase
                 TransformComponent comp2 = obj2.GetComponent<TransformComponent>();
                 MovementController component2 = obj.GetComponent<MovementController>();
                 component2.target = comp2;
+
+                obj.AddComponent(new ColliderComponent(new Vector3(1f)));
 
                 objid++;
 
