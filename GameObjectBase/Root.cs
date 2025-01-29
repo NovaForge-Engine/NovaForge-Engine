@@ -70,7 +70,7 @@ namespace GameObjectBase
             ImGui.Text("Hello imgui from c#.");
             ImGui.End();
 
-            ImGui.SliderInt("X in c#", ref x, 0, 100);
+            //ImGui.SliderInt("X in c#", ref x, 0, 100);
            //Console.WriteLine("this is x in c#  " + x);
 
             ImGui.Begin("Hello, World!");
@@ -124,7 +124,7 @@ namespace GameObjectBase
                 _holder.AddNewObject();
             InternalCalls.GameObject_AddGameObject();
 
-            InternalCalls.GameObject_SetMeshID((ulong)objid, 1);
+            InternalCalls.GameObject_SetMeshID((ulong)objid,(int)MaterialMap.ObjectName.GG_idle1);
             InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.GGIdle);
 
             obj = _holder.FindObjectById(objid);
@@ -138,7 +138,7 @@ namespace GameObjectBase
                 _holder.AddNewObject();
             InternalCalls.GameObject_AddGameObject();
 
-            InternalCalls.GameObject_SetMeshID((ulong)objid, 1);
+            InternalCalls.GameObject_SetMeshID((ulong)objid, (int)MaterialMap.ObjectName.GG_idle1);
             InternalCalls.GameObject_SetMaterialID((ulong)objid,(int)MaterialMap.MaterialName.GGDamaged);
 
                 obj = _holder.FindObjectById(objid);
@@ -152,7 +152,7 @@ namespace GameObjectBase
                 _holder.AddNewObject();
             InternalCalls.GameObject_AddGameObject();
 
-            InternalCalls.GameObject_SetMeshID((ulong)objid, 1);
+            InternalCalls.GameObject_SetMeshID((ulong)objid, (int)MaterialMap.ObjectName.GG_idle1);
             InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.GGHealed);
 
 
@@ -162,7 +162,45 @@ namespace GameObjectBase
                 comp.SetPosition(new GlmSharp.vec3(-5, 0, 0));
 
                 objid++;
-                Console.WriteLine(objid);
+                //6
+
+                _holder.AddNewObject();
+                InternalCalls.GameObject_AddGameObject();
+
+                InternalCalls.GameObject_SetMeshID((ulong)objid, (int)MaterialMap.ObjectName.Monster_idle1);
+                InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.Monster);
+
+
+                obj = _holder.FindObjectById(objid);
+                obj.AddComponent(new TransformComponent());
+                comp = obj.GetComponent<TransformComponent>();
+                comp.SetPosition(new GlmSharp.vec3(0, 0, 0));
+
+                objid++;
+
+                //7
+
+                _holder.AddNewObject();
+                InternalCalls.GameObject_AddGameObject();
+
+                InternalCalls.GameObject_SetMeshID((ulong)objid, (int)MaterialMap.ObjectName.Monster_idle2);
+                InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.MonsterDamaged);
+
+
+                obj = _holder.FindObjectById(objid);
+                obj.AddComponent(new TransformComponent());
+                comp = obj.GetComponent<TransformComponent>();
+                comp.SetPosition(new GlmSharp.vec3(3, 0, 0));
+
+
+                obj.AddComponent(new MovementController());
+
+                GameObject obj2 = _holder.FindObjectById(4);
+                TransformComponent comp2 = obj2.GetComponent<TransformComponent>();
+                MovementController component = obj.GetComponent<MovementController>();
+                component.target = comp2;
+
+                objid++;
 
             }
             ImGui.Image((IntPtr)1000, new SharpDX.Vector2(100, 100));

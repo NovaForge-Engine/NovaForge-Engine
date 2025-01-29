@@ -796,21 +796,21 @@ void MainRenderPass::BeginUI()
 {
 	float positionValues[3] = {cameraPosition.x, cameraPosition.y,
 	                           cameraPosition.z};
-	ImGui::DragFloat3("Position", positionValues, 0.1f);
+	/*ImGui::DragFloat3("Position", positionValues, 0.1f);
 	if (ImGui::IsItemActive())
 	{
 		cameraPosition =
 			glm::vec3(positionValues[0], positionValues[1], positionValues[2]);
-	}
+	}*/
 
 	float rotationValues[3] = {cameraEulerAngles.x, cameraEulerAngles.y,
 	                           cameraEulerAngles.z};
-	ImGui::DragFloat3("Rotation", rotationValues, 0.1f);
+	/*ImGui::DragFloat3("Rotation", rotationValues, 0.1f);
 	if (ImGui::IsItemActive())
 	{
 		cameraEulerAngles =
 			glm::vec3(rotationValues[0], rotationValues[1], rotationValues[2]);
-	}
+	}*/
 }
 
 

@@ -66,9 +66,9 @@ namespace nova
 		void Shutdown();
 
 		uint32_t m_RenderWindowWidth;
-		uint32_t m_RenderOutputWidth = 1280;
+		uint32_t m_RenderOutputWidth = 800;
 		uint32_t m_RenderWindowHeight;
-		uint32_t m_RenderOutputHeight = 720;
+		uint32_t m_RenderOutputHeight = 600;
 
 		std::array<Frame, BUFFERED_FRAME_MAX_NUM>& GetFrames()
 		{

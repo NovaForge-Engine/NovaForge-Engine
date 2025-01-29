@@ -32,5 +32,15 @@ namespace GameObjectBase
             return new quat(quat.X, quat.Y, quat.Z, quat.W);
         }
 
+        public static quat LookAtLH(vec3 direction, vec3 up)
+        {
+            vec3 forward = direction.Normalized;
+            vec3 right = GlmSharp.vec3.Cross(up, forward).Normalized;
+            vec3 newUp = GlmSharp.vec3.Cross(forward, right);
+            mat3 matrix = new mat3(right, newUp, forward);
+            quat rotation = new GlmSharp.quat(matrix);
+            return rotation;
+        }
+
     }
 }

@@ -75,6 +75,7 @@
     <Compile Include="GameComponents\AIComponent.cs" />
     <Compile Include="GameComponents\CameraComponent.cs" />
     <Compile Include="GameComponents\MeshComponent.cs" />
+    <Compile Include="GameComponents\MovementController.cs" />
     <Compile Include="GameComponents\PhysicsComponent.cs" />
     <Compile Include="GameComponents\TransformComponent.cs" />
     <Compile Include="GameObject.cs" />

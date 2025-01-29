@@ -277,8 +277,6 @@ bool Application::Init(int argc, char** argv)
 	}
 	bool result = true;
 
-	//result = loader.LoadModel(scene, GetFullPath("Sponza/models/sponza.obj", DataFolder::SCENES));
-	//result = loader.LoadModel(scene, GetFullPath("cat2/12221_Cat_v1_l3.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-idle-1.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-idle-2.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-attack-1.obj", DataFolder::SCENES));
@@ -287,6 +285,14 @@ bool Application::Init(int argc, char** argv)
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/GG-rest.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/1.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/scene-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/gg-walk-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/gg-walk-2.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-attack-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-attack-2.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-idle-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-idle-2.obj", DataFolder::SCENES));
+    result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-walk-1.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-walk-2.obj", DataFolder::SCENES));
 
 
 
@@ -500,14 +506,22 @@ void Application::Draw()
 
 		ImGui::DockSpaceOverViewport(viewport);
 		//FIXME: This is temporary solution to draw a scene
-
 		ImVec2 windowSize = ImGui::GetWindowSize();
 		ImGui::SetWindowPos(ImVec2(0, 0));
 		ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
+		ImGui::SetCursorPos(ImVec2(200, 0));
 		ImGui::Image((ImTextureID)appState.outputTexture,
+		             ImVec2(600, 370), ImVec2(0.0f, 0.0f),
+		             ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
+		             ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		ImGui::SetCursorPos(ImVec2(0, 0));
+		ImGui::Image((ImTextureID)2000,
 		             ImVec2(windowSize.x, windowSize.y), ImVec2(0.0f, 0.0f),
 		             ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
 		             ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+
+
 
 		/*SplitIdsHelper::SetSplitId("MainDockSpace", mainDockspaceId);
 
