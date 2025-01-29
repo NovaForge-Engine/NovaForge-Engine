@@ -129,7 +129,9 @@ namespace GameObjectBase
 
             obj = _holder.FindObjectById(objid);
             obj.AddComponent(new TransformComponent());
-            comp = obj.GetComponent<TransformComponent>();
+                obj.AddComponent(new PhysicsComponent());
+                obj.SetName("player");
+                comp = obj.GetComponent<TransformComponent>();
             comp.SetPosition(new GlmSharp.vec3(0, 0, -5));
 
                 objid++;
@@ -143,6 +145,7 @@ namespace GameObjectBase
 
                 obj = _holder.FindObjectById(objid);
                 obj.AddComponent(new TransformComponent());
+   
                 comp = obj.GetComponent<TransformComponent>();
                 comp.SetPosition(new GlmSharp.vec3(0, 0, 5));
 
@@ -158,6 +161,7 @@ namespace GameObjectBase
 
                 obj = _holder.FindObjectById(objid);
                 obj.AddComponent(new TransformComponent());
+
                 comp = obj.GetComponent<TransformComponent>();
                 comp.SetPosition(new GlmSharp.vec3(-5, 0, 0));
 
@@ -175,6 +179,15 @@ namespace GameObjectBase
                 obj.AddComponent(new TransformComponent());
                 comp = obj.GetComponent<TransformComponent>();
                 comp.SetPosition(new GlmSharp.vec3(0, 0, 0));
+
+
+                obj.AddComponent(new MovementController());
+
+                GameObject obj3 = _holder.FindObjectById(4);
+                TransformComponent comp3 = obj3.GetComponent<TransformComponent>();
+                MovementController component = obj.GetComponent<MovementController>();
+                component.target = comp3;
+
 
                 objid++;
 
@@ -197,8 +210,28 @@ namespace GameObjectBase
 
                 GameObject obj2 = _holder.FindObjectById(4);
                 TransformComponent comp2 = obj2.GetComponent<TransformComponent>();
-                MovementController component = obj.GetComponent<MovementController>();
-                component.target = comp2;
+                MovementController component2 = obj.GetComponent<MovementController>();
+                component2.target = comp2;
+
+                objid++;
+
+
+                //8
+
+                _holder.AddNewObject();
+                InternalCalls.GameObject_AddGameObject();
+
+                InternalCalls.GameObject_SetMeshID((ulong)objid, (int)MaterialMap.ObjectName.Cart);
+                InternalCalls.GameObject_SetMaterialID((ulong)objid, (int)MaterialMap.MaterialName.Cart);
+
+
+                obj = _holder.FindObjectById(objid);
+                obj.AddComponent(new TransformComponent());
+                comp = obj.GetComponent<TransformComponent>();
+                comp.SetPosition(new GlmSharp.vec3(0, 0, 0));
+                comp.SetScale(new GlmSharp.vec3(0.3f, 0.3f, 0.3f));
+
+
 
                 objid++;
 

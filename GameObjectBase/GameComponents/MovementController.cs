@@ -62,7 +62,7 @@ namespace GameObjectBase.GameComponents
                 comp.SetPosition(comp.Position + moveDirection * speed);
 
                 // Rotate towards the target
-                GlmSharp.quat targetRotation = MathTypes.LookAtLH(directionToMove, vec3.UnitY);
+                GlmSharp.quat targetRotation = MathTypes.LookAtLH(-directionToMove, vec3.UnitY);
                 comp.SetRotation(targetRotation);
             }
         }

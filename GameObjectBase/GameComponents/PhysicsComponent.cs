@@ -45,30 +45,41 @@ namespace GameObjectBase.GameComponents
              TransformComponent comp = gameObject.GetComponent<TransformComponent>();
             if(comp != null)
             {
+                vec3 rightVector = comp.Rotation * new vec3(1, 0, 0);
+                vec3 frontVector = comp.Rotation * new vec3(0, 0, 1);
+
+                vec3 direction = new vec3(0, 0, 0);
+
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_W))
                 {
-                    vec3 pos = comp.Position;
-                    pos -= new vec3(0, 0, 0.005f);
-                    comp.SetPosition(pos);
+
+                    direction -= frontVector * 0.005f;
+
                 }
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_S))
                 {
-                    vec3 pos = comp.Position;
-                    pos += new vec3(0, 0, 0.005f);
-                    comp.SetPosition(pos);
+                    direction += frontVector * 0.005f;
+
                 }
+                
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_A))
                 {
-                    vec3 pos = comp.Position;
-                    pos -= new vec3(0.005f, 0,0);
-                    comp.SetPosition(pos);
+                    quat rot = comp.Rotation;
+                    quat rotation = GlmSharp.quat.FromAxisAngle(glm.Radians(0.5f), new vec3(0, 1, 0));
+                    rot *= rotation;
+                    comp.SetRotation(rot);
                 }
                 if (InputManager.IsKeyDown((int)KeyboardSource.KEY_D))
                 {
-                    vec3 pos = comp.Position;
-                    pos += new vec3(0.005f, 0, 0);
-                    comp.SetPosition(pos);
+                    quat rot = comp.Rotation;
+                    quat rotation = GlmSharp.quat.FromAxisAngle(glm.Radians(-0.5f), new vec3(0, 1, 0));
+                    rot *= rotation;
+                    comp.SetRotation(rot);
                 }
+                vec3 pos = comp.Position;
+                comp.SetPosition(pos + direction);
+
+
             }
         }
     }

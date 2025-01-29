@@ -23,6 +23,18 @@ void keyboardButtonPressed(NovaEngine::InputEvent event, std::string contextName
 		case NovaEngine::KeyboardSource::KEY_D:
 			k = 68;
 			break;
+		case NovaEngine::KeyboardSource::KEY_LEFT:
+			k = 263;
+			break;
+		case NovaEngine::KeyboardSource::KEY_RIGHT:
+			k = 262;
+			break;
+		case NovaEngine::KeyboardSource::KEY_UP:
+			k = 265;
+			break;
+		case NovaEngine::KeyboardSource::KEY_DOWN:
+			k = 264;
+			break;
 		default:
 			spdlog::error("Unknown keyboard button which is not mapped inside switch, please fix it");
 			break;
@@ -52,6 +64,18 @@ void keyboardButtonReleased(NovaEngine::InputEvent event,
 			break;
 		case NovaEngine::KeyboardSource::KEY_D:
 			k = 68;
+			break;
+		case NovaEngine::KeyboardSource::KEY_LEFT:
+			k = 263;
+			break;
+		case NovaEngine::KeyboardSource::KEY_RIGHT:
+			k = 262;
+			break;
+		case NovaEngine::KeyboardSource::KEY_UP:
+			k = 265;
+			break;
+		case NovaEngine::KeyboardSource::KEY_DOWN:
+			k = 264;
 			break;
 		default:
 			spdlog::error("Unknown keyboard button which is not mapped inside "
@@ -293,6 +317,7 @@ bool Application::Init(int argc, char** argv)
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-idle-2.obj", DataFolder::SCENES));
     result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-walk-1.obj", DataFolder::SCENES));
 	result = loader.LoadModel(scene, GetFullPath("Anastasya/monster-walk-2.obj", DataFolder::SCENES));
+	result = loader.LoadModel(scene, GetFullPath("Anastasya/cart.obj", DataFolder::SCENES));
 
 
 
@@ -448,7 +473,71 @@ bool Application::Init(int argc, char** argv)
 			bind4, NovaEngine::KeyboardSource::KEY_D);
 	}
 
+	// Press keyboardButtons
+	{
+		NovaEngine::InputBinding bind("helloBind13",
+		                              NovaEngine::EventAxes::BUTTON,
+		                              NovaEngine::EventType::STARTED);
+		NovaEngine::InputBinding bind2("helloBind14",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::STARTED);
+		NovaEngine::InputBinding bind3("helloBind15",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::STARTED);
+		NovaEngine::InputBinding bind4("helloBind16",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::STARTED);
+		bind.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
+		bind2.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
+		bind3.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
+		bind4.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonPressed>});
 
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind, NovaEngine::KeyboardSource::KEY_LEFT);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind2, NovaEngine::KeyboardSource::KEY_RIGHT);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind3, NovaEngine::KeyboardSource::KEY_UP);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind4, NovaEngine::KeyboardSource::KEY_DOWN);
+	}
+
+	// Press keyboardButtons
+	{
+		NovaEngine::InputBinding bind("helloBind9",
+		                              NovaEngine::EventAxes::BUTTON,
+		                              NovaEngine::EventType::ENDED);
+		NovaEngine::InputBinding bind2("helloBind10",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::ENDED);
+		NovaEngine::InputBinding bind3("helloBind11",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::ENDED);
+		NovaEngine::InputBinding bind4("helloBind12",
+		                               NovaEngine::EventAxes::BUTTON,
+		                               NovaEngine::EventType::ENDED);
+		bind.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+		bind2.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+		bind3.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+		bind4.addSubscriber(NovaEngine::InputDelegate{
+			entt::connect_arg<&keyboardButtonReleased>});
+
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind, NovaEngine::KeyboardSource::KEY_LEFT);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind2, NovaEngine::KeyboardSource::KEY_RIGHT);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind3, NovaEngine::KeyboardSource::KEY_UP);
+		NovaEngine::InputManager::instance().getContext("Default").addBinding(
+			bind4, NovaEngine::KeyboardSource::KEY_DOWN);
+	}
 
 
 

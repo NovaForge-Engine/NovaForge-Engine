@@ -25,7 +25,8 @@ namespace GameObjectBase
             Monster_idle1,
             Monster_idle2,
             Monster_walk1,
-            Monster_walk2
+            Monster_walk2,
+            Cart
         }
         public enum MaterialName
         {
@@ -37,7 +38,8 @@ namespace GameObjectBase
            GGDamaged,
            GGHealed,
            Monster,
-           MonsterDamaged
+           MonsterDamaged,
+           Cart
 
         }
     }
