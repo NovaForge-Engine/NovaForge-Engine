@@ -42,7 +42,15 @@ namespace GameObjectBase
                     {
                         a.OnCollision(b);
                         if (b != null) b.OnCollision(a);
-                        Console.WriteLine($"Collision detected: {a.parent.Name} <-> {b.parent.Name}");
+
+                        if(a.parent.Name == "player" && b.parent.Name == "monster")
+                        {
+
+                            MovementController movementController = b.parent.GetComponent<MovementController>();
+                            movementController.Respawn();
+                        }
+
+                        //Console.WriteLine($"Collision detected: {a.parent.Name} <-> {b.parent.Name}");
                     }
                 }
             }

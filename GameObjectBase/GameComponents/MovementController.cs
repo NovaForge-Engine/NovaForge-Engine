@@ -12,7 +12,7 @@ namespace GameObjectBase.GameComponents
     internal class MovementController : Component
     {
         public TransformComponent target;
-        float speed = 0.001f;
+        float speed = 0.0025f;
         public override void FixedUpdate()
         {
            
@@ -65,6 +65,17 @@ namespace GameObjectBase.GameComponents
                 GlmSharp.quat targetRotation = MathTypes.LookAtLH(-directionToMove, vec3.UnitY);
                 comp.SetRotation(targetRotation);
             }
+             
         }
+
+        public void Respawn()
+        {
+            Console.WriteLine("Respawn");
+            var rand = new Random();
+            TransformComponent comp = parent.GetComponent<TransformComponent>();
+            comp.SetPosition(new vec3(rand.Next(-20,20),0,rand.Next(-20,20)));
+
+        }
+
     }
 }

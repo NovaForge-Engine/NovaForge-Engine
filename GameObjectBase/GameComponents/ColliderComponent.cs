@@ -45,27 +45,27 @@ namespace GameObjectBase.GameComponents
 
         public override void Start()
         {
-            Console.WriteLine("Collider Start");
+
             Root.CollisionManager.RegisterCollider(this);
             UpdateBounds();
         }
 
         public override void Update()
         {
-            Console.WriteLine("Collider Update");
+
             UpdateBounds();
         }
 
         private void UpdateBounds()
         {
-            Console.WriteLine("Collider UpdateBounds");
+            
             Center = MathTypes.ToCSharp(parent.GetComponent<TransformComponent>().Position);
             Rotation = MathTypes.ToCSharp(parent.GetComponent<TransformComponent>().Rotation);
         }
 
         public bool Intersects(ColliderComponent other)
         {
-            Console.WriteLine("Collider Intersects");
+
             return OBBIntersection(this, other);
         }
 

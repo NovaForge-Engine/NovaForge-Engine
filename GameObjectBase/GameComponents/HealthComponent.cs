@@ -1,5 +1,6 @@
 ﻿using GameObjectsBase;
 using GlmSharp;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,8 +11,9 @@ using System.Threading.Tasks;
 namespace GameObjectBase.GameComponents {
     
     internal class HealthComponent : Component {
-        float maxHealth = 100.f;
+        static float maxHealth = 100.0f;
         float health = maxHealth;
+        private bool flag = false;
         public override void FixedUpdate() {
 		// None
         }
@@ -28,8 +30,24 @@ namespace GameObjectBase.GameComponents {
 		// None
         }
 
-        public override void Start() {
-        // None
+        public override void Start()
+        {
+            var collider = parent.GetComponent<ColliderComponent>();
+            if (collider != null)
+            {
+                collider.OnCollisionEvent += OnCollision;
+            }
+        }
+
+        private void OnCollision(ColliderComponent col)
+        {
+            if (col.parent.Name != "monster" || flag) return;
+            flag = true;
+            Damage(0.001f);
+            MovementController movementController = col.parent.GetComponent<MovementController>();
+            movementController.Respawn();
+            flag = false;
+            //some code
         }
 
         public override void Update() {
@@ -43,10 +61,12 @@ namespace GameObjectBase.GameComponents {
         }
 
         public void Damage(float damage) {
+            Console.WriteLine("Health: " + health);
             health -= damage;
             if (health <= 0) { 
                 health = 0;
-                GameManager.EndGame(); // TODO: link to the actual function
+                InternalCalls.Close();
+                //GameManager.EndGame(); // TODO: link to the actual function
             }
         }
 

@@ -22,6 +22,7 @@ static void GameObject_SetMaterialID(int id, int mat_id);
 static void GameObject_SetMeshID(int id, int mesh_id);
 static void GameObject_AddGameObject();
 static void GameObject_RemoveGameObject(int target_id);
+static void Close();
 
 class ScriptEngine
 {
@@ -39,9 +40,14 @@ public:
 	void processMousePos(glm::vec2 pos);
 
 	GameScene* scene;
+	bool close() { return shouldClose; };
+
+	bool shouldClose = false;
 
 private:
 	static ScriptEngine* instance;
+
+	
 
 	void InitMono();
 	void ShutdownMono();

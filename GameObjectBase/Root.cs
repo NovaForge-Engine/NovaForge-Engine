@@ -64,19 +64,15 @@ namespace GameObjectBase
         {
             //Console.WriteLine("C# Root Gui Start!");
            // Console.WriteLine();
-            ImGui.Begin("Hello, World!");
-            ImGui.Text("Hello imgui from c#.");
-            ImGui.End();
 
             //ImGui.SliderInt("X in c#", ref x, 0, 100);
            //Console.WriteLine("this is x in c#  " + x);
 
-            ImGui.Begin("Hello, World!");
-            ImGui.Text("This is some useful text2.");
+            ImGui.Begin("Welcome, ITMO!");
+            ImGui.Text("This is test game using this engine.");
+            
 
-
-
-            if (ImGui.Button("button"))
+            if (ImGui.Button("Start"))
             {
                 int objid = 1;
                 //0
@@ -146,7 +142,7 @@ namespace GameObjectBase
                 obj.AddComponent(new TransformComponent());
    
                 comp = obj.GetComponent<TransformComponent>();
-                comp.SetPosition(new GlmSharp.vec3(0, 0, 5));
+                comp.SetPosition(new GlmSharp.vec3(0, 0, 1));
 
                 objid++;
                 Console.WriteLine(objid);
@@ -162,7 +158,7 @@ namespace GameObjectBase
                 obj.AddComponent(new TransformComponent());
 
                 comp = obj.GetComponent<TransformComponent>();
-                comp.SetPosition(new GlmSharp.vec3(-5, 0, 0));
+                comp.SetPosition(new GlmSharp.vec3(-1, 0, 0));
 
                 objid++;
                 //6
@@ -175,9 +171,12 @@ namespace GameObjectBase
 
 
                 obj = _holder.FindObjectById(objid);
+                obj.SetName("monster");
                 obj.AddComponent(new TransformComponent());
+                obj.AddComponent(new ColliderComponent(new Vector3(1f, 1f, 2f)));
                 comp = obj.GetComponent<TransformComponent>();
                 comp.SetPosition(new GlmSharp.vec3(0, 0, 0));
+
 
 
                 obj.AddComponent(new MovementController());
@@ -186,6 +185,7 @@ namespace GameObjectBase
                 TransformComponent comp3 = obj3.GetComponent<TransformComponent>();
                 MovementController component = obj.GetComponent<MovementController>();
                 component.target = comp3;
+                component.Respawn();
 
 
                 objid++;
@@ -200,6 +200,7 @@ namespace GameObjectBase
 
 
                 obj = _holder.FindObjectById(objid);
+                obj.SetName("monster");
                 obj.AddComponent(new TransformComponent());
                 comp = obj.GetComponent<TransformComponent>();
                 comp.SetPosition(new GlmSharp.vec3(3, 0, 0));
@@ -211,8 +212,10 @@ namespace GameObjectBase
                 TransformComponent comp2 = obj2.GetComponent<TransformComponent>();
                 MovementController component2 = obj.GetComponent<MovementController>();
                 component2.target = comp2;
+                component2.Respawn();
 
-                obj.AddComponent(new ColliderComponent(new Vector3(1f)));
+
+                obj.AddComponent(new ColliderComponent(new Vector3(1f,1f,2f)));
 
                 objid++;
 
@@ -230,21 +233,32 @@ namespace GameObjectBase
                 obj.AddComponent(new TransformComponent());
                 comp = obj.GetComponent<TransformComponent>();
                 comp.SetPosition(new GlmSharp.vec3(0, 0, 0));
-                comp.SetScale(new GlmSharp.vec3(0.3f, 0.3f, 0.3f));
+                comp.SetScale(new GlmSharp.vec3(0.15f, 0.15f, 0.15f));
+                obj.AddComponent(new ColliderComponent(new Vector3(4f, 4f, 6f)));
+                obj.AddComponent(new HealthComponent());
+
+
+                GameObject sobaka = _holder.FindObjectById(7);
+                MovementController sobakaComp = sobaka.GetComponent<MovementController>();
+                
+                sobakaComp.target = comp;
+
+                sobaka = _holder.FindObjectById(8);
+                sobakaComp = sobaka.GetComponent<MovementController>();
+
+                sobakaComp.target = comp;
+
 
 
 
                 objid++;
 
             }
-            ImGui.Image((IntPtr)1000, new SharpDX.Vector2(100, 100));
-
-            ImGui.Image((IntPtr)2000, new SharpDX.Vector2(100, 100));
 
             ImGui.End();
 
-            _view.Render();
-            _fieldInspector.Render(_view.SelectedObject);
+            //_view.Render();
+            //_fieldInspector.Render(_view.SelectedObject);
 
             // Console.WriteLine("C# Root Gui End!");
             _holder.Start();

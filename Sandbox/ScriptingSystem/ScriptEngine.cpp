@@ -163,6 +163,8 @@ void ScriptEngine::InitMono()
 		"GameObjectBase.InternalCalls::GameObject_RemoveGameObject",
 		GameObject_RemoveGameObject);
 
+	mono_add_internal_call("GameObjectBase.InternalCalls::Close", Close);
+
 }
 
 
@@ -247,4 +249,12 @@ void GameObject_RemoveGameObject(int target_id)
 {
 	GameScene* scene = GameScene::Get();
 	scene->RemoveObject(target_id);
+}
+
+
+
+void Close()
+{
+	ScriptEngine* engine = ScriptEngine::Get();
+	engine->shouldClose = true;
 }

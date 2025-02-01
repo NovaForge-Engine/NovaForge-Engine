@@ -43,7 +43,7 @@
 constexpr uint32_t DYNAMIC_CONSTANT_BUFFER_SIZE = 1024 * 1024; // 1MB
 constexpr bool D3D11_COMMANDBUFFER_EMULATION = false;
 constexpr uint32_t DEFAULT_MEMORY_ALIGNMENT = 16;
-
+static bool externalClose = false;
 static int windowWidth, windowHeight;
 
 class Application

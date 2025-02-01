@@ -26,5 +26,8 @@ namespace GameObjectBase
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static bool GameObject_RemoveGameObject(ulong entityID);
 
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static bool Close();
+
     }
 }

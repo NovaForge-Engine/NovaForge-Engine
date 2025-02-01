@@ -563,6 +563,8 @@ void Application::Update()
 	    window->m_RenderWindowHeight != windowHeight)
 		ResizeSwapChain(windowWidth, windowHeight);
 
+	if (scriptEngine->shouldClose)
+		shouldClose = false;
 	//(@Tenzy21) Note: Updating physics at the end of the frame. Everything else
 	//is updating above
 	physicsEngine->Update();
