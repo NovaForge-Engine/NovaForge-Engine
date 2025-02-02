@@ -44,8 +44,6 @@ namespace GameObjectBase
 
         public static void Update()
         {
-
-           // Console.WriteLine("C# Root Update!");
             _holder.Update();
             _collisionManager.Update();
         }
@@ -253,6 +251,8 @@ namespace GameObjectBase
 
                 objid++;
 
+                _holder.Start();
+
             }
 
             ImGui.End();
@@ -261,7 +261,7 @@ namespace GameObjectBase
             //_fieldInspector.Render(_view.SelectedObject);
 
             // Console.WriteLine("C# Root Gui End!");
-            _holder.Start();
+            
         }
 
 

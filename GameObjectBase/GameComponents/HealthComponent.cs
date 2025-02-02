@@ -31,7 +31,7 @@ namespace GameObjectBase.GameComponents {
         }
 
         public override void Start()
-        {
+        {         
             var collider = parent.GetComponent<ColliderComponent>();
             if (collider != null)
             {
@@ -41,13 +41,11 @@ namespace GameObjectBase.GameComponents {
 
         private void OnCollision(ColliderComponent col)
         {
-            if (col.parent.Name != "monster" || flag) return;
-            flag = true;
+            if (col.parent.Name != "monster") return;
+
             Damage(0.001f);
             MovementController movementController = col.parent.GetComponent<MovementController>();
             movementController.Respawn();
-            flag = false;
-            //some code
         }
 
         public override void Update() {
@@ -66,7 +64,6 @@ namespace GameObjectBase.GameComponents {
             if (health <= 0) { 
                 health = 0;
                 InternalCalls.Close();
-                //GameManager.EndGame(); // TODO: link to the actual function
             }
         }
 

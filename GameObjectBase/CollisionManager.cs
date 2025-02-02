@@ -37,20 +37,18 @@ namespace GameObjectBase
                 {
                     ColliderComponent a = colliders[i];
                     ColliderComponent b = colliders[j];
-
+                   
                     if (a.Intersects(b))
                     {
                         a.OnCollision(b);
-                        if (b != null) b.OnCollision(a);
+                        b?.OnCollision(a);
 
                         if(a.parent.Name == "player" && b.parent.Name == "monster")
                         {
-
                             MovementController movementController = b.parent.GetComponent<MovementController>();
                             movementController.Respawn();
+ 
                         }
-
-                        //Console.WriteLine($"Collision detected: {a.parent.Name} <-> {b.parent.Name}");
                     }
                 }
             }

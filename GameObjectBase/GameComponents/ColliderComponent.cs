@@ -52,7 +52,6 @@ namespace GameObjectBase.GameComponents
 
         public override void Update()
         {
-
             UpdateBounds();
         }
 
@@ -159,6 +158,7 @@ namespace GameObjectBase.GameComponents
         public void OnCollision(ColliderComponent col)
         {
             OnCollisionEvent?.Invoke(col);
+            Update();
         }
     }
 }
